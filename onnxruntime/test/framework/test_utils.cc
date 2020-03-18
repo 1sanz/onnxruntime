@@ -43,6 +43,15 @@ IExecutionProvider* TestNnapiExecutionProvider() {
 }
 #endif
 
+#ifdef USE_PLAIDML
+IExecutionProvider* TestPlaidMLExecutionProvider() {
+  static PlaidMLExecutionProviderInfo info;
+  static PlaidMLExecutionProvider plaidml_provider(info);
+  return &plaidml_provider;
+}
+#endif
+
+
 static void CountOpsInGraphImpl(const Graph& graph, std::map<std::string, int>& ops) {
   for (auto& node : graph.Nodes()) {
     auto pos = ops.find(node.OpType());

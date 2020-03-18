@@ -494,6 +494,7 @@ if (onnxruntime_USE_ACL)
 endif()
 
 if (onnxruntime_USE_PLAIDML)
+  add_definitions(-DUSE_PLAIDML=1)
   file(GLOB_RECURSE onnxruntime_providers_plaidml_cc_srcs CONFIGURE_DEPENDS
     "${ONNXRUNTIME_ROOT}/core/providers/plaidml/*.h"
     "${ONNXRUNTIME_ROOT}/core/providers/plaidml/*.cc"
