@@ -81,6 +81,7 @@ set(onnxruntime_pybind11_state_libs
     ${PROVIDERS_NUPHAR}
     ${PROVIDERS_NNAPI}
     ${PROVIDERS_DML}
+    ${PROVIDERS_PLAIDML}
     onnxruntime_optimizer
     onnxruntime_providers
     onnxruntime_util

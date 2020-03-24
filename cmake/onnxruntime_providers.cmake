@@ -77,6 +77,10 @@ if(onnxruntime_USE_ACL)
   set(PROVIDERS_ACL onnxruntime_providers_acl)
   list(APPEND ONNXRUNTIME_PROVIDER_NAMES acl)
 endif()
+if(onnxruntime_USE_PLAIDML)
+  set(PROVIDERS_PLAIDML onnxruntime_providers_plaidml)
+  list(APPEND ONNXRUNTIME_PROVIDER_NAMES plaidml)
+endif()
 source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_common_srcs} ${onnxruntime_providers_srcs})
 
 set(onnxruntime_providers_src ${onnxruntime_providers_common_srcs} ${onnxruntime_providers_srcs})
@@ -487,6 +491,31 @@ if (onnxruntime_USE_ACL)
   target_include_directories(onnxruntime_providers_acl PRIVATE ${ONNXRUNTIME_ROOT} ${eigen_INCLUDE_DIRS} ${ACL_INCLUDE_DIR})
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/../include/onnxruntime/core/providers/acl  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/onnxruntime/core/providers)
   set_target_properties(onnxruntime_providers_acl PROPERTIES LINKER_LANGUAGE CXX)
+endif()
+
+if (onnxruntime_USE_PLAIDML)
+  add_definitions(-DUSE_PLAIDML=1)
+  file(GLOB_RECURSE onnxruntime_providers_plaidml_cc_srcs CONFIGURE_DEPENDS
+    "${ONNXRUNTIME_ROOT}/core/providers/plaidml/*.h"
+    "${ONNXRUNTIME_ROOT}/core/providers/plaidml/*.cc"
+  )
+
+  source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_plaidml_cc_srcs})
+  add_library(onnxruntime_providers_plaidml ${onnxruntime_providers_plaidml_cc_srcs})
+  onnxruntime_add_include_to_target(onnxruntime_providers_plaidml onnxruntime_common onnxruntime_framework onnx onnx_proto protobuf::libprotobuf)
+  # TODO: Verify add_dependencies as follows is right
+  add_dependencies(onnxruntime_providers_plaidml ${onnxruntime_EXTERNAL_DEPENDENCIES})
+
+  set_target_properties(onnxruntime_providers_plaidml PROPERTIES FOLDER "ONNXRuntime")
+  set_target_properties(onnxruntime_providers_plaidml PROPERTIES LINKER_LANGUAGE CXX)
+
+  # TODO: This is a HACK to just get something running. It requires a mac and setting some awkward temporary environment variables
+  # To make the hack work: Make sure the temp env vars are set. First to root of PlaidML source;
+  #       second to library location (which should be something your mac can find eg ~/lib)
+  target_include_directories(onnxruntime_providers_plaidml PRIVATE $ENV{TODO_TEMP_PLAIDML_DIR})
+  target_link_libraries(onnxruntime_providers_plaidml PRIVATE $ENV{TODO_TEMP_PLAIDML_LIB_DIR}/libplaidml.dylib)
+
+
 endif()
 
 if (onnxruntime_ENABLE_MICROSOFT_INTERNAL)

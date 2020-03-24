@@ -17,6 +17,7 @@ std::shared_ptr<IExecutionProviderFactory> CreateExecutionProviderFactory_Nnapi(
 std::shared_ptr<IExecutionProviderFactory> CreateExecutionProviderFactory_Tensorrt(int device_id);
 std::shared_ptr<IExecutionProviderFactory> CreateExecutionProviderFactory_OpenVINO(const char* device_id);
 std::shared_ptr<IExecutionProviderFactory> CreateExecutionProviderFactory_ACL(int use_arena);
+std::shared_ptr<IExecutionProviderFactory> CreateExecutionProviderFactory_PlaidML();
 
 namespace test {
 
@@ -87,6 +88,14 @@ std::unique_ptr<IExecutionProvider> DefaultAclExecutionProvider(bool enable_aren
   return CreateExecutionProviderFactory_ACL(enable_arena)->CreateProvider();
 #else
   ORT_UNUSED_PARAMETER(enable_arena);
+  return nullptr;
+#endif
+}
+
+std::unique_ptr<IExecutionProvider> DefaultPlaidMLExecutionProvider() {
+#ifdef USE_PLAIDML
+  return CreateExecutionProviderFactory_PlaidML()->CreateProvider();
+#else
   return nullptr;
 #endif
 }

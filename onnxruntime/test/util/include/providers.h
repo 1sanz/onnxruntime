@@ -31,3 +31,6 @@
 #ifdef USE_ACL
 #include "core/providers/acl/acl_provider_factory.h"
 #endif
+#ifdef USE_PLAIDML
+#include "core/providers/plaidml/plaidml_provider_factory.h"
+#endif
