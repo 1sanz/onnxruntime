@@ -5,6 +5,7 @@
 
 #include "plaidml/edsl/edsl.h"
 #include "plaidml/exec/exec.h"
+#include "plaidml/op/op.h"
 
 #include "core/framework/allocatormgr.h"
 #include "core/framework/compute_capability.h"
@@ -19,11 +20,14 @@ namespace onnxruntime {
 
 PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
   PlaidMLProgram ret;
+
   std::map<std::string, plaidml::edsl::Tensor> tensors;
   // TODO: We might instead implement this on an ONNX ModelProto instead of an ONNX RT Node.
   //     This might have benefits for reuse in a non-RT ONNX context?
 
   // TODO: In general, inputs are a mix of initializers and input data; this currently assumes they're all the latter
+
+  // TODO: work out if deprecated op is being used and handle it
 
   // For each input, look up shape (or at least rank) and construct a (placeholder) tensor accordingly;
   // add this to the `tensors` dict
@@ -177,7 +181,10 @@ common::Status PlaidMLExecutionProvider::Compile(
             void* input_data = const_cast<void*>(ort.GetTensorData<void>(input_value));
             binder.input(input_placeholder).copy_from(input_data);
           }
-
+          plaidml::init();
+          plaidml::edsl::init();
+          plaidml::op::init();
+          plaidml::exec::init();
           executable->run();
 
           // Write output data

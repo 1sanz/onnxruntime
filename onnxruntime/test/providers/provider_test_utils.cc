@@ -696,6 +696,7 @@ void OpTester::Run(
         kOpenVINOExecutionProvider,
         kDmlExecutionProvider,
         kAclExecutionProvider,
+        //kPlaidMLExecutionProvider,
     };
 
     bool has_run = false;
@@ -761,6 +762,8 @@ void OpTester::Run(
           execution_provider = DefaultNnapiExecutionProvider();
         else if (provider_type == onnxruntime::kAclExecutionProvider)
           execution_provider = DefaultAclExecutionProvider();
+        //else if (provider_type == onnxruntime::kPlaidMLExecutionProvider)
+        //  execution_provider = DefaultPlaidMLExecutionProvider();
         // skip if execution provider is disabled
         if (execution_provider == nullptr)
           continue;
