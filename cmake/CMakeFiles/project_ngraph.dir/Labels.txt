@@ -1,0 +1,13 @@
+# Target labels
+ project_ngraph
+# Source files and their labels
+/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/project_ngraph
+/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/project_ngraph.rule
+/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/project_ngraph-complete.rule
+/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/ngraph/src/project_ngraph-stamp/project_ngraph-install.rule
+/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/ngraph/src/project_ngraph-stamp/project_ngraph-mkdir.rule
+/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/ngraph/src/project_ngraph-stamp/project_ngraph-download.rule
+/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/ngraph/src/project_ngraph-stamp/project_ngraph-update.rule
+/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/ngraph/src/project_ngraph-stamp/project_ngraph-patch.rule
+/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/ngraph/src/project_ngraph-stamp/project_ngraph-configure.rule
+/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/ngraph/src/project_ngraph-stamp/project_ngraph-build.rule

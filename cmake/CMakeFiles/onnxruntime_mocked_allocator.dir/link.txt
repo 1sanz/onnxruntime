@@ -1,0 +1,2 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libonnxruntime_mocked_allocator.a  CMakeFiles/onnxruntime_mocked_allocator.dir/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/onnxruntime/test/util/test_allocator.cc.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libonnxruntime_mocked_allocator.a

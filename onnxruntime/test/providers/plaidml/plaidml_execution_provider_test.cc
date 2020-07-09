@@ -143,49 +143,35 @@ TEST(PlaidMLExecutionProviderTest, ClipTest)
   RunTest("testdata/plaidml/clip.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
 }
 
-// TODO: fix -> use keras bridge conv style
-// TEST(PlaidMLExecutionProviderTest, ConvTest)
-// {
-//   NameMLValMap feeds;
+// TODO: fix -> in plaidml  "Invalid enumeration value"
+//onnx nchw plaidml nhwc (default)
+TEST(PlaidMLExecutionProviderTest, ConvTest)
+{
+  NameMLValMap feeds;
 
-//   add_feeds(feeds, "I", {1,1,5,5}, {0., 1., 2., 3., 4.,5.,
-//                          6., 7., 8., 9.,10., 
-//                          11., 12., 13., 14.,15., 
-//                          16., 17., 18., 19.,20., 
-//                          21., 22., 23., 24.});
+  add_feeds(feeds, "x", {1,1,5,5}, {0., 1., 2., 3., 4.,5.,
+                         6., 7., 8., 9.,10., 
+                         11., 12., 13., 14.,15., 
+                         16., 17., 18., 19.,20., 
+                         21., 22., 23., 24.});
 
-//     add_feeds(feeds, "K", {1,1,5,5}, {1., 1., 1.,
-//                                       1., 1., 1.,
-//                                       1., 1., 1.});
+    add_feeds(feeds, "w", {1,1,3,3}, {1., 1., 1.,
+                                      1., 1., 1.,
+                                      1., 1., 1.});
 
 
-//   std::vector<std::vector<float>> expected_values = {
-//       {12., 21., 27., 33., 24.,
-//        33., 54., 63., 72., 51.,
-//        63., 99., 108., 117., 81.,
-//        93., 144., 153., 162., 111.,
-//        72., 111., 117., 123., 84.}};
+  std::vector<std::vector<float>> expected_values = {
+      {12., 21., 27., 33., 24.,
+       33., 54., 63., 72., 51.,
+       63., 99., 108., 117., 81.,
+       93., 144., 153., 162., 111.,
+       72., 111., 117., 123., 84.}};
 
-//   std::vector<std::vector<int64_t>> expected_shapes = {
-//       {4}};
+  std::vector<std::vector<int64_t>> expected_shapes = {
+      {1,1,5,5}};
 
-//   RunTest("testdata/plaidml/conv.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
-// }
-
-// TEST(PlaidMLExecutionProviderTest, TanTest)
-// {
-//   NameMLValMap feeds;
-
-//   add_feeds(feeds, "A", {4}, {0.0f, 90.0f, 180.0f, 270.0f});
-
-//   std::vector<std::vector<float>> expected_values = {
-//       {1.0f, 0.0f, 0.0f, 5.0f}};
-
-//   std::vector<std::vector<int64_t>> expected_shapes = {
-//       {4}};
-
-//   RunTest("testdata/plaidml/tan.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
-// }
+  RunTest("testdata/plaidml/conv.onnx", feeds, {"y"}, expected_shapes, expected_values, GetEnvironment());
+}
 
 TEST(PlaidMLExecutionProviderTest, CosTest)
 {
@@ -202,6 +188,7 @@ TEST(PlaidMLExecutionProviderTest, CosTest)
   RunTest("testdata/plaidml/cos.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
 }
 
+// TODO: values match but not accepted 
 // TEST(PlaidMLExecutionProviderTest, CoshTest)
 // {
 //   NameMLValMap feeds;
@@ -209,7 +196,7 @@ TEST(PlaidMLExecutionProviderTest, CosTest)
 //   add_feeds(feeds, "A", {4}, {-4.5f, -2.2f, 3.7f, 4.1f});
 
 //   std::vector<std::vector<float>> expected_values = {
-//       {-4.0f, -2.0f, 4.0f, 5.0f}};
+//       {45.0141, 4.56791, 20.236, 30.1784}};
 
 //   std::vector<std::vector<int64_t>> expected_shapes = {
 //       {4}};
@@ -263,6 +250,69 @@ TEST(PlaidMLExecutionProviderTest, ExpTest)
   RunTest("testdata/plaidml/exp.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
 }
 
+TEST(PlaidMLExecutionProviderTest, FloorTest)
+{
+  NameMLValMap feeds;
+
+  add_feeds(feeds, "A", {4}, {-1.5 ,  0.4, 0.5, 2.3});
+
+  std::vector<std::vector<float>> expected_values = {
+      {-2.,  0.,  0.,  2.}};
+
+  std::vector<std::vector<int64_t>> expected_shapes = {
+      {4}};
+
+  RunTest("testdata/plaidml/floor.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
+}
+
+TEST(PlaidMLExecutionProviderTest, FlattenTest)
+{
+  NameMLValMap feeds;
+
+  add_feeds(feeds, "A", {5,4,3}, {0.43511736, 0.684851  , 0.7479755,
+                                  0.7615042 , 0.64659685, 0.2486658,
+                                  0.65377426, 0.9870222 , 0.70429796,
+                                  0.42194828, 0.84952426, 0.71247995,
+                                  0.13712448, 0.50205755, 0.0216208,
+                                  0.9232303 , 0.7301768 , 0.77392966,
+                                  0.12261592, 0.6070028 , 0.41062224,
+                                  0.56569165, 0.4989046 , 0.24323109,
+                                  0.817748  , 0.28690833, 0.22093466,
+                                  0.6299816 , 0.38470078, 0.63924766,
+                                  0.3930874 , 0.82013094, 0.7363478,
+                                  0.43261915, 0.35227805, 0.08362589,
+                                  0.19125114, 0.47730285, 0.49478233,
+                                  0.8514512 , 0.28996357, 0.62918735,
+                                  0.29403505, 0.5220902 , 0.24513079,
+                                  0.60193336, 0.9612385 , 0.36742613,
+                                  0.98025334, 0.3123538 , 0.34941122,
+                                  0.29762167, 0.24541792, 0.8721895,
+                                  0.2395823 , 0.32739183, 0.37540108,
+                                  0.42139563, 0.75938505, 0.48045367 });
+
+  std::vector<std::vector<float>> expected_values = {
+      {0.43511736, 0.684851  , 0.7479755 , 0.7615042 , 0.64659685,
+        0.2486658 , 0.65377426, 0.9870222 , 0.70429796, 0.42194828,
+        0.84952426, 0.71247995,
+       0.13712448, 0.50205755, 0.0216208 , 0.9232303 , 0.7301768 ,
+        0.77392966, 0.12261592, 0.6070028 , 0.41062224, 0.56569165,
+        0.4989046 , 0.24323109,
+       0.817748  , 0.28690833, 0.22093466, 0.6299816 , 0.38470078,
+        0.63924766, 0.3930874 , 0.82013094, 0.7363478 , 0.43261915,
+        0.35227805, 0.08362589,
+       0.19125114, 0.47730285, 0.49478233, 0.8514512 , 0.28996357,
+        0.62918735, 0.29403505, 0.5220902 , 0.24513079, 0.60193336,
+        0.9612385 , 0.36742613,
+       0.98025334, 0.3123538 , 0.34941122, 0.29762167, 0.24541792,
+        0.8721895 , 0.2395823 , 0.32739183, 0.37540108, 0.42139563,
+        0.75938505, 0.48045367}};
+
+  std::vector<std::vector<int64_t>> expected_shapes = {
+      {5,12}};
+
+  RunTest("testdata/plaidml/flatten.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
+}
+
 // TODO: need to handle bool tensor type -> add a template 
 // TEST(PlaidMLExecutionProviderTest, LessTest)
 // {
@@ -293,6 +343,29 @@ TEST(PlaidMLExecutionProviderTest, LogTest)
 
   RunTest("testdata/plaidml/log.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
 }
+// matching values not accepted 
+// TEST(PlaidMLExecutionProviderTest, MatMulTest)
+// {
+//   NameMLValMap feeds;
+//   // TODO: fix dimension mismatch issue
+//   add_feeds(feeds, "A", {3,4}, {-0.9919076 , -0.14901264, -0.59774035,  0.6674725,
+//                                   1.0593789 , -1.5417196 , -0.97480005,  0.02791898,
+//                                   1.0556105 , -0.3583958 ,  0.39082012,  0.8940921 });
+//   add_feeds(feeds, "B", {4,3}, {0.9037312 , -0.09459062,  0.31371272,
+//                                   -0.5577994 , -0.91824627, -0.5219324,
+//                                   0.12406149,  0.9651308 , -0.3065415,
+//                                   0.19474697, -0.8462181 , -2.3100126});
+
+//   std::vector<std::vector<float>> expected_values = {
+//       {-0.75746703, -0.91107, -1.59204,
+//        1.7018659 ,  0.35103583,  1.3713375,
+//        1.3765087 , -0.15015958, -1.6669497}};
+
+//   std::vector<std::vector<int64_t>> expected_shapes = {
+//       {3,3}};
+
+//   RunTest("testdata/plaidml/matmul.onnx", feeds, {"Z"}, expected_shapes, expected_values, GetEnvironment());
+// }
 
 TEST(PlaidMLExecutionProviderTest, MulTest)
 {
@@ -362,14 +435,15 @@ TEST(PlaidMLExecutionProviderTest, SigmoidTest)
   RunTest("testdata/plaidml/sigmoid.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
 }
 
+// values match but not accepted
 // TEST(PlaidMLExecutionProviderTest, SinTest)
 // {
 //   NameMLValMap feeds;
 
-//   add_feeds(feeds, "A", {4}, {-4.5f, -2.2f, 3.7f, 4.1f});
+//   add_feeds(feeds, "A", {4}, {-1.0, 3.14, 0.0, 0.5});
 
 //   std::vector<std::vector<float>> expected_values = {
-//       {-4.0f, -2.0f, 4.0f, 5.0f}};
+//       {-0.84147098,  0.00159265,  0.0,  0.47942554}};
 
 //   std::vector<std::vector<int64_t>> expected_shapes = {
 //       {4}};
@@ -377,7 +451,7 @@ TEST(PlaidMLExecutionProviderTest, SigmoidTest)
 //   RunTest("testdata/plaidml/sin.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
 // }
 
-// TODO: fix in plaidml required  (conversion to the LLVM IR dialect failed)
+// TODO: values match but not accepted
 // TEST(PlaidMLExecutionProviderTest, SinhTest)
 // {
 //   NameMLValMap feeds;
@@ -385,7 +459,7 @@ TEST(PlaidMLExecutionProviderTest, SigmoidTest)
 //   add_feeds(feeds, "A", {4}, {-4.5f, -2.2f, 3.7f, 4.1f});
 
 //   std::vector<std::vector<float>> expected_values = {
-//       {-4.0f, -2.0f, 4.0f, 5.0f}};
+//       {-45.003f, -4.45711f, 20.2113f, 30.1619f}};
 
 //   std::vector<std::vector<int64_t>> expected_shapes = {
 //       {4}};
@@ -393,21 +467,21 @@ TEST(PlaidMLExecutionProviderTest, SigmoidTest)
 //   RunTest("testdata/plaidml/sinh.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
 // }
 
-// TODO: fix ShapeInferenceError
-// TEST(PlaidMLExecutionProviderTest, SoftmaxTest)
-// {
-//   NameMLValMap feeds;
 
-//   add_feeds(feeds, "A", {4}, {2.0f, 2.0f, 3.0f, 4.0f});
+TEST(PlaidMLExecutionProviderTest, SoftmaxTest)
+{
+  NameMLValMap feeds;
 
-//   std::vector<std::vector<float>> expected_values = {
-//       {0.7310586 , 0.880797  , 0.95257413, 0.98201376 }};
+  add_feeds(feeds, "A", {1,3}, {-1.0f,  0.0f,  1.0f});
 
-//   std::vector<std::vector<int64_t>> expected_shapes = {
-//       {4}};
+  std::vector<std::vector<float>> expected_values = {
+      {0.09003057, 0.24472847, 0.66524096 }};
 
-//    RunTest("testdata/plaidml/softmax.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
-// }
+  std::vector<std::vector<int64_t>> expected_shapes = {
+      {1,3}};
+
+   RunTest("testdata/plaidml/softmax.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
+}
 
 TEST(PlaidMLExecutionProviderTest, SqrtTest)
 {
@@ -437,6 +511,53 @@ TEST(PlaidMLExecutionProviderTest, SubTest)
       {4}};
 
   RunTest("testdata/plaidml/sub.onnx", feeds, {"Z"}, expected_shapes, expected_values, GetEnvironment());
+}
+
+// fix values 
+// TEST(PlaidMLExecutionProviderTest, TanTest)
+// {
+//   NameMLValMap feeds;
+
+//   add_feeds(feeds, "A", {4}, {0.0f, 90.0f, 180.0f, 270.0f});
+
+//   std::vector<std::vector<float>> expected_values = {
+//       {1.0f, 0.0f, 0.0f, 5.0f}};
+
+//   std::vector<std::vector<int64_t>> expected_shapes = {
+//       {4}};
+
+//   RunTest("testdata/plaidml/tan.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
+// }
+
+TEST(PlaidMLExecutionProviderTest, TransposeTest)
+{
+  NameMLValMap feeds;
+  //TODO: remove hardcoded values add expected value computation 
+  add_feeds(feeds, "A", {2,3,4}, {0.20217323, 0.7418437 , 0.8095215 , 0.78543824,
+                                  0.8493133 , 0.54738104, 0.5216761 , 0.5134987 ,
+                                  0.8872334 , 0.8586917 , 0.64419013, 0.17729734,
+                                  0.81542754, 0.14297868, 0.42068878, 0.96306694,
+                                  0.9126632 , 0.11507355, 0.8961067 , 0.90747726,
+                                  0.54890287, 0.03705996, 0.56190175, 0.8113009 });
+
+  std::vector<std::vector<float>> expected_values = {
+      {0.20217323, 0.81542754,
+        0.8493133 , 0.9126632,
+        0.8872334 , 0.54890287,
+        0.7418437 , 0.14297868,
+        0.54738104, 0.11507355,
+        0.8586917 , 0.03705996,
+        0.8095215 , 0.42068878,
+        0.5216761 , 0.8961067,
+        0.64419013, 0.56190175,
+        0.78543824, 0.96306694,
+        0.5134987 , 0.90747726,
+        0.17729734, 0.8113009}};
+
+  std::vector<std::vector<int64_t>> expected_shapes = {
+      {4,3,2}};
+
+  RunTest("testdata/plaidml/transpose.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
 }
 }  // namespace test
 }  // namespace onnxruntime

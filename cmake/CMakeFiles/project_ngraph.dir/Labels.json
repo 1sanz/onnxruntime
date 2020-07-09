@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/project_ngraph"
+		},
+		{
+			"file" : "/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/project_ngraph.rule"
+		},
+		{
+			"file" : "/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/project_ngraph-complete.rule"
+		},
+		{
+			"file" : "/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/ngraph/src/project_ngraph-stamp/project_ngraph-install.rule"
+		},
+		{
+			"file" : "/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/ngraph/src/project_ngraph-stamp/project_ngraph-mkdir.rule"
+		},
+		{
+			"file" : "/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/ngraph/src/project_ngraph-stamp/project_ngraph-download.rule"
+		},
+		{
+			"file" : "/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/ngraph/src/project_ngraph-stamp/project_ngraph-update.rule"
+		},
+		{
+			"file" : "/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/ngraph/src/project_ngraph-stamp/project_ngraph-patch.rule"
+		},
+		{
+			"file" : "/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/ngraph/src/project_ngraph-stamp/project_ngraph-configure.rule"
+		},
+		{
+			"file" : "/Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/ngraph/src/project_ngraph-stamp/project_ngraph-build.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"project_ngraph"
+		],
+		"name" : "project_ngraph"
+	}
+}

@@ -1,0 +1,125 @@
+Performing C++ SOURCE FILE Test HAS_UNUSED_BUT_SET_VARIABLE failed with the following output:
+Change Dir: /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_c74dd/fast && /Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_c74dd.dir/build.make CMakeFiles/cmTC_c74dd.dir/build
+Building CXX object CMakeFiles/cmTC_c74dd.dir/src.cxx.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_UNUSED_BUT_SET_VARIABLE -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -fPIE   -Wunused-but-set-variable -std=gnu++14 -o CMakeFiles/cmTC_c74dd.dir/src.cxx.o -c /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp/src.cxx
+warning: unknown warning option '-Wunused-but-set-variable'; did you mean '-Wunused-const-variable'? [-Wunknown-warning-option]
+1 warning generated.
+Linking CXX executable cmTC_c74dd
+/usr/local/Cellar/cmake/3.16.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c74dd.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_UNUSED_BUT_SET_VARIABLE -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_c74dd.dir/src.cxx.o  -o cmTC_c74dd 
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test HAS_CAST_FUNCTION_TYPE failed with the following output:
+Change Dir: /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_93ea7/fast && /Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_93ea7.dir/build.make CMakeFiles/cmTC_93ea7.dir/build
+Building CXX object CMakeFiles/cmTC_93ea7.dir/src.cxx.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_CAST_FUNCTION_TYPE -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -fPIE   -Wcast-function-type -std=gnu++14 -o CMakeFiles/cmTC_93ea7.dir/src.cxx.o -c /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp/src.cxx
+warning: unknown warning option '-Wcast-function-type'; did you mean '-Wbad-function-cast'? [-Wunknown-warning-option]
+1 warning generated.
+Linking CXX executable cmTC_93ea7
+/usr/local/Cellar/cmake/3.16.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_93ea7.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_CAST_FUNCTION_TYPE -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_93ea7.dir/src.cxx.o  -o cmTC_93ea7 
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test HAS_USELESS_CAST failed with the following output:
+Change Dir: /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_a84a0/fast && /Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_a84a0.dir/build.make CMakeFiles/cmTC_a84a0.dir/build
+Building CXX object CMakeFiles/cmTC_a84a0.dir/src.cxx.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_USELESS_CAST -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -fPIE   -Wuseless-cast -std=gnu++14 -o CMakeFiles/cmTC_a84a0.dir/src.cxx.o -c /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp/src.cxx
+warning: unknown warning option '-Wuseless-cast' [-Wunknown-warning-option]
+1 warning generated.
+Linking CXX executable cmTC_a84a0
+/usr/local/Cellar/cmake/3.16.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a84a0.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_USELESS_CAST -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_a84a0.dir/src.cxx.o  -o cmTC_a84a0 
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test HAS_NONNULL_COMPARE failed with the following output:
+Change Dir: /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_c1327/fast && /Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_c1327.dir/build.make CMakeFiles/cmTC_c1327.dir/build
+Building CXX object CMakeFiles/cmTC_c1327.dir/src.cxx.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_NONNULL_COMPARE -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -fPIE   -Wnonnull-compare -std=gnu++14 -o CMakeFiles/cmTC_c1327.dir/src.cxx.o -c /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp/src.cxx
+warning: unknown warning option '-Wnonnull-compare'; did you mean '-Wenum-compare'? [-Wunknown-warning-option]
+1 warning generated.
+Linking CXX executable cmTC_c1327
+/usr/local/Cellar/cmake/3.16.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c1327.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_NONNULL_COMPARE -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_c1327.dir/src.cxx.o  -o cmTC_c1327 
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test HAS_CATCH_VALUE failed with the following output:
+Change Dir: /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_6148a/fast && /Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_6148a.dir/build.make CMakeFiles/cmTC_6148a.dir/build
+Building CXX object CMakeFiles/cmTC_6148a.dir/src.cxx.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_CATCH_VALUE -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -fPIE   -Wcatch-value -std=gnu++14 -o CMakeFiles/cmTC_6148a.dir/src.cxx.o -c /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp/src.cxx
+warning: unknown warning option '-Wcatch-value'; did you mean '-Wunused-value'? [-Wunknown-warning-option]
+1 warning generated.
+Linking CXX executable cmTC_6148a
+/usr/local/Cellar/cmake/3.16.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6148a.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_CATCH_VALUE -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_6148a.dir/src.cxx.o  -o cmTC_6148a 
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test HAS_DEPRECATED_COPY failed with the following output:
+Change Dir: /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_a43a9/fast && /Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_a43a9.dir/build.make CMakeFiles/cmTC_a43a9.dir/build
+Building CXX object CMakeFiles/cmTC_a43a9.dir/src.cxx.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_DEPRECATED_COPY -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -fPIE   -Wdeprecated-copy -std=gnu++14 -o CMakeFiles/cmTC_a43a9.dir/src.cxx.o -c /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp/src.cxx
+warning: unknown warning option '-Wdeprecated-copy'; did you mean '-Wdeprecated'? [-Wunknown-warning-option]
+1 warning generated.
+Linking CXX executable cmTC_a43a9
+/usr/local/Cellar/cmake/3.16.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a43a9.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_DEPRECATED_COPY -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_a43a9.dir/src.cxx.o  -o cmTC_a43a9 
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test HAS_CLASS_MEMACCESS failed with the following output:
+Change Dir: /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_27b53/fast && /Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_27b53.dir/build.make CMakeFiles/cmTC_27b53.dir/build
+Building CXX object CMakeFiles/cmTC_27b53.dir/src.cxx.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_CLASS_MEMACCESS -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -fPIE   -Wclass-memaccess -std=gnu++14 -o CMakeFiles/cmTC_27b53.dir/src.cxx.o -c /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp/src.cxx
+warning: unknown warning option '-Wclass-memaccess'; did you mean '-Wclass-varargs'? [-Wunknown-warning-option]
+1 warning generated.
+Linking CXX executable cmTC_27b53
+/usr/local/Cellar/cmake/3.16.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_27b53.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_CLASS_MEMACCESS -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_27b53.dir/src.cxx.o  -o cmTC_27b53 
+
+
+Source file was:
+int main() { return 0; }
+Performing C++ SOURCE FILE Test HAS_MAYBE_UNINITIALIZED failed with the following output:
+Change Dir: /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_d9c50/fast && /Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_d9c50.dir/build.make CMakeFiles/cmTC_d9c50.dir/build
+Building CXX object CMakeFiles/cmTC_d9c50.dir/src.cxx.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_MAYBE_UNINITIALIZED -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -fPIE   -Wmaybe-uninitialized -std=gnu++14 -o CMakeFiles/cmTC_d9c50.dir/src.cxx.o -c /Users/snazir/Documents/PlaidML/plaid_onnx/onnxruntime/cmake/CMakeFiles/CMakeTmp/src.cxx
+warning: unknown warning option '-Wmaybe-uninitialized'; did you mean '-Wuninitialized'? [-Wunknown-warning-option]
+1 warning generated.
+Linking CXX executable cmTC_d9c50
+/usr/local/Cellar/cmake/3.16.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d9c50.dir/link.txt --verbose=1
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -fstack-protector-strong -Dgsl_CONFIG_CONTRACT_VIOLATION_THROWS -Wno-deprecated -Wall -Wextra -ffunction-sections -fdata-sections -DHAS_MAYBE_UNINITIALIZED -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names   CMakeFiles/cmTC_d9c50.dir/src.cxx.o  -o cmTC_d9c50 
+
+
+Source file was:
+int main() { return 0; }
+Checking whether the ASM compiler is GNU using "--version" did not match "(GNU assembler)|(GCC)|(Free Software Foundation)":
+Apple clang version 11.0.3 (clang-1103.0.32.29)
+Target: x86_64-apple-darwin19.4.0
+Thread model: posix
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin

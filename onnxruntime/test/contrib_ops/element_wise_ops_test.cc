@@ -22,7 +22,8 @@ TEST(MathOpTest, AffineDefaultAttributes) {
   std::vector<int64_t> dims{2, 2};
   test.AddInput<float>("A", dims, {0.0f, 1.0f, 2.0f, 3.0f});
   test.AddOutput<float>("B", dims, {0.0f, 1.0f, 2.0f, 3.0f});
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(MathOpTest, Affine) {
@@ -32,7 +33,8 @@ TEST(MathOpTest, Affine) {
   test.AddAttribute("beta", 1.0f);
   test.AddInput<float>("A", dims, {0.0f, 1.0f, 2.0f, 3.0f});
   test.AddOutput<float>("B", dims, {1.0f, 3.0f, 5.0f, 7.0f});
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(MathOpTest, Scale) {
@@ -41,7 +43,8 @@ TEST(MathOpTest, Scale) {
   test.AddAttribute("scale", 2.0f);
   test.AddInput<float>("A", dims, {0.0f, 1.0f, 2.0f, 3.0f});
   test.AddOutput<float>("B", dims, {0.0f, 2.0f, 4.0f, 6.0f});
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(MathOpTest, Scale_Default) {
@@ -49,7 +52,8 @@ TEST(MathOpTest, Scale_Default) {
   std::vector<int64_t> dims{2, 2};
   test.AddInput<float>("A", dims, {0.0f, 1.0f, 2.0f, 3.0f});
   test.AddOutput<float>("B", dims, {0.0f, 1.0f, 2.0f, 3.0f});
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 std::vector<float> Add_Simple(const std::vector<float>& input_a_data, const std::vector<float>& input_b_data) {
@@ -99,7 +103,8 @@ static void RunBiasGeluTest(
     tester.AddInput<float>("B", input_b_dims, input_b_data);
     tester.AddOutput<float>("C", output_dims, output_data);
 
-    tester.Run();
+    tester.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+    //tester.Run();
   }
 }
 

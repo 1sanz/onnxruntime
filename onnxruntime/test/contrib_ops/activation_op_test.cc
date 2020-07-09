@@ -35,6 +35,8 @@ void TestActivationContribOp(const char* szOp, std::vector<float>& input_vals,
   if (!is_tensorrt_supported) {
     excluded_providers.insert(kTensorrtExecutionProvider);
   }
+  //Plaidml removed from tests for now 
+   excluded_providers.insert(kPlaidMLExecutionProvider);
   test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
 }
 

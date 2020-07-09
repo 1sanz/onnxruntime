@@ -763,7 +763,7 @@ void OpTester::Run(
         else if (provider_type == onnxruntime::kAclExecutionProvider)
           execution_provider = DefaultAclExecutionProvider();
         //else if (provider_type == onnxruntime::kPlaidMLExecutionProvider)
-        //  execution_provider = DefaultPlaidMLExecutionProvider();
+          //execution_provider = DefaultPlaidMLExecutionProvider();
         // skip if execution provider is disabled
         if (execution_provider == nullptr)
           continue;
@@ -780,7 +780,8 @@ void OpTester::Run(
           if (provider_type == onnxruntime::kNGraphExecutionProvider ||
               provider_type == onnxruntime::kTensorrtExecutionProvider ||
               provider_type == onnxruntime::kOpenVINOExecutionProvider ||
-              provider_type == onnxruntime::kNupharExecutionProvider)
+              provider_type == onnxruntime::kNupharExecutionProvider )
+              //provider_type == onnxruntime::kPlaidMLExecutionProvider)
             continue;
           auto reg = execution_provider->GetKernelRegistry();
           const KernelCreateInfo* kci =

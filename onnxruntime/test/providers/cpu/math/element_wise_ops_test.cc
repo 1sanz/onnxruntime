@@ -73,6 +73,7 @@ TEST(MathOpTest, Add_int64) {
   test.AddInput<int64_t>("A", {3}, {1, 2, 3});
   test.AddInput<int64_t>("B", {3}, {4, 5, 6});
   test.AddOutput<int64_t>("C", {3}, {5, 7, 9});
+  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
   test.Run();
 }
 
@@ -95,6 +96,7 @@ TEST(MathOpTest, Add_float) {
 #if defined(OPENVINO_CONFIG_MYRIAD) || defined(OPENVINO_CONFIG_GPU_FP16) || defined(OPENVINO_CONFIG_VAD_M)
   test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kOpenVINOExecutionProvider});  //OpenVINO: Disabled due to accuracy mismatch for FP16
 #else
+  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
   test.Run();
 #endif
 }
@@ -115,6 +117,7 @@ TEST(MathOpTest, Add_double) {
                           0.0, 5.0, -36.0,
                           -10.8, 18.6, 0.0});
 
+  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kOpenVINOExecutionProvider,kPlaidMLExecutionProvider});
   test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kOpenVINOExecutionProvider});  // Disabling OpenVINO as this type is not supported
 }
 
@@ -134,6 +137,7 @@ TEST(MathOpTest, Add_Broadcast_Axis) {
                         {4.0f, 5.0f, 6.0f,
                          6.0f, 7.0f, 8.0f,
                          8.0f, 9.0f, 10.0f});
+  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
   test.Run(OpTester::ExpectResult::kExpectSuccess, "");
 }
 
@@ -150,6 +154,7 @@ TEST(MathOpTest, Add_Broadcast_MultidirectionalAB) {
                         {4.0f, 5.0f, 6.0f,
                          3.0f, 4.0f, 5.0f,
                          2.0f, 3.0f, 4.0f});
+  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider,kPlaidMLExecutionProvider}); 
   test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider});  //TensorRT: got C with shape [3, 1]
 }
 
@@ -166,6 +171,7 @@ TEST(MathOpTest, Add_Broadcast_MultidirectionalBA) {
                         {4.0f, 5.0f, 6.0f,
                          3.0f, 4.0f, 5.0f,
                          2.0f, 3.0f, 4.0f});
+  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider,kPlaidMLExecutionProvider}); 
   test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider});  //TensorRT: got C with shape [3, 1]
 }
 

@@ -4,35 +4,35 @@ import onnx
 from onnx import helper
 from onnx import AttributeProto, TensorProto, GraphProto
 
-A = helper.make_tensor_value_info('A', TensorProto.FLOAT, [4])
-B = helper.make_tensor_value_info('B', TensorProto.FLOAT, [4])
-Z = helper.make_tensor_value_info('Z', TensorProto.BOOL, [4])
+A = helper.make_tensor_value_info('A', TensorProto.FLOAT, [3,4])
+B = helper.make_tensor_value_info('B', TensorProto.FLOAT, [4,3])
+Z = helper.make_tensor_value_info('Z', TensorProto.FLOAT, [3,3])
 axis = helper.make_tensor_value_info('axis',TensorProto.INT32,[1])
 min_val = helper.make_tensor_value_info('min_val',TensorProto.FLOAT,[1])
 max_val = helper.make_tensor_value_info('max_val',TensorProto.FLOAT,[1])
 #node_add = helper.make_node('Mul',['A','B'],['Z'],)
 
-node_exp = onnx.helper.make_node(
-    'Exp',
-    inputs=['A'],
-    outputs=['B'],
+node_matmul = onnx.helper.make_node(
+       'MatMul',
+        inputs=['A','B'],
+        outputs=['Z'],
 )
 
-graph_exp_graph = helper.make_graph(
-    [node_exp],
-    "exp-graph",
-    [A],
-    [B],
+graph_matmul_graph = helper.make_graph(
+    [node_matmul],
+    "matmul-graph",
+    [A,B],
+    [Z],
 )
 
-model_exp = helper.make_model(graph_exp_graph,
-                              producer_name='onnx-exp-example')
-onnx.save(model_exp,'./onnxruntime/onnxruntime/test/testdata/plaidml/exp.onnx')
-model_in = onnx.load('./onnxruntime/onnxruntime/test/testdata/plaidml/exp.onnx')
+model_matmul = helper.make_model(graph_matmul_graph,
+                              producer_name='onnx-matmul-example')
+onnx.save(model_matmul,'./onnxruntime/onnxruntime/test/testdata/plaidml/matmul.onnx')
+model_in = onnx.load('./onnxruntime/onnxruntime/test/testdata/plaidml/matmul.onnx')
 print('The graph in model:\n{}'.format(model_in.graph))
 
 onnx.checker.check_model(model_in)
-print('The model is checked!')
+
 
 
 # The protobuf definition can be found here:

@@ -22,7 +22,8 @@ TEST(MathOpTest, Clip_6) {
                         {10.0f, 4.4f, 10.0f,
                          -1.3f, 3.5f, 10.0f,
                          -5.4f, 9.3f, 10.0f});
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(MathOpTest, Clip_Default) {
@@ -39,7 +40,8 @@ TEST(MathOpTest, Clip_Default) {
                          -5.4f, 9.3f, 82.4f});
 
   // nGraph does not support Clip opset 11 yet.
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kNGraphExecutionProvider});
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kNGraphExecutionProvider,kPlaidMLExecutionProvider});
+  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kNGraphExecutionProvider});
 }
 
 TEST(MathOpTest, Clip) {
@@ -58,7 +60,8 @@ TEST(MathOpTest, Clip) {
                          -5.0f, 2.0f, 5.0f});
 
   // nGraph and Tensorrt does not support Clip opset 11 yet.
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kNGraphExecutionProvider, kTensorrtExecutionProvider});
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kNGraphExecutionProvider, kTensorrtExecutionProvider,kPlaidMLExecutionProvider});
+  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kNGraphExecutionProvider, kTensorrtExecutionProvider});
 }
 
 TEST(MathOpTest, ClipDimWithZero) {
@@ -71,7 +74,8 @@ TEST(MathOpTest, ClipDimWithZero) {
   test.AddOutput<float>("Y", dims, {});
 
   // nGraph and Tensorrt does not support Clip opset 11 yet.
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kNGraphExecutionProvider, kTensorrtExecutionProvider});
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kNGraphExecutionProvider, kTensorrtExecutionProvider,kPlaidMLExecutionProvider});
+  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kNGraphExecutionProvider, kTensorrtExecutionProvider});
 
   OpTester test1("Clip");  //
   test1.AddInput<float>("X", dims, {});
@@ -79,7 +83,8 @@ TEST(MathOpTest, ClipDimWithZero) {
   test1.AddAttribute("max", 10.0f);
   test1.AddOutput<float>("Y", dims, {});
   // TRT doesn't handle this
-  test1.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider});
+  test1.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider,kPlaidMLExecutionProvider});
+  //test1.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider});
 }
 
 }  // namespace test
