@@ -16,7 +16,8 @@ TEST(SequenceOpsTest, SequenceLengthPositiveFloat) {
   input.AddTensor({3, 3}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f});
   test.AddSeqInput("S", input);
   test.AddOutput<int64_t>("I", {}, {2});
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SequenceLengthPositiveInt64) {
@@ -26,7 +27,8 @@ TEST(SequenceOpsTest, SequenceLengthPositiveInt64) {
   input.AddTensor({3, 3}, {1, 2, 3, 4, 5, 6, 7, 8, 9});
   test.AddSeqInput("S", input);
   test.AddOutput<int64_t>("I", {}, {2});
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 // SequenceAt
@@ -40,7 +42,8 @@ TEST(SequenceOpsTest, SequenceAtPositiveIdx) {
   test.AddSeqInput("S", input);
   test.AddInput("I", {}, {1});
   test.AddOutput<float>("T", output_shape, output_vec);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SequenceAtNegativeIdx) {
@@ -53,7 +56,8 @@ TEST(SequenceOpsTest, SequenceAtNegativeIdx) {
   test.AddSeqInput("S", input);
   test.AddInput("I", {}, {-1});
   test.AddOutput<float>("T", output_shape, output_vec);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SequenceAtInvalidPositiveIdx) {
@@ -66,7 +70,8 @@ TEST(SequenceOpsTest, SequenceAtInvalidPositiveIdx) {
   test.AddSeqInput("S", input);
   test.AddInput("I", {}, {10});
   test.AddOutput<float>("T", output_shape, output_vec);
-  test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index");
+  test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index",{kPlaidMLExecutionProvider});
+  //test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index");
 }
 
 TEST(SequenceOpsTest, SequenceAtInvalidNegativeIdx) {
@@ -79,21 +84,24 @@ TEST(SequenceOpsTest, SequenceAtInvalidNegativeIdx) {
   test.AddSeqInput("S", input);
   test.AddInput("I", {}, {-10});
   test.AddOutput<float>("T", output_shape, output_vec);
-  test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index");
+  test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index",{kPlaidMLExecutionProvider});
+  //test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index");
 }
 
 // SequenceEmpty
 TEST(SequenceOpsTest, SequenceEmptyDefault) {
   OpTester test("SequenceEmpty", 11);
   test.AddSeqOutput("S", SeqTensors<float>());
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SequenceEmptyInt64) {
   OpTester test("SequenceEmpty", 11);
   test.AddAttribute("dtype", static_cast<int64_t>(7));
   test.AddSeqOutput("S", SeqTensors<int64_t>());
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 // SequenceInsert
@@ -110,7 +118,8 @@ TEST(SequenceOpsTest, SequenceInsertPositiveDefaultFloat) {
   output.AddTensor({3, 3}, {1., 2., 3., 4., 5., 6., 7., 8., 9.});
   output.AddTensor({3, 2}, {10., 20., 30., 40., 50., 60.});
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SequenceInsertPositiveDefault) {
@@ -126,7 +135,8 @@ TEST(SequenceOpsTest, SequenceInsertPositiveDefault) {
   output.AddTensor({3, 3}, {1, 2, 3, 4, 5, 6, 7, 8, 9});
   output.AddTensor({3, 2}, {10, 20, 30, 40, 50, 60});
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SequenceInsertValidPositiveIdx) {
@@ -143,7 +153,8 @@ TEST(SequenceOpsTest, SequenceInsertValidPositiveIdx) {
   output.AddTensor({3, 2}, {10, 20, 30, 40, 50, 60});
   output.AddTensor({3, 3}, {1, 2, 3, 4, 5, 6, 7, 8, 9});
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SequenceInsertValidNegativeIdx) {
@@ -160,7 +171,8 @@ TEST(SequenceOpsTest, SequenceInsertValidNegativeIdx) {
   output.AddTensor({3, 2}, {1, 2, 3, 4, 5, 6});
   output.AddTensor({3, 3}, {1, 2, 3, 4, 5, 6, 7, 8, 9});
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SequenceInsertInvalidPositiveIdx) {
@@ -177,7 +189,8 @@ TEST(SequenceOpsTest, SequenceInsertInvalidPositiveIdx) {
   output.AddTensor({3, 2}, {10, 20, 30, 40, 50, 60});
   output.AddTensor({3, 3}, {1, 2, 3, 4, 5, 6, 7, 8, 9});
   test.AddSeqOutput("S2", output);
-  test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index");
+  test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index",{kPlaidMLExecutionProvider});
+  //test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index");
 }
 
 TEST(SequenceOpsTest, SequenceInsertInvalidNegativeIdx) {
@@ -194,7 +207,8 @@ TEST(SequenceOpsTest, SequenceInsertInvalidNegativeIdx) {
   output.AddTensor({3, 2}, {10, 20, 30, 40, 50, 60});
   output.AddTensor({3, 3}, {1, 2, 3, 4, 5, 6, 7, 8, 9});
   test.AddSeqOutput("S2", output);
-  test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index");
+  test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index",{kPlaidMLExecutionProvider});
+  //test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index");
 }
 
 // SequenceErase
@@ -210,7 +224,8 @@ TEST(SequenceOpsTest, SequenceErasePositiveDefault) {
   output.AddTensor({3, 2}, {1, 2, 3, 4, 5, 6});
   output.AddTensor({3, 3}, {1, 2, 3, 4, 5, 6, 7, 8, 9});
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SequenceEraseValidPositiveIdx) {
@@ -226,7 +241,8 @@ TEST(SequenceOpsTest, SequenceEraseValidPositiveIdx) {
   output.AddTensor({3, 2}, {1, 2, 3, 4, 5, 6});
   output.AddTensor({3, 2}, {10, 20, 30, 40, 50, 60});
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SequenceEraseValidNegativeIdx) {
@@ -244,7 +260,8 @@ TEST(SequenceOpsTest, SequenceEraseValidNegativeIdx) {
   output.AddTensor({3, 3}, {1, 2, 3, 4, 5, 6, 7, 8, 9});
   output.AddTensor({2, 2}, {2, 4, 6, 8});
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SequenceEraseInvalidPositiveIdx) {
@@ -262,7 +279,8 @@ TEST(SequenceOpsTest, SequenceEraseInvalidPositiveIdx) {
   input.AddTensor({3, 3}, {1, 2, 3, 4, 5, 6, 7, 8, 9});
   input.AddTensor({2, 2}, {2, 4, 6, 8});
   test.AddSeqOutput("S2", output);
-  test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index");
+  test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index",{kPlaidMLExecutionProvider});
+  //test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index");
 }
 
 TEST(SequenceOpsTest, SequenceEraseInvalidNegativeIdx) {
@@ -280,7 +298,8 @@ TEST(SequenceOpsTest, SequenceEraseInvalidNegativeIdx) {
   input.AddTensor({3, 3}, {1, 2, 3, 4, 5, 6, 7, 8, 9});
   input.AddTensor({2, 2}, {2, 4, 6, 8});
   test.AddSeqOutput("S2", output);
-  test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index");
+  test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index",{kPlaidMLExecutionProvider});
+  //test.Run(OpTester::ExpectResult::kExpectFailure, "Invalid sequence index");
 }
 
 // SequenceConstruct
@@ -295,7 +314,8 @@ TEST(SequenceOpsTest, SequenceConstructPositive) {
   output.AddTensor({3, 3}, {1, 2, 3, 4, 5, 6, 7, 8, 9});
   output.AddTensor({3, 2}, {10, 20, 30, 40, 50, 60});
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 // SplitToSequence
@@ -314,7 +334,8 @@ TEST(SequenceOpsTest, SplitToSequence_DefaultAxis0EqualSplitFloat) {
   output.AddTensor({2, 2}, {1.f, 2.f, 3.f, 4.f});
   output.AddTensor({2, 2}, {5.f, 6.f, 7.f, 8.f});
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SplitToSequence_DefaultAxis0EqualSplitFloatScalarSplit) {
@@ -325,7 +346,8 @@ TEST(SequenceOpsTest, SplitToSequence_DefaultAxis0EqualSplitFloatScalarSplit) {
   output.AddTensor({2, 2}, {1.f, 2.f, 3.f, 4.f});
   output.AddTensor({2, 2}, {5.f, 6.f, 7.f, 8.f});
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SplitToSequence_Axis0DefaultSplitFloatSetAxisExplicitly) {
@@ -339,7 +361,8 @@ TEST(SequenceOpsTest, SplitToSequence_Axis0DefaultSplitFloatSetAxisExplicitly) {
   output.AddTensor({1, 2}, {5.f, 6.f});
   output.AddTensor({1, 2}, {7.f, 8.f});
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SplitToSequence_PositiveAxisScalarSplit) {
@@ -365,7 +388,8 @@ TEST(SequenceOpsTest, SplitToSequence_PositiveAxisScalarSplit) {
                                17.f, 18.f,
                                23.f, 24.f});
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SplitToSequence_DefaultAxis0UnevenSplitFloat) {
@@ -377,7 +401,8 @@ TEST(SequenceOpsTest, SplitToSequence_DefaultAxis0UnevenSplitFloat) {
   output.AddTensor({2, 2}, GetConsequtiveVector<float>(5.f, 4));
   output.AddTensor({1, 2}, {9.f, 10.f});
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SplitToSequence_DefaultAxis0UnevenSplitFloat2) {
@@ -392,7 +417,8 @@ TEST(SequenceOpsTest, SplitToSequence_DefaultAxis0UnevenSplitFloat2) {
   output.AddTensor({3, 2}, GetConsequtiveVector<float>(25.f, 6));
   output.AddTensor({2, 2}, GetConsequtiveVector<float>(31.f, 4));
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SplitToSequence_PositiveAxisUnevenSplit) {
@@ -406,7 +432,8 @@ TEST(SequenceOpsTest, SplitToSequence_PositiveAxisUnevenSplit) {
   output.AddTensor({2, 2}, {3.f, 4.f, 8.f, 9.f});
   output.AddTensor({2, 1}, {5.f, 10.f});
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SplitToSequence_Axis0DefaultSplitFloatSetAxisExplicitlyDontKeepDims3Dim) {
@@ -419,7 +446,8 @@ TEST(SequenceOpsTest, SplitToSequence_Axis0DefaultSplitFloatSetAxisExplicitlyDon
   output.AddTensor({3, 4}, GetConsequtiveVector<float>(1.f, 12));
   output.AddTensor({3, 4}, GetConsequtiveVector<float>(13.f, 12));
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SplitToSequence_Axis0DefaultSplitFloatSetAxisExplicitlyDontKeepDims2Dim) {
@@ -432,7 +460,8 @@ TEST(SequenceOpsTest, SplitToSequence_Axis0DefaultSplitFloatSetAxisExplicitlyDon
   output.AddTensor({3}, GetConsequtiveVector<float>(1.f, 3));
   output.AddTensor({3}, GetConsequtiveVector<float>(4.f, 3));
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(SequenceOpsTest, SplitToSequence_PositiveAxisDontKeepDims) {
@@ -447,7 +476,8 @@ TEST(SequenceOpsTest, SplitToSequence_PositiveAxisDontKeepDims) {
   output.AddTensor({2, 3}, {3.f, 7.f, 11.f, 15.f, 19.f, 23.f});
   output.AddTensor({2, 3}, {4.f, 8.f, 12.f, 16.f, 20.f, 24.f});
   test.AddSeqOutput("S2", output);
-  test.Run();
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 }  // namespace test
 }  // namespace onnxruntime

@@ -245,6 +245,8 @@ void RunTest(bool condition_value,
   if (!is_tensorrt_supported) {
     excluded_providers.insert(kTensorrtExecutionProvider);
   }
+
+  excluded_providers.insert(kPlaidMLExecutionProvider); //TODO: PlaidML_TODO add plaidml test
   if (options.mixed_execution_providers) {
     // we want the CUDA provider to be first, and the CPU provider second. all except the If should run on
     // CUDA given that, which creates the scenario where we need to copy to/from CPU to execute the If node correctly.

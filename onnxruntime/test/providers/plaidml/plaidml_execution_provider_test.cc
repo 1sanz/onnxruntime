@@ -420,6 +420,12 @@ TEST(PlaidMLExecutionProviderTest, ReluTest)
   RunTest("testdata/plaidml/relu.onnx", feeds, {"Y"}, expected_shapes, expected_values, GetEnvironment());
 }
 
+// TODO: test reshape
+// TODO: test unsqueeze
+// TODO: test argmax
+// TODO: test argmin
+// TODO: test concat
+
 TEST(PlaidMLExecutionProviderTest, SigmoidTest)
 {
   NameMLValMap feeds;

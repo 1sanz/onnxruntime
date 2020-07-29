@@ -14,14 +14,48 @@
 // #include "core/providers/plaidml/plaidml_ops.h"
 #include "plaidml_ops.h"
 
+#include <stdio.h>
+#include <string.h>
 namespace onnxruntime {
+plaidml::DType ConvertPrecisionONNXToPlaidML(
+    ONNX_NAMESPACE::DataType onnx_type) {
+  if (*onnx_type == "double" || *onnx_type == "tensor(double)") {
+    return plaidml::DType::FLOAT64;
+  }else if (*onnx_type == "float" || *onnx_type == "tensor(float)") {
+    return plaidml::DType::FLOAT32;
+  } else if (*onnx_type == "float16" || *onnx_type == "tensor(float16)") {
+    return plaidml::DType::FLOAT16;
+  } else if (*onnx_type == "int32" || *onnx_type == "tensor(int32)") {
+    return plaidml::DType::INT32;
+  }else if (*onnx_type == "int64" || *onnx_type == "tensor(int64)") {
+    return plaidml::DType::INT64; 
+  }else if (*onnx_type == "int16" || *onnx_type == "tensor(int16)") {
+    return plaidml::DType::INT16;
+  } else if (*onnx_type == "int8" || *onnx_type == "tensor(int8)") {
+    return plaidml::DType::INT8;
+  } else if (*onnx_type == "uint16" || *onnx_type == "tensor(uint16)") {
+    return plaidml::DType::UINT16;
+  } else if (*onnx_type == "uint8" || *onnx_type == "tensor(uint8)") {
+    return plaidml::DType::UINT8;
+  } else if (*onnx_type == "bool" || *onnx_type == "tensor(bool)") {
+    return plaidml::DType::BOOLEAN;
+  } 
 
+  // else if(*onnx_type == "string" || *onnx_type == "tensor(string)"){
+  //   return plaidml::DType::???;
+  // }
+  else {
+    throw "Unsupported Data type";
+  }
+}
 // TODO: Some of this stuff should probably be separated into new files
 
 PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
   PlaidMLProgram ret;
 
-  std::map<std::string, plaidml::edsl::Tensor> tensors;
+  //std::map<std::string, plaidml::edsl::Tensor> tensors;
+
+  std::map<std::string, plaidml::edsl::Value> init_tensors;
   // TODO: We might instead implement this on an ONNX ModelProto instead of an ONNX RT Node.
   //     This might have benefits for reuse in a non-RT ONNX context?
 
@@ -31,34 +65,55 @@ PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
 
   // For each input, look up shape (or at least rank) and construct a (placeholder) tensor accordingly;
   // add this to the `tensors` dict
+
+  int count =0;
+  
   for (const auto& node_input : fused_node->InputDefs()) {
     // TODO: A node_input's Shape can be nullptr (i.e. if the input isn't a tensor) and we need to handle that case
     // TODO: This doesn't address symbolic shapes
+    count++;
+    //printf("node %d name : %s type: %s\n\n\n", count, node_input->Name().c_str(),node_input->Type()->c_str());
     std::vector<int64_t> shape;
     for (int dim = 0; dim < node_input->Shape()->dim_size(); dim++) {
       shape.push_back(node_input->Shape()->dim(dim).dim_value());
     }
-    auto input_placeholder = plaidml::edsl::Placeholder(plaidml::DType::FLOAT32, shape);
-    if (!tensors.insert({node_input->Name(), input_placeholder}).second) {
+    auto type = ConvertPrecisionONNXToPlaidML(node_input->Type());
+    auto input_placeholder = plaidml::edsl::Placeholder(type, shape);
+    if (!init_tensors.insert({node_input->Name(), plaidml::edsl::Value(input_placeholder)}).second) {
       throw std::runtime_error("Unexpected duplicate name in fused node while adding inputs [TODO better error handling]");
     }
     ret.inputs.push_back(input_placeholder);
   }
 
+  //print out the inputs registred as plaidml values 
+  // for(auto input_inits: init_tensors)
+  // {printf("reg input name : %s\n",input_inits.first.c_str());}
+
   // For each node in topological order:
   //   * Get its inputs out of the `tensors` dict
   //   * Call `MakePlaidMLOp` and write results into `tensors` dict
+  
   for (const auto& node : fused_node->GetFunctionBody()->Body().Nodes()) {
     std::vector<plaidml::edsl::Value> local_input_tensors;
+    int count_i=0;
     for (const auto& local_input : node.InputDefs()) {
       try {
-        local_input_tensors.push_back(plaidml::edsl::Value(tensors.at(local_input->Name())));
+        count_i++;
+        //printf("trying to find the input num:%d type %s\n\n\n",count_i,local_input->Name().c_str());
+        if(local_input->Name()!=""){
+          auto input = init_tensors.at(local_input->Name());
+          //printf("got it , inserting...\n\n");
+          local_input_tensors.push_back(plaidml::edsl::Value(input));
+          //printf("trying to print the input num:%d name %s\n\n\n",count_i,local_input->Name().c_str());
+        }
       } catch (const std::out_of_range& e) {
+        //printf("trying to print the input num:%d name %s\n\n\n",count_i,local_input->Name().c_str());
         throw std::runtime_error("Could not find expected tensor " + local_input->Name() + " [TODO better error handling]");
       }
     }
     ONNX_NAMESPACE::NodeProto node_proto;
     node.ToProto(node_proto);
+    //printf("creating op for node: %s\n\n",node_proto.op_type().c_str());
     auto local_output_tensors = plaidml_ep::MakePlaidMLOp(node_proto, local_input_tensors);
     // Iterate over output tensors and names in tandem
     auto output_tensor_it = local_output_tensors.begin();
@@ -66,9 +121,9 @@ PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
       if (output_tensor_it == local_output_tensors.end()) {
         throw std::runtime_error("Inconsistent number of outputs [TODO better error handling]");
       }
-      if (!tensors.insert({
+      if (!init_tensors.insert({
           local_output->Name(),
-          *output_tensor_it
+          plaidml::edsl::Value(*output_tensor_it)
       }).second) {
         throw std::runtime_error("Unexpected duplicate name in fused node while adding outputs (possibly intermediate) [TODO better error handling]");
       }
@@ -82,11 +137,11 @@ PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
   // Lookup outputs from `tensors` dict, use those to call edsl::ProgramBuilder
   std::vector<plaidml::edsl::Tensor> output_tensors;
   for (const auto& node_output : fused_node->OutputDefs()) {
-    auto local_output_tensor_it = tensors.find(node_output->Name());
-    if (local_output_tensor_it == tensors.end()) {
+    auto local_output_tensor_it = init_tensors.find(node_output->Name());
+    if (local_output_tensor_it == init_tensors.end()) {
       throw std::runtime_error("Expected output tensor " + node_output->Name() + " not found [TODO better error handling]");
     }
-    output_tensors.push_back(local_output_tensor_it->second);
+    output_tensors.push_back(local_output_tensor_it->second.as_tensor());
   }
   ret.program = std::make_shared<plaidml::edsl::Program>(plaidml::edsl::ProgramBuilder(fused_node->Name(), output_tensors).compile());
   return ret;
