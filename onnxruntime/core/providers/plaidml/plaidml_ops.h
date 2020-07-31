@@ -184,7 +184,11 @@ std::vector<plaidml::edsl::Tensor> sin(const std::vector<plaidml::edsl::Value>& 
 std::vector<plaidml::edsl::Tensor> sinh(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> tan(const std::vector<plaidml::edsl::Value>& args);
 
-std::vector<plaidml::edsl::Tensor> _LRN(
+std::vector<plaidml::edsl::Tensor> _lrn(
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs);
+
+std::vector<plaidml::edsl::Tensor> _one_hot(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
 

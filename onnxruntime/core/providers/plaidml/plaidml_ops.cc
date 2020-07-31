@@ -74,9 +74,10 @@ std::map<std::string, _OpFunction> _kSupportedOps =
   {"Flatten", _flatten},
   {"HardSigmoid",_hard_sigmoid},
   {"LogSoftmax",_log_softmax},
-  {"LRN",_LRN},
+  {"LRN",_lrn},
   {"MaxPool",_maxpool},
   {"Mod",_mod},
+  {"OneHot",_one_hot},
   {"ReduceMax",_reduce_max},
   {"ReduceMean",_reduce_mean},
   {"ReduceMin",_reduce_min},
@@ -483,7 +484,6 @@ std::vector<plaidml::edsl::Tensor> _conv(
 
     const auto I = inputs[0].as_tensor();
     const auto K = inputs[1].as_tensor();
-        //int B=1;
     auto num_attributes = node.attribute_size();
 
     //default auto_pad mode
@@ -695,7 +695,7 @@ std::vector<plaidml::edsl::Tensor> _log_softmax(
   return {plaidml::edsl::log(O)};
 }
 
-std::vector<plaidml::edsl::Tensor> _LRN(    
+std::vector<plaidml::edsl::Tensor> _lrn(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
   const auto& A = inputs[0].as_tensor();
@@ -906,7 +906,7 @@ std::vector<plaidml::edsl::Tensor> _mod(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
   const auto& A = inputs[0].as_tensor();
-  const auto& B = inputs[0].as_tensor();
+  const auto& B = inputs[1].as_tensor();
   int fmod = 0;
 
   auto num_attributes = node.attribute_size();
@@ -921,6 +921,50 @@ std::vector<plaidml::edsl::Tensor> _mod(
   
   auto result = A % B;//TODO: need to handle fmod
   return {result};
+}
+
+std::vector<plaidml::edsl::Tensor> _one_hot(    
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs){
+  const auto& indices = inputs[0].as_tensor();
+  //const auto& depth = inputs[1].as_tensor();//TODO: need to convert this to int
+  //const auto& values = inputs[2].as_tensor();//on value off value 
+  int axis = -1;
+   auto num_attributes = node.attribute_size();
+     if(num_attributes>0){
+       auto attributes = node.attribute();
+       for(auto attribute: attributes){
+         if(attribute.name() == "axis"){
+          axis = attribute.i();
+         }
+       }
+     }
+  
+
+  // std::vector<plaidml::edsl::TensorDim> I_dims(indices.rank());
+  // indices.bind_dims(I_dims);
+  // std::vector<plaidml::edsl::TensorDim> O_dims(indices.rank() + 1);
+
+  //  if (axis < 0) axis = indices.rank() + axis;
+  //  size_t j = 0;
+  //  for (size_t i = 0; i < O_dims.size(); i++) {
+  //    if (i == axis) {
+  //      O_dims[i] = plaidml::edsl::TensorDim(depth[0]);
+  //    } else {
+  //      O_dims[i] = I_dims[j];
+  //      j++;
+  //    }
+  //  }
+ 
+  // plaidml::edsl::TensorIndex v;
+  // plaidml::edsl::Tensor O = plaidml::edsl::TensorOutput(O_dims);
+  // std::vector<plaidml::edsl::TensorIndex> O_idxs(indices.rank() + 1);
+  // std::vector<plaidml::edsl::TensorIndex> I_idxs(indices.rank());
+  // plaidml::edsl::Tensor count = plaidml::edsl::index(O_dims, axis);
+  // plaidml::edsl::TensorIndex c;
+  // O(O_idxs) = indices(I_idxs) == count(c);
+  // O = select(O, values(v), values(v+1));
+  return {indices};
 }
 
 std::vector<plaidml::edsl::Tensor> _reduce_max(    
@@ -1071,7 +1115,6 @@ std::vector<plaidml::edsl::Tensor> _squeeze(
         }
       }
     }
-    //throw std::runtime_error("squeeze op throwing up" + node.op_type());
   return {plaidml::op::squeeze(A,axes)};
 }
 
@@ -1134,31 +1177,6 @@ std::vector<plaidml::edsl::Tensor> _transpose(
     }
   return {plaidml::op::transpose(A,plaidml::edsl::make_tuple(axes))};
 }
-// std::vector<plaidml::edsl::Tensor> _crop(
-//     const ONNX_NAMESPACE::NodeProto& node,
-//     const std::vector<plaidml::edsl::Value>& inputs){
-  
-//     const auto& A = inputs[0].as_tensor();
-//     int axis = 1;
-//     auto num_attributes = node.attribute_size();
-//     if(num_attributes>0){
-//       auto attributes = node.attribute();
-//       for(auto attribute = attributes.begin();attribute < attributes.end();attribute++)
-//       {
-//         if(attribute->name() == "border")
-//         {
-//           const auto at_axis = attribute->i();
-//           axis = at_axis;
-//         }
-//         if(attribute->name() == "scale")
-//         {
-//           const auto at_axis = attribute->i();
-//           axis = at_axis;
-//         }
-//       }
-//     }
-//   return {plaidml::op::softmax(A,axis)};
-// }
 
 std::vector<plaidml::edsl::Tensor> MakePlaidMLOp(
     const ONNX_NAMESPACE::NodeProto& node,

@@ -40,7 +40,6 @@ plaidml::DType ConvertPrecisionONNXToPlaidML(
   } else if (*onnx_type == "bool" || *onnx_type == "tensor(bool)") {
     return plaidml::DType::BOOLEAN;
   } 
-
   // else if(*onnx_type == "string" || *onnx_type == "tensor(string)"){
   //   return plaidml::DType::???;
   // }
@@ -72,7 +71,6 @@ PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
     // TODO: A node_input's Shape can be nullptr (i.e. if the input isn't a tensor) and we need to handle that case
     // TODO: This doesn't address symbolic shapes
     count++;
-    //printf("node %d name : %s type: %s\n\n\n", count, node_input->Name().c_str(),node_input->Type()->c_str());
     std::vector<int64_t> shape;
     for (int dim = 0; dim < node_input->Shape()->dim_size(); dim++) {
       shape.push_back(node_input->Shape()->dim(dim).dim_value());
@@ -85,10 +83,6 @@ PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
     ret.inputs.push_back(input_placeholder);
   }
 
-  //print out the inputs registred as plaidml values 
-  // for(auto input_inits: init_tensors)
-  // {printf("reg input name : %s\n",input_inits.first.c_str());}
-
   // For each node in topological order:
   //   * Get its inputs out of the `tensors` dict
   //   * Call `MakePlaidMLOp` and write results into `tensors` dict
@@ -99,21 +93,16 @@ PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
     for (const auto& local_input : node.InputDefs()) {
       try {
         count_i++;
-        //printf("trying to find the input num:%d type %s\n\n\n",count_i,local_input->Name().c_str());
         if(local_input->Name()!=""){
           auto input = init_tensors.at(local_input->Name());
-          //printf("got it , inserting...\n\n");
           local_input_tensors.push_back(plaidml::edsl::Value(input));
-          //printf("trying to print the input num:%d name %s\n\n\n",count_i,local_input->Name().c_str());
         }
       } catch (const std::out_of_range& e) {
-        //printf("trying to print the input num:%d name %s\n\n\n",count_i,local_input->Name().c_str());
         throw std::runtime_error("Could not find expected tensor " + local_input->Name() + " [TODO better error handling]");
       }
     }
     ONNX_NAMESPACE::NodeProto node_proto;
     node.ToProto(node_proto);
-    //printf("creating op for node: %s\n\n",node_proto.op_type().c_str());
     auto local_output_tensors = plaidml_ep::MakePlaidMLOp(node_proto, local_input_tensors);
     // Iterate over output tensors and names in tandem
     auto output_tensor_it = local_output_tensors.begin();
