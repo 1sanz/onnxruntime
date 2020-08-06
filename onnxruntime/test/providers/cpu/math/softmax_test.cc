@@ -28,7 +28,6 @@ static void RunTest(const std::vector<float>& x_vals,
   if (!is_tensorrt_supported) {
     excluded_providers.insert(kTensorrtExecutionProvider);
   }
-  excluded_providers.insert(kPlaidMLExecutionProvider);
   test.Run(expect_result, error_msg, excluded_providers);
 }
 

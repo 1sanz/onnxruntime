@@ -24,14 +24,13 @@ std::map<std::string, OpFunction> kSupportedOps = {
   {"Clip", clip},
   {"Cos", cos},
   {"Cosh", cosh},
-  //{"CumSum", cumsum},
   {"Div", div},
   {"Equal", equal},
   {"Erf", erf},
   {"Exp", exp},
-  //{"Flatten", flatten},
   {"Floor", floor},
   {"Greater", greater},
+  {"Identity", identity},
   {"Less", less},
   {"Log", log},
   {"Max", max},
@@ -47,6 +46,7 @@ std::map<std::string, OpFunction> kSupportedOps = {
   {"Relu", relu},
   {"Reshape", reshape},
   {"SampleOp", sample_op},
+  {"Shape", shape},
   {"Sigmoid", sigmoid},
   {"Sign", sign},
   {"Sin", sin},
@@ -57,7 +57,6 @@ std::map<std::string, OpFunction> kSupportedOps = {
   {"Tan", tan,},
   {"Tanh", tanh,},
   {"Tile", tile,},
-  {"Transpose", transpose,},
   {"Xor", logical_xor,},
 };
 
@@ -66,6 +65,7 @@ std::map<std::string, _OpFunction> _kSupportedOps =
   {"ArgMax", _argmax,},
   {"ArgMin", _argmin,},
   {"AveragePool", _average_pool,},
+  {"Cast",_cast},
   {"Conv",_conv},
   //{"ConvInteger",_conv},
   {"Concat",_concat},
@@ -74,18 +74,21 @@ std::map<std::string, _OpFunction> _kSupportedOps =
   {"Flatten", _flatten},
   {"HardSigmoid",_hard_sigmoid},
   {"LogSoftmax",_log_softmax},
+  {"LpNormalization",_lp_normalization},
   {"LRN",_lrn},
   {"MaxPool",_maxpool},
   {"Mod",_mod},
-  {"OneHot",_one_hot},
+  //{"OneHot",_one_hot},
   {"ReduceMax",_reduce_max},
   {"ReduceMean",_reduce_mean},
   {"ReduceMin",_reduce_min},
   {"ReduceProd",_reduce_prod},
   {"ReduceSum",_reduce_sum},
+  {"ReverseSequence",_reverse_sequence},
   {"Selu",_selu},
   {"Softmax",_softmax},
   {"Squeeze",_squeeze},
+  {"Transpose", _transpose,},
   {"Unsqueeze",_unsqueeze},
 
 };
@@ -184,12 +187,6 @@ std::vector<plaidml::edsl::Tensor> cosh(const std::vector<plaidml::edsl::Value>&
   return {plaidml::edsl::cosh(A)};
 }
 
-// std::vector<plaidml::edsl::Tensor> cumsum(const std::vector<plaidml::edsl::Value>& args) {
-//   const auto& A = args[0].as_tensor();
-//   const auto& B = args[1].as_int();
-//   return {plaidml::op::cumsum(A,B)};
-// }
-
 std::vector<plaidml::edsl::Tensor> div(const std::vector<plaidml::edsl::Value>& args) {
   const auto& A = args[0].as_tensor();
   const auto& B = args[1].as_tensor();
@@ -235,6 +232,11 @@ std::vector<plaidml::edsl::Tensor> greater(const std::vector<plaidml::edsl::Valu
   const auto& A = args[0].as_tensor();
   const auto& B = args[1].as_tensor();
   return {A > B};
+}
+
+std::vector<plaidml::edsl::Tensor> identity(const std::vector<plaidml::edsl::Value>& args) {
+  const auto& I = args[0].as_tensor();
+  return {I};
 }
 
 std::vector<plaidml::edsl::Tensor> less(const std::vector<plaidml::edsl::Value>& args) {
@@ -314,13 +316,18 @@ std::vector<plaidml::edsl::Tensor> relu(const std::vector<plaidml::edsl::Value>&
 
 std::vector<plaidml::edsl::Tensor> reshape(const std::vector<plaidml::edsl::Value>& args) {
   const auto& I = args[0].as_tensor();
-  const auto& shape = args[1].as_tensor();//need to convert this into 
+  const auto& shape = args[1];//need to convert this into 
   return {plaidml::op::reshape(I,plaidml::edsl::make_tuple(shape))};
 }
 
 std::vector<plaidml::edsl::Tensor> sample_op(const std::vector<plaidml::edsl::Value>& args) {
   const auto& X = args[0].as_tensor();
   return {X};
+}
+
+std::vector<plaidml::edsl::Tensor> shape(const std::vector<plaidml::edsl::Value>& args) {
+  const auto& I= args[0].as_tensor();
+  return {plaidml::edsl::shape(I)};
 }
 
 std::vector<plaidml::edsl::Tensor> sign(const std::vector<plaidml::edsl::Value>& args) {
@@ -383,12 +390,6 @@ std::vector<plaidml::edsl::Tensor> tile(const std::vector<plaidml::edsl::Value>&
   return {plaidml::op::tile(inputs, reps_int)};
 }
 
-std::vector<plaidml::edsl::Tensor> transpose(const std::vector<plaidml::edsl::Value>& args){
-  const auto& A = args[0].as_tensor();
-  return {plaidml::op::transpose(A)};
-}
-
-
 std::vector<plaidml::edsl::Tensor> _argmax(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -449,6 +450,77 @@ std::vector<plaidml::edsl::Tensor> _argmin(
       }
     }
   return {plaidml::op::argmax(-A,plaidml::edsl::make_tuple(axis))};
+}
+
+std::vector<plaidml::edsl::Tensor> _cast(
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs){
+  
+    const auto& I = inputs[0].as_tensor();
+    int to = onnx::TensorProto::UNDEFINED;
+    auto plaidml_type = plaidml::DType::INVALID;
+    auto num_attributes = node.attribute_size();
+    if(num_attributes>0){
+      auto attributes = node.attribute();
+      for(auto attribute :attributes)
+      {
+        if(attribute.name() == "to")
+        {
+          to = attribute.i();
+        }
+      }
+    }
+
+    switch (to) {
+      case onnx::TensorProto::INT8:
+        plaidml_type = plaidml::DType::INT8;
+        break;
+      case onnx::TensorProto::INT16:
+        plaidml_type = plaidml::DType::INT8;
+        break;
+      case onnx::TensorProto::INT32:
+        plaidml_type = plaidml::DType::INT32;
+        break;
+      case onnx::TensorProto::INT64:
+        plaidml_type = plaidml::DType::INT64;
+        break;
+      case onnx::TensorProto::UINT8:
+        plaidml_type = plaidml::DType::UINT8;
+        break;
+      case onnx::TensorProto::UINT16:
+        plaidml_type = plaidml::DType::UINT16;
+        break;
+      case onnx::TensorProto::UINT32:
+        plaidml_type = plaidml::DType::UINT32;
+        break;
+      case onnx::TensorProto::UINT64:
+        plaidml_type = plaidml::DType::UINT64;
+        break;
+      case onnx::TensorProto::BOOL:
+        plaidml_type = plaidml::DType::BOOLEAN;
+        break;
+      case onnx::TensorProto::FLOAT16:
+        plaidml_type = plaidml::DType::FLOAT16;
+        break;
+      case onnx::TensorProto::FLOAT:
+        plaidml_type = plaidml::DType::FLOAT32;
+        break;
+      case onnx::TensorProto::DOUBLE: 
+        plaidml_type = plaidml::DType::FLOAT64;
+        break;
+      case onnx::TensorProto::BFLOAT16:
+        plaidml_type = plaidml::DType::BFLOAT16;
+        break;
+      case onnx::TensorProto::STRING:
+      case onnx::TensorProto::COMPLEX64:
+      case onnx::TensorProto::COMPLEX128:
+        throw std::runtime_error("{PlaidML} ERROR: Asked to cast to unsupported data_type");
+        break;
+
+      default:
+      throw std::runtime_error("{PlaidML} ERROR: Asked to cast to Unrecognized data_type");
+    }
+  return {plaidml::edsl::cast(I,plaidml_type)};
 }
 
 std::vector<plaidml::edsl::Tensor> _concat(
@@ -579,12 +651,12 @@ std::vector<plaidml::edsl::Tensor> _cumsum(
   auto num_attributes = node.attribute_size();
     if(num_attributes>0){
       auto attributes = node.attribute();
-      for(auto attribute = attributes.begin();attribute < attributes.end();attribute++){
-        if(attribute->name() == "exclusive"){
-         exclusive = attribute->i();
+      for(auto attribute :attributes){
+        if(attribute.name() == "exclusive"){
+         exclusive = attribute.i();
         }
-        if(attribute->name() == "reverse"){
-         reverse = attribute->i();
+        if(attribute.name() == "reverse"){
+         reverse = attribute.i();
         }
       }
     }
@@ -613,7 +685,7 @@ std::vector<plaidml::edsl::Tensor> _flatten(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
     const auto X = inputs[0].as_tensor();
-    int axis = 0; //TODO: add check (input tensor must have rank>=axis)
+    int axis = 0; 
 
     auto num_attributes = node.attribute_size();
     if(num_attributes>0){
@@ -669,7 +741,6 @@ std::vector<plaidml::edsl::Tensor> _hard_sigmoid(
   result = plaidml::edsl::select(result > O, O, result);
   result = plaidml::edsl::select(result < Z, Z, result);
 
-  //return edsl::make_tuple(I);
   return {result};
 }
 
@@ -693,6 +764,62 @@ std::vector<plaidml::edsl::Tensor> _log_softmax(
     }
   auto O = plaidml::op::softmax(A,axis);
   return {plaidml::edsl::log(O)};
+}
+
+std::vector<plaidml::edsl::Tensor> _lp_normalization(
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs){
+  
+    const auto& I = inputs[0].as_tensor();
+    int axis = -1;
+    int p = 2;
+    auto num_attributes = node.attribute_size();
+    if(num_attributes>0){
+      auto attributes = node.attribute();
+      for(auto attribute = attributes.begin();attribute < attributes.end();attribute++)
+      {
+        if(attribute->name() == "axis")
+        {
+          axis = attribute->i();
+        }
+        if(attribute->name() == "p")
+        {
+          p = attribute->i();
+        }
+      }
+    }
+    
+    std::vector<int64_t> axes; 
+    size_t last_axis = I.rank()-1;
+
+    if(axis==-1){
+      axes.push_back(last_axis);
+      }
+    else {
+      axes.push_back(size_t(axis));
+      }
+
+    if(p==2)
+    {
+        
+    }
+
+    if(p!=1 && p!=2)
+    {
+      throw std::runtime_error("LpNormalize only supports p=1 and p=2");
+    }
+
+    if(p==1){
+      //l1norm
+      auto X = plaidml::op::sum(I,plaidml::edsl::make_tuple(axes), 1);
+      auto N = plaidml::op::maximum(X, plaidml::edsl::Tensor{0.001});
+      return {I/N};
+    }
+    else{
+      //l2norm
+      auto N = plaidml::op::l2norm(I, {axes});
+      return {I/N};
+    } 
 }
 
 std::vector<plaidml::edsl::Tensor> _lrn(    
@@ -1077,6 +1204,46 @@ std::vector<plaidml::edsl::Tensor> _reduce_sum(
   return {plaidml::op::sum(A,plaidml::edsl::make_tuple(axes),keep_dims)};
 }
 
+std::vector<plaidml::edsl::Tensor> _reverse_sequence(    
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs){
+  const auto& I = inputs[0].as_tensor();
+  //const auto& sequence_lens = inputs[1].as_tensor();
+  size_t batch_axis = 1;
+  size_t time_axis = 0;
+
+  auto num_attributes = node.attribute_size();
+    if(num_attributes>0){
+       auto attributes = node.attribute();
+      for(auto attribute: attributes){
+        if(attribute.name() == "batch_axis"){
+         batch_axis = attribute.i();
+        }
+        if(attribute.name() == "time_axis"){
+         time_axis = attribute.i();
+        }
+      }
+    }
+
+   
+ 
+
+  //check that input tensor has rank>=2 else throw error
+  // if(I.rank()<2){
+  //   throw std::runtime_error("{PlaidML ERROR} ReverseSequense reqiured an input Tensor of rank >= 2");
+  // }
+  // if(time_axis> I.rank() || batch_axis>I.rank()){
+  //   throw std::runtime_error("{PlaidML ERROR} ReverseSequense was given invalid axis");
+  // }
+
+ 
+
+   //auto O=I+I;
+
+
+  return {I+I};
+}
+
 std::vector<plaidml::edsl::Tensor> _selu(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1163,19 +1330,22 @@ std::vector<plaidml::edsl::Tensor> _transpose(
     const std::vector<plaidml::edsl::Value>& inputs){
   
     const auto& A = inputs[0].as_tensor();
-    std::vector<size_t> axes;
+    std::vector<int64_t> axes;
+    bool no_perm = true;
     auto num_attributes = node.attribute_size();
-    if(num_attributes>0){
-      auto attributes = node.attribute();
-      for(auto attribute: attributes)
-      {
+     if(num_attributes>0){
+       auto attributes = node.attribute();
+       for(auto attribute: attributes)
+       {
         if(attribute.name() == "perm"){
          auto  at_axes = attribute.ints();
          axes.assign(at_axes.begin(),at_axes.end());
+         no_perm = false;
         }
-      }
-    }
-  return {plaidml::op::transpose(A,plaidml::edsl::make_tuple(axes))};
+       }
+     }
+    if(no_perm) return {plaidml::op::transpose(A)};
+    else return {plaidml::op::transpose(A,plaidml::edsl::make_tuple(axes))};
 }
 
 std::vector<plaidml::edsl::Tensor> MakePlaidMLOp(
@@ -1192,14 +1362,12 @@ std::vector<plaidml::edsl::Tensor> MakePlaidMLOp(
   if (op_it == plaidml_ep::kSupportedOps.end() && _op_it==plaidml_ep::_kSupportedOps.end()) {
     throw std::runtime_error("Asked to executed unsupported op " + node.op_type());
   }
-  //return op_it->second(inputs);
   if(op_it != plaidml_ep::kSupportedOps.end()){
     return op_it->second(inputs);
   }
   else{
     return _op_it->second(node, inputs);
   }
-  
 }
 
 }  // namespace plaidml_ep

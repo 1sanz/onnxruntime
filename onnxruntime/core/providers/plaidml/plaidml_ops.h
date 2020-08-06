@@ -24,6 +24,9 @@ std::vector<plaidml::edsl::Tensor> logical_and(const std::vector<plaidml::edsl::
 std::vector<plaidml::edsl::Tensor> logical_or(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> logical_not(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> logical_xor(const std::vector<plaidml::edsl::Value>& args);
+std::vector<plaidml::edsl::Tensor> _lp_normalization(
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs);
 std::vector<plaidml::edsl::Tensor> _mod(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
@@ -126,7 +129,9 @@ std::vector<plaidml::edsl::Tensor> sum(const std::vector<plaidml::edsl::Value>& 
 
 
 //---------------------------------------other ops
-//std::vector<plaidml::edsl::Tensor> cast(const std::vector<plaidml::edsl::Value>& args);
+std::vector<plaidml::edsl::Tensor> _cast(
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs);
 std::vector<plaidml::edsl::Tensor> clip(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> _concat(
     const ONNX_NAMESPACE::NodeProto& node,
@@ -145,7 +150,7 @@ std::vector<plaidml::edsl::Tensor> _flatten(
 //std::vector<plaidml::edsl::Tensor> gather(const std::vector<plaidml::edsl::Value>& args);
 //std::vector<plaidml::edsl::Tensor> gather_elements(const std::vector<plaidml::edsl::Value>& args);
 //std::vector<plaidml::edsl::Tensor> gem(const std::vector<plaidml::edsl::Value>& args);
-//std::vector<plaidml::edsl::Tensor> identity(const std::vector<plaidml::edsl::Value>& args);
+std::vector<plaidml::edsl::Tensor> identity(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> _log_softmax(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
@@ -154,7 +159,7 @@ std::vector<plaidml::edsl::Tensor> _log_softmax(
 //std::vector<plaidml::edsl::Tensor> matmul_integer(const std::vector<plaidml::edsl::Value>& args);
 //std::vector<plaidml::edsl::Tensor> pad(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> reshape(const std::vector<plaidml::edsl::Value>& args);
-//std::vector<plaidml::edsl::Tensor> shape(const std::vector<plaidml::edsl::Value>& args);
+std::vector<plaidml::edsl::Tensor> shape(const std::vector<plaidml::edsl::Value>& args);
 //std::vector<plaidml::edsl::Tensor> slice(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> _softmax(
     const ONNX_NAMESPACE::NodeProto& node,
@@ -163,7 +168,10 @@ std::vector<plaidml::edsl::Tensor> _softmax(
 std::vector<plaidml::edsl::Tensor> _squeeze(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
-std::vector<plaidml::edsl::Tensor> transpose(const std::vector<plaidml::edsl::Value>& args);
+//std::vector<plaidml::edsl::Tensor> transpose(const std::vector<plaidml::edsl::Value>& args);
+std::vector<plaidml::edsl::Tensor> _transpose(
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs);
 std::vector<plaidml::edsl::Tensor> _unsqueeze(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
@@ -189,6 +197,10 @@ std::vector<plaidml::edsl::Tensor> _lrn(
     const std::vector<plaidml::edsl::Value>& inputs);
 
 std::vector<plaidml::edsl::Tensor> _one_hot(
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs);
+
+std::vector<plaidml::edsl::Tensor> _reverse_sequence(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
 

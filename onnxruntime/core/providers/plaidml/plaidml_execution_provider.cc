@@ -21,15 +21,15 @@ plaidml::DType ConvertPrecisionONNXToPlaidML(
     ONNX_NAMESPACE::DataType onnx_type) {
   if (*onnx_type == "double" || *onnx_type == "tensor(double)") {
     return plaidml::DType::FLOAT64;
-  }else if (*onnx_type == "float" || *onnx_type == "tensor(float)") {
+  } else if (*onnx_type == "float" || *onnx_type == "tensor(float)") {
     return plaidml::DType::FLOAT32;
   } else if (*onnx_type == "float16" || *onnx_type == "tensor(float16)") {
     return plaidml::DType::FLOAT16;
   } else if (*onnx_type == "int32" || *onnx_type == "tensor(int32)") {
     return plaidml::DType::INT32;
-  }else if (*onnx_type == "int64" || *onnx_type == "tensor(int64)") {
+  } else if (*onnx_type == "int64" || *onnx_type == "tensor(int64)") {
     return plaidml::DType::INT64; 
-  }else if (*onnx_type == "int16" || *onnx_type == "tensor(int16)") {
+  } else if (*onnx_type == "int16" || *onnx_type == "tensor(int16)") {
     return plaidml::DType::INT16;
   } else if (*onnx_type == "int8" || *onnx_type == "tensor(int8)") {
     return plaidml::DType::INT8;
@@ -40,12 +40,11 @@ plaidml::DType ConvertPrecisionONNXToPlaidML(
   } else if (*onnx_type == "bool" || *onnx_type == "tensor(bool)") {
     return plaidml::DType::BOOLEAN;
   } 
-  // else if(*onnx_type == "string" || *onnx_type == "tensor(string)"){
-  //   return plaidml::DType::???;
-  // }
-  else {
-    throw "Unsupported Data type";
+  else{
+    throw std::runtime_error("{PlaidML} ERROR: invalid data type");
+    return plaidml::DType::INVALID;
   }
+
 }
 // TODO: Some of this stuff should probably be separated into new files
 
@@ -226,10 +225,12 @@ common::Status PlaidMLExecutionProvider::Compile(
             binder.input(input_placeholder).copy_from(input_data);
           }
           plaidml::init();
-          plaidml::edsl::init();
-          plaidml::op::init();
-          plaidml::exec::init();
-          executable->run();
+      
+          
+              plaidml::edsl::init();
+              plaidml::op::init();
+              plaidml::exec::init();
+              executable->run();
 
           // Write output data
           unsigned output_idx = 0;
