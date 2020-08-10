@@ -41,7 +41,9 @@ plaidml::DType ConvertPrecisionONNXToPlaidML(
     return plaidml::DType::BOOLEAN;
   } 
   else{
-    throw std::runtime_error("{PlaidML} ERROR: invalid data type");
+    auto error = "{PlaidML} ERROR: invalid data type " + *onnx_type;
+    //buffer = sprintf("{PlaidML} ERROR: invalid data type %s",*onnx_type);
+    throw std::runtime_error(error);
     return plaidml::DType::INVALID;
   }
 
@@ -225,7 +227,6 @@ common::Status PlaidMLExecutionProvider::Compile(
             binder.input(input_placeholder).copy_from(input_data);
           }
           plaidml::init();
-      
           
               plaidml::edsl::init();
               plaidml::op::init();

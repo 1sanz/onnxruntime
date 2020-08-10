@@ -34,6 +34,7 @@ std::map<std::string, OpFunction> kSupportedOps = {
   {"Less", less},
   {"Log", log},
   {"Max", max},
+  {"Mean", mean},
   //{"MatMul", matmul},
   {"Min", min},
   {"Mul", mul},
@@ -57,6 +58,7 @@ std::map<std::string, OpFunction> kSupportedOps = {
   {"Tan", tan,},
   {"Tanh", tanh,},
   {"Tile", tile,},
+  {"Where", where,},
   {"Xor", logical_xor,},
 };
 
@@ -67,12 +69,14 @@ std::map<std::string, _OpFunction> _kSupportedOps =
   {"AveragePool", _average_pool,},
   {"Cast",_cast},
   {"Conv",_conv},
-  //{"ConvInteger",_conv},
+  {"ConvInteger",_conv},
   {"Concat",_concat},
   {"CumSum", _cumsum},
   {"Elu",_elu},
+  {"EyeLike",_eye_like},
   {"Flatten", _flatten},
   {"HardSigmoid",_hard_sigmoid},
+  {"LeakyRelu",_leaky_relu},
   {"LogSoftmax",_log_softmax},
   {"LpNormalization",_lp_normalization},
   {"LRN",_lrn},
@@ -87,7 +91,9 @@ std::map<std::string, _OpFunction> _kSupportedOps =
   {"ReverseSequence",_reverse_sequence},
   {"Selu",_selu},
   {"Softmax",_softmax},
+  {"Split",_split},
   {"Squeeze",_squeeze},
+  {"ThresholdedRelu",_thresholded_relu},
   {"Transpose", _transpose,},
   {"Unsqueeze",_unsqueeze},
 
@@ -270,6 +276,16 @@ std::vector<plaidml::edsl::Tensor> max(const std::vector<plaidml::edsl::Value>& 
 //   return {plaidml::op::dot(A,B)};
 // }
 
+std::vector<plaidml::edsl::Tensor> mean(const std::vector<plaidml::edsl::Value>& args) {
+  int num_tensors = (int)args.size();
+  auto result = args[0].as_tensor();
+  if(args.size()==1)return {result};
+  for(size_t i=1;i<args.size();i++){
+    result = result + args[i].as_tensor();
+  }
+  return {result/num_tensors};
+}
+
 std::vector<plaidml::edsl::Tensor> min(const std::vector<plaidml::edsl::Value>& args) {
   plaidml::edsl::Tensor result = args[0].as_tensor();
   if(args.size()==1)return {result};
@@ -388,6 +404,16 @@ std::vector<plaidml::edsl::Tensor> tile(const std::vector<plaidml::edsl::Value>&
   //const auto& repeats = args[1].as_tensor();// TODO: need to convert this to vector<int>
   std::vector<int> reps_int;
   return {plaidml::op::tile(inputs, reps_int)};
+}
+
+std::vector<plaidml::edsl::Tensor> where(const std::vector<plaidml::edsl::Value>& args) {
+  const auto& condition = args[0].as_tensor();
+  const auto& X = args[1].as_tensor();
+  const auto& Y = args[2].as_tensor();
+
+  auto O = plaidml::edsl::select(condition,X,Y);
+
+  return {O};
 }
 
 std::vector<plaidml::edsl::Tensor> _argmax(
@@ -681,6 +707,55 @@ std::vector<plaidml::edsl::Tensor> _elu(
   return {plaidml::edsl::select(I >= 0, I, alpha * (plaidml::edsl::exp(I) - 1))};
 }
 
+std::vector<plaidml::edsl::Tensor> _eye_like(    
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs){
+    const auto I = inputs[0].as_tensor();
+    // must be 2D tensor 
+    if(I.rank()>2)throw std::runtime_error("{PlaidML} ERROR: EyeLike given tensor of rank !=2 \n");
+    int dtype = 0; //optional attribue 
+    bool has_dtye = false;
+    int k = 0; 
+    auto num_attributes = node.attribute_size();
+    if(num_attributes>0){
+      auto attributes = node.attribute();
+      for(auto attribute: attributes){
+        if(attribute.name() == "dtype"){
+         dtype = attribute.i();
+         has_dtye = true;
+        }
+        if(attribute.name() == "k"){
+         k = attribute.i();
+        }
+      }
+    }
+    //create identity matrix from input tensor
+    //auto identity = plaidml::edsl::ident(I);
+    plaidml::edsl::TensorDim X, Y;
+    plaidml::edsl::TensorIndex x, y, i;
+    I.bind_dims(X, Y);
+    auto O = plaidml::edsl::TensorOutput(X,Y);
+    
+    //auto O = plaidml::edsl::Placeholder(type, shape);
+    auto I_zero = plaidml::edsl::Tensor{0};
+    auto I_one = plaidml::edsl::Tensor{1};
+    O(x,y) = I_zero(i);
+    O(x,x+k) = I_one(i);
+    //O(x,x+k) = I(x,x+k) + I(x,x+k);
+    //O = O - I;
+    // O = plaidml::edsl::select(O>0,plaidml::edsl::Tensor{1},O);
+    //TODO: should not require division, needs a work around
+    //TODO: maybe select should allow indices 
+    // O = plaidml::edsl::select(y==x+k,0,1) should get the required identity ?
+ 
+
+    
+    //TODO: handle dtye attribute
+    //if(has_dtype){cast the tensor into given dtype  }
+
+    return {O};	 
+}
+
 std::vector<plaidml::edsl::Tensor> _flatten(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -799,11 +874,6 @@ std::vector<plaidml::edsl::Tensor> _lp_normalization(
       axes.push_back(size_t(axis));
       }
 
-    if(p==2)
-    {
-        
-    }
-
     if(p!=1 && p!=2)
     {
       throw std::runtime_error("LpNormalize only supports p=1 and p=2");
@@ -820,6 +890,24 @@ std::vector<plaidml::edsl::Tensor> _lp_normalization(
       auto N = plaidml::op::l2norm(I, {axes});
       return {I/N};
     } 
+}
+
+std::vector<plaidml::edsl::Tensor> _leaky_relu(    
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs){
+  const auto& I = inputs[0].as_tensor();
+  float alpha = 0.01;
+
+  auto num_attributes = node.attribute_size();
+    if(num_attributes>0){
+      auto attributes = node.attribute();
+      for(auto attribute = attributes.begin();attribute < attributes.end();attribute++){
+        if(attribute->name() == "alpha"){
+         alpha = attribute->f();
+        }
+      }
+    }
+  return {plaidml::op::relu(I).alpha(plaidml::edsl::Tensor{alpha})};
 }
 
 std::vector<plaidml::edsl::Tensor> _lrn(    
@@ -1229,12 +1317,12 @@ std::vector<plaidml::edsl::Tensor> _reverse_sequence(
  
 
   //check that input tensor has rank>=2 else throw error
-  // if(I.rank()<2){
-  //   throw std::runtime_error("{PlaidML ERROR} ReverseSequense reqiured an input Tensor of rank >= 2");
-  // }
-  // if(time_axis> I.rank() || batch_axis>I.rank()){
-  //   throw std::runtime_error("{PlaidML ERROR} ReverseSequense was given invalid axis");
-  // }
+  if(I.rank()<2){
+    throw std::runtime_error("{PlaidML ERROR} ReverseSequense reqiured an input Tensor of rank >= 2");
+  }
+  if(time_axis> I.rank() || batch_axis>I.rank()){
+    throw std::runtime_error("{PlaidML ERROR} ReverseSequense was given invalid axis");
+  }
 
  
 
@@ -1267,43 +1355,6 @@ std::vector<plaidml::edsl::Tensor> _selu(
   return {gamma * plaidml::edsl::select(I > 0, I, alpha * (plaidml::edsl::exp(I) - 1))};
 }
 
-std::vector<plaidml::edsl::Tensor> _squeeze(    
-    const ONNX_NAMESPACE::NodeProto& node,
-    const std::vector<plaidml::edsl::Value>& inputs){
-  const auto& A = inputs[0].as_tensor();
-  std::vector<int> axes;
-  auto num_attributes = node.attribute_size();
-    if(num_attributes>0){
-      auto attributes = node.attribute();
-      for(auto attribute: attributes){
-        if(attribute.name() == "axes"){
-         auto  at_axes = attribute.ints();
-         axes.assign(at_axes.begin(),at_axes.end());
-        }
-      }
-    }
-  return {plaidml::op::squeeze(A,axes)};
-}
-
-std::vector<plaidml::edsl::Tensor> _unsqueeze(    
-    const ONNX_NAMESPACE::NodeProto& node,
-    const std::vector<plaidml::edsl::Value>& inputs){
-  const auto& A = inputs[0].as_tensor();
-  std::vector<int64_t> axes;
-  auto num_attributes = node.attribute_size();
-    if(num_attributes>0){
-      auto attributes = node.attribute();
-      for(auto attribute: attributes){
-        if(attribute.name() == "axes"){
-         auto  at_axes = attribute.ints();
-         axes.assign(at_axes.begin(),at_axes.end());
-        }
-      }
-    }
-  return {plaidml::op::unsqueeze(A,{axes})};
-}
-
-
 std::vector<plaidml::edsl::Tensor> _softmax(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1323,6 +1374,93 @@ std::vector<plaidml::edsl::Tensor> _softmax(
       }
     }
   return {plaidml::op::softmax(A,axis)};
+}
+
+std::vector<plaidml::edsl::Tensor> _split(
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs){
+  
+    const auto& I = inputs[0].as_tensor();
+    int axis = 0;
+    std::vector<int> splits;
+    std::vector<plaidml::edsl::Tensor> I_split;
+    auto num_attributes = node.attribute_size();
+    if(num_attributes>0){
+      auto attributes = node.attribute();
+      for(auto attribute: attributes)
+      {
+        if(attribute.name() == "axis")
+        {
+          const auto at_axis = attribute.i();
+          axis = at_axis;
+        }
+        if(attribute.name() == "split")
+        {
+          const auto at_split = attribute.ints();
+          splits.assign(at_split.begin(),at_split.end());
+        }
+      }
+    }
+    auto ndims = I.rank();
+    std::vector<plaidml::edsl::TensorDim> I_dims(ndims);
+    I.bind_dims(I_dims);
+    std::vector<plaidml::edsl::TensorDim> O_dims(I_dims);
+    std::vector<plaidml::edsl::TensorIndex> I_idxs(ndims);
+    std::vector<plaidml::edsl::TensorIndex> O_idxs(I_idxs);
+
+    //set up dims for output
+  
+    if(splits.size()==0){
+      return {I};
+      }
+     int64_t prev_split = 0;
+    for(auto split: splits){
+      //O_idxs[axis] = (int64_t)split;
+      auto O = plaidml::edsl::TensorOutput(O_dims);
+      O(O_idxs) = I(I_idxs);
+      //O.add_constraint(prev_split < I_idxs[axis]);
+      O.add_constraint(I_idxs[axis] < (int64_t)split);
+      I_split.push_back(O);
+      prev_split = (int64_t)split;
+    }
+
+  return {I_split};
+}
+
+std::vector<plaidml::edsl::Tensor> _squeeze(    
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs){
+  const auto& A = inputs[0].as_tensor();
+  std::vector<int> axes;
+  auto num_attributes = node.attribute_size();
+    if(num_attributes>0){
+      auto attributes = node.attribute();
+      for(auto attribute: attributes){
+        if(attribute.name() == "axes"){
+         auto  at_axes = attribute.ints();
+         axes.assign(at_axes.begin(),at_axes.end());
+        }
+      }
+    }
+  return {plaidml::op::squeeze(A,axes)};
+}
+
+std::vector<plaidml::edsl::Tensor> _thresholded_relu(    
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs){
+  const auto& I = inputs[0].as_tensor();
+  float alpha = 1.0;
+
+  auto num_attributes = node.attribute_size();
+    if(num_attributes>0){
+      auto attributes = node.attribute();
+      for(auto attribute = attributes.begin();attribute < attributes.end();attribute++){
+        if(attribute->name() == "alpha"){
+         alpha = attribute->f();
+        }
+      }
+    }
+  return {plaidml::op::relu(I).threshold((double)alpha)};
 }
 
 std::vector<plaidml::edsl::Tensor> _transpose(
@@ -1346,6 +1484,24 @@ std::vector<plaidml::edsl::Tensor> _transpose(
      }
     if(no_perm) return {plaidml::op::transpose(A)};
     else return {plaidml::op::transpose(A,plaidml::edsl::make_tuple(axes))};
+}
+
+std::vector<plaidml::edsl::Tensor> _unsqueeze(    
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs){
+  const auto& A = inputs[0].as_tensor();
+  std::vector<int64_t> axes;
+  auto num_attributes = node.attribute_size();
+    if(num_attributes>0){
+      auto attributes = node.attribute();
+      for(auto attribute: attributes){
+        if(attribute.name() == "axes"){
+         auto  at_axes = attribute.ints();
+         axes.assign(at_axes.begin(),at_axes.end());
+        }
+      }
+    }
+  return {plaidml::op::unsqueeze(A,{axes})};
 }
 
 std::vector<plaidml::edsl::Tensor> MakePlaidMLOp(
