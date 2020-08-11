@@ -17,6 +17,8 @@
 #include <stdio.h>
 #include <string.h>
 namespace onnxruntime {
+
+  //TODO: move to plaidml_utils
 plaidml::DType ConvertPrecisionONNXToPlaidML(
     ONNX_NAMESPACE::DataType onnx_type) {
   if (*onnx_type == "double" || *onnx_type == "tensor(double)") {
@@ -41,9 +43,7 @@ plaidml::DType ConvertPrecisionONNXToPlaidML(
     return plaidml::DType::BOOLEAN;
   } 
   else{
-    auto error = "{PlaidML} ERROR: invalid data type " + *onnx_type;
-    //buffer = sprintf("{PlaidML} ERROR: invalid data type %s",*onnx_type);
-    throw std::runtime_error(error);
+    throw std::runtime_error("{PlaidML} ERROR: invalid data type " + *onnx_type);
     return plaidml::DType::INVALID;
   }
 
@@ -65,13 +65,10 @@ PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
 
   // For each input, look up shape (or at least rank) and construct a (placeholder) tensor accordingly;
   // add this to the `tensors` dict
-
-  int count =0;
   
   for (const auto& node_input : fused_node->InputDefs()) {
     // TODO: A node_input's Shape can be nullptr (i.e. if the input isn't a tensor) and we need to handle that case
     // TODO: This doesn't address symbolic shapes
-    count++;
     std::vector<int64_t> shape;
     for (int dim = 0; dim < node_input->Shape()->dim_size(); dim++) {
       shape.push_back(node_input->Shape()->dim(dim).dim_value());
@@ -90,10 +87,9 @@ PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
   
   for (const auto& node : fused_node->GetFunctionBody()->Body().Nodes()) {
     std::vector<plaidml::edsl::Value> local_input_tensors;
-    int count_i=0;
+   
     for (const auto& local_input : node.InputDefs()) {
       try {
-        count_i++;
         if(local_input->Name()!=""){
           auto input = init_tensors.at(local_input->Name());
           local_input_tensors.push_back(plaidml::edsl::Value(input));

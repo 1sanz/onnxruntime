@@ -714,7 +714,7 @@ std::vector<plaidml::edsl::Tensor> _eye_like(
     // must be 2D tensor 
     if(I.rank()>2)throw std::runtime_error("{PlaidML} ERROR: EyeLike given tensor of rank !=2 \n");
     int dtype = 0; //optional attribue 
-    bool has_dtye = false;
+    bool has_dtype = false;
     int k = 0; 
     auto num_attributes = node.attribute_size();
     if(num_attributes>0){
@@ -722,32 +722,35 @@ std::vector<plaidml::edsl::Tensor> _eye_like(
       for(auto attribute: attributes){
         if(attribute.name() == "dtype"){
          dtype = attribute.i();
-         has_dtye = true;
+         has_dtype = true;
         }
         if(attribute.name() == "k"){
          k = attribute.i();
         }
       }
     }
+
+    if(!has_dtype && k==0){
+      return{plaidml::edsl::ident(I)};
+      }
+
     //create identity matrix from input tensor
-    //auto identity = plaidml::edsl::ident(I);
     plaidml::edsl::TensorDim X, Y;
-    plaidml::edsl::TensorIndex x, y, i;
+    plaidml::edsl::TensorIndex i,j;
     I.bind_dims(X, Y);
     auto O = plaidml::edsl::TensorOutput(X,Y);
     
     //auto O = plaidml::edsl::Placeholder(type, shape);
     auto I_zero = plaidml::edsl::Tensor{0};
     auto I_one = plaidml::edsl::Tensor{1};
-    O(x,y) = I_zero(i);
-    O(x,x+k) = I_one(i);
+    O(i,j) = I_zero(i);
+    O(i,i+k) = I_one(i);
     //O(x,x+k) = I(x,x+k) + I(x,x+k);
     //O = O - I;
     // O = plaidml::edsl::select(O>0,plaidml::edsl::Tensor{1},O);
-    //TODO: should not require division, needs a work around
     //TODO: maybe select should allow indices 
     // O = plaidml::edsl::select(y==x+k,0,1) should get the required identity ?
- 
+    
 
     
     //TODO: handle dtye attribute
@@ -1312,10 +1315,6 @@ std::vector<plaidml::edsl::Tensor> _reverse_sequence(
         }
       }
     }
-
-   
- 
-
   //check that input tensor has rank>=2 else throw error
   if(I.rank()<2){
     throw std::runtime_error("{PlaidML ERROR} ReverseSequense reqiured an input Tensor of rank >= 2");
@@ -1376,7 +1375,7 @@ std::vector<plaidml::edsl::Tensor> _softmax(
   return {plaidml::op::softmax(A,axis)};
 }
 
-std::vector<plaidml::edsl::Tensor> _split(
+std::vector<plaidml::edsl::Tensor> _split(//TODO: need to handle multiple outputs in makeprogram 
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
   
@@ -1415,10 +1414,9 @@ std::vector<plaidml::edsl::Tensor> _split(
       }
      int64_t prev_split = 0;
     for(auto split: splits){
-      //O_idxs[axis] = (int64_t)split;
       auto O = plaidml::edsl::TensorOutput(O_dims);
+      I_idxs[axis] = I_idxs[axis] + (int64_t)prev_split;
       O(O_idxs) = I(I_idxs);
-      //O.add_constraint(prev_split < I_idxs[axis]);
       O.add_constraint(I_idxs[axis] < (int64_t)split);
       I_split.push_back(O);
       prev_split = (int64_t)split;
