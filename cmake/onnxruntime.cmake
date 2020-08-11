@@ -80,7 +80,6 @@ target_link_libraries(onnxruntime PRIVATE
     ${PROVIDERS_NUPHAR}
     ${PROVIDERS_DML}
     ${PROVIDERS_ACL}
-    ${PROVIDERS_PLAIDML}
     ${onnxruntime_winml}
     onnxruntime_optimizer
     onnxruntime_providers

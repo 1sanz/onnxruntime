@@ -1,2 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libonnx_proto.a  CMakeFiles/onnx_proto.dir/onnx-ml.pb.cc.o CMakeFiles/onnx_proto.dir/onnx-operators-ml.pb.cc.o
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libonnx_proto.a

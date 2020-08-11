@@ -163,13 +163,6 @@ if (onnxruntime_USE_NNAPI)
   list(APPEND onnxruntime_test_providers_src ${onnxruntime_test_providers_nnapi_src})
 endif()
 
-if (onnxruntime_USE_PLAIDML)
-  file(GLOB_RECURSE onnxruntime_test_providers_plaidml_src CONFIGURE_DEPENDS
-    "${TEST_SRC_DIR}/providers/plaidml/*"
-    )
-  list(APPEND onnxruntime_test_providers_src ${onnxruntime_test_providers_plaidml_src})
-endif()
-
 set (ONNXRUNTIME_SHARED_LIB_TEST_SRC_DIR "${ONNXRUNTIME_ROOT}/test/shared_lib")
 set (ONNXRUNTIME_GLOBAL_THREAD_POOLS_TEST_SRC_DIR "${ONNXRUNTIME_ROOT}/test/global_thread_pools")
 
@@ -283,10 +276,6 @@ if(onnxruntime_USE_ACL)
   list(APPEND onnxruntime_test_providers_dependencies onnxruntime_providers_acl)
 endif()
 
-if(onnxruntime_USE_PLAIDML)
-  list(APPEND onnxruntime_test_providers_dependencies onnxruntime_providers_plaidml)
-endif()
-
 if (onnxruntime_ENABLE_MICROSOFT_INTERNAL)
   include(onnxruntime_unittests_internal.cmake)
 endif()
@@ -308,7 +297,6 @@ set(ONNXRUNTIME_TEST_LIBS
     ${PROVIDERS_NNAPI}
     ${PROVIDERS_DML}
     ${PROVIDERS_ACL}
-    ${PROVIDERS_PLAIDML}
     onnxruntime_optimizer
     onnxruntime_providers
     onnxruntime_util
