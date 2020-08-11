@@ -1,3 +1,0 @@
-repository='https://github.com/NervanaSystems/ngraph.git'
-module=''
-tag='origin'
