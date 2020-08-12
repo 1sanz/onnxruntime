@@ -60,8 +60,8 @@ TEST(MathOpTest, Clip) {
                          -5.0f, 2.0f, 5.0f});
 
   // nGraph and Tensorrt does not support Clip opset 11 yet.
-  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kNGraphExecutionProvider, kTensorrtExecutionProvider,kPlaidMLExecutionProvider});
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kNGraphExecutionProvider, kTensorrtExecutionProvider});
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kNGraphExecutionProvider, kTensorrtExecutionProvider,kPlaidMLExecutionProvider});
+  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kNGraphExecutionProvider, kTensorrtExecutionProvider});
 }
 
 TEST(MathOpTest, ClipDimWithZero) {

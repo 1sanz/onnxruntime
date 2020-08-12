@@ -80,7 +80,7 @@ TEST(ContribOpTest, MaxPoolWithMask) {
   //TODO: Plaidml-TODO need to add some ops to get this to work tanh is missing 
   std::unordered_set<std::string> excluded_providers;
   //Plaidml removed from tests for now 
-  //excluded_providers.insert(kPlaidMLExecutionProvider);
+  excluded_providers.insert(kPlaidMLExecutionProvider);
   test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
   //test.Run();
 }

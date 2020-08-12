@@ -13,7 +13,9 @@ TEST(MurmurHash3OpTest, UnsupportedInputType) {
   test.AddAttribute<int64_t>("positive", 0);
   test.AddOutput<int32_t>("Y", {1}, {847579505L});
   // Unsupported input type
-  test.Run(OpTester::ExpectResult::kExpectFailure);
+  //TODO: PlaidML MurmurHash3 not yet handled 
+  test.Run(OpTester::ExpectResult::kExpectFailure, "", {kPlaidMLExecutionProvider});
+  //test.Run(OpTester::ExpectResult::kExpectFailure);
 }
 
 TEST(MurmurHash3OpTest, DefaultSeed) {
@@ -21,7 +23,9 @@ TEST(MurmurHash3OpTest, DefaultSeed) {
   test.AddInput<int32_t>("X", {1}, {3L});
   test.AddAttribute<int64_t>("positive", 0);
   test.AddOutput<int32_t>("Y", {1}, {847579505L});
-  test.Run();
+  //TODO: PlaidML MurmurHash3 not yet handled 
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
+  //test.Run();
 }
 
 TEST(MurmurHash3OpTest, ZeroSeed) {
@@ -30,7 +34,9 @@ TEST(MurmurHash3OpTest, ZeroSeed) {
   test.AddAttribute<int64_t>("seed", 0LL);
   test.AddAttribute<int64_t>("positive", 0);
   test.AddOutput<int32_t>("Y", {1}, {847579505L});
-  test.Run();
+  //TODO: PlaidML MurmurHash3 not yet handled 
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider}); 
+  //test.Run();
 }
 
 TEST(MurmurHash3OpTest, ZeroSeedUIntResult) {
@@ -38,7 +44,9 @@ TEST(MurmurHash3OpTest, ZeroSeedUIntResult) {
   test.AddInput<int32_t>("X", {1}, {3L});
   test.AddAttribute<int64_t>("seed", 0LL);
   test.AddOutput<uint32_t>("Y", {1}, {847579505L});
-  test.Run();
+  //TODO: PlaidML MurmurHash3 not yet handled 
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider}); 
+  //test.Run();
 }
 
 TEST(MurmurHash3OpTest, ZeroSeedUIntResult2) {
@@ -46,7 +54,9 @@ TEST(MurmurHash3OpTest, ZeroSeedUIntResult2) {
   test.AddInput<int32_t>("X", {1}, {4L});
   test.AddAttribute<int64_t>("seed", 0LL);
   test.AddOutput<uint32_t>("Y", {1}, {1889779975L});
-  test.Run();
+  //TODO: PlaidML MurmurHash3 not yet handled 
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider}); 
+  //test.Run();
 }
 
 TEST(MurmurHash3OpTest, MoreData) {
@@ -54,7 +64,9 @@ TEST(MurmurHash3OpTest, MoreData) {
   test.AddInput<int32_t>("X", {2}, {3L, 4L});
   test.AddAttribute<int64_t>("seed", 0LL);
   test.AddOutput<uint32_t>("Y", {2}, {847579505L, 1889779975L});
-  test.Run();
+  //TODO: PlaidML MurmurHash3 not yet handled 
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider}); 
+  //test.Run();
 }
 
 TEST(MurmurHash3OpTest, NonZeroSeed) {
@@ -63,7 +75,9 @@ TEST(MurmurHash3OpTest, NonZeroSeed) {
   test.AddAttribute<int64_t>("seed", 42LL);
   test.AddAttribute<int64_t>("positive", 0);
   test.AddOutput<int32_t>("Y", {1}, {-1823081949L});
-  test.Run();
+  //TODO: PlaidML MurmurHash3 not yet handled 
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider}); 
+  //test.Run();
 }
 
 TEST(MurmurHash3OpTest, NonZeroSeedUIntResult) {
@@ -71,7 +85,9 @@ TEST(MurmurHash3OpTest, NonZeroSeedUIntResult) {
   test.AddInput<int32_t>("X", {1}, {3L});
   test.AddAttribute<int64_t>("seed", 42LL);
   test.AddOutput<uint32_t>("Y", {1}, {2471885347L});
-  test.Run();
+  //TODO: PlaidML MurmurHash3 not yet handled 
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider}); 
+  //test.Run();
 }
 
 TEST(MurmurHash3OpTest, StringKeyIntResult) {
@@ -80,7 +96,9 @@ TEST(MurmurHash3OpTest, StringKeyIntResult) {
   test.AddAttribute<int64_t>("seed", 0LL);
   test.AddAttribute<int64_t>("positive", 0);
   test.AddOutput<int32_t>("Y", {1}, {-156908512L});
-  test.Run();
+  //TODO: PlaidML MurmurHash3 not yet handled 
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider}); 
+  //test.Run();
 }
 
 TEST(MurmurHash3OpTest, StringKeyUIntResult) {
@@ -88,7 +106,9 @@ TEST(MurmurHash3OpTest, StringKeyUIntResult) {
   test.AddInput<std::string>("X", {1}, {"foo"});
   test.AddAttribute<int64_t>("seed", 0LL);
   test.AddOutput<uint32_t>("Y", {1}, {4138058784L});
-  test.Run();
+  //TODO: PlaidML MurmurHash3 not yet handled 
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider}); 
+  //test.Run();
 }
 
 TEST(MurmurHash3OpTest, MultipleStringsKeyUIntResult) {
@@ -96,7 +116,9 @@ TEST(MurmurHash3OpTest, MultipleStringsKeyUIntResult) {
   test.AddInput<std::string>("X", {2}, {"foo", "bar"});
   test.AddAttribute<int64_t>("seed", 0LL);
   test.AddOutput<uint32_t>("Y", {2}, {4138058784L, 1158584717L});
-  test.Run();
+  //TODO: PlaidML MurmurHash3 not yet handled 
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider}); 
+  //test.Run();
 }
 
 TEST(MurmurHash3OpTest, StringKeyIntWithSeed42) {
@@ -105,7 +127,9 @@ TEST(MurmurHash3OpTest, StringKeyIntWithSeed42) {
   test.AddAttribute<int64_t>("seed", 42LL);
   test.AddAttribute<int64_t>("positive", 0);
   test.AddOutput<int32_t>("Y", {1}, {-1322301282L});
-  test.Run();
+  //TODO: PlaidML MurmurHash3 not yet handled 
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider}); 
+  //test.Run();
 }
 
 TEST(MurmurHash3OpTest, StringKeyUIntWithSeed42) {
@@ -113,7 +137,9 @@ TEST(MurmurHash3OpTest, StringKeyUIntWithSeed42) {
   test.AddInput<std::string>("X", {1}, {"foo"});
   test.AddAttribute<int64_t>("seed", 42LL);
   test.AddOutput<uint32_t>("Y", {1}, {2972666014L});
-  test.Run();
+  //TODO: PlaidML MurmurHash3 not yet handled 
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider}); 
+  //test.Run();
 }
 
 }  // namespace test

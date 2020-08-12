@@ -96,8 +96,8 @@ void RunMatMulTest(int32_t opset_version = 7)
     test.AddInput<T>("B", t.input1_dims, input1_vals);
 
     test.AddOutput<T>("Y", t.expected_dims, t.expected_vals);
-
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider});// Disable TensorRT because of unsupported data type
+    //TODO: PlaidML matmul not yet implemented 
+    test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider,kPlaidMLExecutionProvider});// Disable TensorRT because of unsupported data type
   }
 }
 
