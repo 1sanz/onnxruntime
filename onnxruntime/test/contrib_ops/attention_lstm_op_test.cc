@@ -182,6 +182,7 @@ static void RunAttnLstmTest(
   } else {
     test.AddMissingOptionalOutput<float>();
   }
+
   test.Run();
 }
 

@@ -48,6 +48,7 @@ static void RunAttentionTest(
       tester.AddInput<int32_t>("mask_index", mask_index_dims, mask_index_data);
       tester.AddOutput<float>("output", output_dims, output_data);
     }
+
     tester.Run();
   }
 }

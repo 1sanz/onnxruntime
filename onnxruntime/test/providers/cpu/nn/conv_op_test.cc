@@ -54,6 +54,7 @@ void TestConvOp(const ConvOpAndTestAttributes& attributes,
   std::unordered_set<std::string> excluded_providers(attributes.excluded_providers);
   // Disable TensorRT because weight as input is not supported
   excluded_providers.insert(kTensorrtExecutionProvider);
+
   test.Run(expect_result, err_str, excluded_providers);
 }
 

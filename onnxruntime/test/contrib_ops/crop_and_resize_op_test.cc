@@ -7,7 +7,6 @@
 namespace onnxruntime {
 namespace test {
 
-
 TEST(CropAndResizeTest, CropAndResize_1122) {
   OpTester test1 ("CropAndResize", 1, onnxruntime::kMSDomain);
   test1.AddInput  <float> ("X",   {1, 1, 2, 2}, {1.1f, 2.2f, 3.3f, 4.4f});
@@ -98,6 +97,8 @@ TEST(CropAndResizeTest, CropAndResize_1133) {
 	test3.AddOutput <float>("output", {3, 1, 2, 2}, {1.1f, 3.3f, 7.7f, 9.9f, 1.1f, 2.2f, 4.4f, 5.5f, 1.1f, 3.3f, 4.4f, 6.6f});
 	test3.Run();
 }
+
+
 
 }  // namespace Test
 }  // namespace onnxruntime

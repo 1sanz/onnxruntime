@@ -12,7 +12,7 @@ TEST(ContribOpTest, ExpandDims_0) {
   test.AddInput<float>("X", {2, 3}, std::vector<float>(6, 1.0f));
   test.AddInput<int32_t>("axis", {}, {-1});
   test.AddOutput<float>("Y", {2, 3, 1}, std::vector<float>(6, 1.0f));
-  test.Run(OpTester::ExpectResult::kExpectSuccess);
+  test.Run();
 }
 
 TEST(ContribOpTest, ExpandDims_1) {

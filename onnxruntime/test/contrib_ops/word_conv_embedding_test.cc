@@ -122,6 +122,7 @@ TEST(ContribOpTest, WordConvEmbedding_char_embedding_shape_conv_shape_not_match)
   test.AddInput<float>("B", B_conv_shape, B_conv);
   test.AddInput<float>("C", W_char_embedding_shape, W_char_embedding);
   test.AddOutput<float>("Y", output_shape, output);
+
   test.Run(OpTester::ExpectResult::kExpectFailure);
 }
 

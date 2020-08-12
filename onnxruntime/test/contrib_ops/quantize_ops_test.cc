@@ -91,7 +91,7 @@ TEST(DequantizeLinearContribOpTest, DequantizeLinear_2) {
                          80, -10, 30, 30,
 
                          42, 42, -7, 7,
-                         21, 21, -7, 28}); 
+                         21, 21, -7, 28});
   test.Run();
 }
 

@@ -29,6 +29,7 @@ static void RunTest(const std::map<int64_t, TFrom>& input,
 
   std::vector<int64_t> dims{1, gsl::narrow_cast<int64_t>(output.size())};
   test.AddOutput("Y", dims, output);
+
   test.Run(expect_result);
 }
 

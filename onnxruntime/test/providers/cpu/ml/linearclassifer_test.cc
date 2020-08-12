@@ -30,6 +30,7 @@ TEST(MLOpTest, LinearClassifierMulticlass) {
   test.AddInput<float>("X", {3, 2}, X);
   test.AddOutput<int64_t>("Y", {3}, predicted_class);
   test.AddOutput<float>("Z", {3, 3}, predictions);
+
   test.Run();
 }
 
@@ -83,7 +84,7 @@ TEST(MLOpTest, LinearClassifierMulticlassProbSigmoid) {
   test.AddInput<float>("X", {3, 2}, X);
   test.AddOutput<int64_t>("Y", {3}, predicted_class);
   test.AddOutput<float>("Z", {3, 3}, predictions);
-  test.SetOutputAbsErr("Z", 0.0001f); 
+  test.SetOutputAbsErr("Z", 0.0001f);
   test.Run();
 }
 

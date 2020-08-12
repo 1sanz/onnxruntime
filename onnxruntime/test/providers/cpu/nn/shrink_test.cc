@@ -82,8 +82,7 @@ void RunShrinkTest(const std::vector<ShrinkTestData<T>>& test_cases) {
 
     test.AddInput<T>("X", test_data.input_dimensions, test_data.input_vals);
     test.AddOutput<T>("Y", test_data.expected_dimensions, test_data.expected_vals);
-    
-  test.Run();
+    test.Run();
   }
 }
 

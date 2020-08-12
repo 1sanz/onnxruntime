@@ -64,6 +64,7 @@ TEST(ContribOpTest, TokenizerCharLevel_LatinCharsNoMarkersC) {
         padval};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -102,6 +103,7 @@ TEST(ContribOpTest, TokenizerCharLevel_LatinCharsWithMarkersC) {
         padval};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -148,6 +150,7 @@ TEST(ContribOpTest, TokenizerCharLevel_LatinCharsNoMarkersNC) {
         "f"};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -202,6 +205,7 @@ TEST(ContribOpTest, TokenizerCharLevel_LatinCharsWithMarkersNC) {
         end_mark};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -234,6 +238,7 @@ TEST(ContribOpTest, TokenizerCharLevel_CyrillicCharsWithMarkersC) {
         padval};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -267,6 +272,7 @@ TEST(ContribOpTest, TokenizerCharLevel_MixedCharsWithMarkersC) {
         padval};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -287,6 +293,7 @@ TEST(ContribOpTest, TokenizerCharLevel_EmptyOutputC) {
     std::vector<std::string> output{};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -307,6 +314,7 @@ TEST(ContribOpTest, TokenizerCharLevel_EmptyOutputNC) {
     std::vector<std::string> output{};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -338,6 +346,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsWithMarkersC) {
         end_mark};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }  // namespace test
 }
@@ -361,6 +370,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsWithMarkersCompleteMatchEmpt
     std::vector<std::string> output;
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -389,6 +399,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsWithMarkersStartMatchC) {
         end_mark};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -417,6 +428,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsWithMarkersEndMatchC) {
         end_mark};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -446,6 +458,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsWithMarkersEndMatchAtLeast4C
         padval};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -467,6 +480,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsWithMarkersEmptyInputEmptyOu
     std::vector<std::string> output;
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }  // namespace test
@@ -488,6 +502,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsWithMarkersEmptyInputEmptyOu
     std::vector<std::string> output;
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -515,6 +530,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsNoMarkersSeparatorsOverlapSh
         u8"Аб", u8"中文"};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -544,6 +560,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsNoMarkersSeparatorsOverlapLo
     std::vector<std::string> output{u8"中文"};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -573,6 +590,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsNoMarkersSeparatorsOverlapLo
     std::vector<std::string> output{u8"中文"};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -604,6 +622,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsNoMarkersSeparatorsOverlapin
     std::vector<std::string> output{u8"Абс", u8"су中文"};
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
@@ -810,6 +829,7 @@ TEST(ContribOpTest, Tokenizer_EmptyInput) {
     std::vector<std::string> output;
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
   // For [N][C] empty input we output [N][0]
@@ -825,6 +845,7 @@ TEST(ContribOpTest, Tokenizer_EmptyInput) {
     std::vector<std::string> output;
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
   {
@@ -839,6 +860,7 @@ TEST(ContribOpTest, Tokenizer_EmptyInput) {
     std::vector<std::string> output;
 
     test.AddOutput<std::string>("Y", output_dims, output);
+
     test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
