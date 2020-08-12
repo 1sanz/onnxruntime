@@ -21,7 +21,7 @@ std::map<std::string, OpFunction> kSupportedOps = {
   {"Acos", acos},
   {"Atan", atan},
   {"Ceil", ceil},
-  //{"Clip", clip}, TODO: PlaidML segfault in clip tests needs to be fixed
+  //{"Clip", clip}, //TODO: PlaidML fix broken tests (segfault) (4/4 failures)
   {"Cos", cos},
   {"Cosh", cosh},
   {"Div", div},
@@ -30,26 +30,26 @@ std::map<std::string, OpFunction> kSupportedOps = {
   {"Exp", exp},
   {"Floor", floor},
   {"Greater", greater},
-  //{"Identity", identity}, TODO: PlaidML failing identity tests need to be fixed string type needs to be handled
+  //{"Identity", identity}, //TODO: PlaidML broken test (1/2 failures) (string type needed)
   {"Less", less},
   {"Log", log},
   {"Max", max},
   {"Mean", mean},
-  //{"MatMul", matmul},
+  //{"MatMul", matmul}, //TODO: PlaidML OP WIP 
   {"Min", min},
   {"Mul", mul},
   {"Neg", neg},
   {"Not", logical_not},
   {"Or", logical_or},
-  //{"Pow", pow}, TODO: PlaidML fix failed test for double
+  //{"Pow", pow}, //TODO: PlaidML fix broken tests (double)
   {"PRelu", prelu},
   {"Reciprocal", reciprocal},
   {"Relu", relu},
-  //{"Reshape", reshape}, TODO: PlaidML fix
+  //{"Reshape", reshape}, //TODO: PlaidML OP WIP
   {"SampleOp", sample_op},
-  //{"Shape", shape}, TODO: PlaidML failing shape tests need to be fixed 
+  //{"Shape", shape}, //TODO: PlaidML fix broken tests (11/11 failures)
   {"Sigmoid", sigmoid},
-  //{"Sign", sign}, TODO: PlaidML fix
+  //{"Sign", sign}, //TODO: PlaidML fix broken tests (4/5 failures)
   {"Sin", sin},
   {"Sinh", sinh},
   {"Sqrt", sqrt,},
@@ -57,44 +57,44 @@ std::map<std::string, OpFunction> kSupportedOps = {
   {"Sum", sum,},
   {"Tan", tan,},
   {"Tanh", tanh,},
-  //{"Tile", tile,}, TODO: PlaidML failing tile tests need to be fixed 
-  //{"Where", where,}, TODO: PlaidML fix
-  //{"Xor", logical_xor,}, TODO: PlaidML fix
+  //{"Tile", tile,}, //TODO: PlaidML OP WIP (11/11 failures)
+  //{"Where", where,}, //TODO: PlaidML fix broken tests (3/4 failures)
+  //{"Xor", logical_xor,}, //TODO: PlaidML fix broken tests (2/2 failures)
 };
 
 std::map<std::string, _OpFunction> _kSupportedOps = 
 {
-  //{"ArgMax", _argmax,}, TODO: PlaidML fix 
-  //{"ArgMin", _argmin,},  TODO: PlaidML fix
-  //{"AveragePool", _average_pool,}, TODO: PlaidML fix
-  //{"Cast",_cast}, TODO: PlaidML fix
-  //{"Conv",_conv}, TODO: PlaidML fix
-  //{"ConvInteger",_conv}, TODO: PlaidML 
-  //{"Concat",_concat}, TODO: PlaidML failing concat tests need to be fixed
-  //{"CumSum", _cumsum}, TODO: PlaidML fix
+  //{"ArgMax", _argmax,}, //TODO: PlaidML fix broken tests (7/7 failures )
+  //{"ArgMin", _argmin,},  //TODO: PlaidML fix (4/5 failures)
+  //{"AveragePool", _average_pool,}, //TODO: PlaidML fix broken tests (2/4 failures)
+  //{"Cast",_cast}, //TODO: PlaidML fix
+  //{"Conv",_conv}, //TODO: PlaidML fix broken tests (6/17 failures)
+  //{"ConvInteger",_conv}, //TODO: PlaidML 
+  //{"Concat",_concat}, //TODO: PlaidML fix broken tests (3/12 failures)
+  //{"CumSum", _cumsum}, //TODO: PlaidML fix broken tests
   {"Elu",_elu},
-  //{"EyeLike",_eye_like}, TODO: PlaidML failing eyelike tests need to be fixed
-  //{"Flatten", _flatten}, TODO: PlaidML fix
+  //{"EyeLike",_eye_like}, //TODO: PlaidML OP WIP
+  //{"Flatten", _flatten}, //TODO: PlaidML fix broken tests (4/6 failures)
   {"HardSigmoid",_hard_sigmoid},
   {"LeakyRelu",_leaky_relu},
-  //{"LogSoftmax",_log_softmax}, TODO: PlaidML fix
+  //{"LogSoftmax",_log_softmax}, //TODO: PlaidML fix broken tests (2/7 failures)
   {"LpNormalization",_lp_normalization},
-  //{"LRN",_lrn}, TODO: PlaidML fix
-  //{"MaxPool",_maxpool}, TODO: PlaidML fix
-  //{"Mod",_mod}, TODO: PlaidML fix
-  //{"OneHot",_one_hot},
-  //{"ReduceMax",_reduce_max}, TODO: PlaidML fix
-  //{"ReduceMean",_reduce_mean}, TODO: PlaidML fix
-  //{"ReduceMin",_reduce_min}, TODO: PlaidML fix
-  //{"ReduceProd",_reduce_prod}, TODO: PlaidML fix
-  //{"ReduceSum",_reduce_sum}, TODO: PlaidML fix
-  //{"ReverseSequence",_reverse_sequence}, TODO: PlaidML 
+  //{"LRN",_lrn}, //TODO: PlaidML fix broken tests (2/2 failures)
+  //{"MaxPool",_maxpool}, //TODO: PlaidML fix broken tests (10/12 failures) (attribute handling)
+  //{"Mod",_mod}, //TODO: PlaidML fix broken tests (6/15 failures)
+  //{"OneHot",_one_hot}, //TODO: PlaidML OP WIP
+  //{"ReduceMax",_reduce_max}, //TODO: PlaidML fix broken tests (2/9 failures)
+  //{"ReduceMean",_reduce_mean}, //TODO: PlaidML fix broken tests (2/8 failures)
+  //{"ReduceMin",_reduce_min}, //TODO: PlaidML fix broken tests (4/9 failures)
+  //{"ReduceProd",_reduce_prod}, //TODO: PlaidML fix broken tests (2/8 failures)
+  //{"ReduceSum",_reduce_sum}, //TODO: PlaidML fix broken tests (2/19 failures)
+  //{"ReverseSequence",_reverse_sequence}, //TODO: PlaidML OP WIP
   {"Selu",_selu},
-  //{"Softmax",_softmax}, TODO: PlaidML fix
-  //{"Split",_split}, TODO: PlaidML failing split tests need to be fixed 
-  //{"Squeeze",_squeeze}, TODO: PlaidML segfault in squeeze tests needs to be fixed
-  //{"ThresholdedRelu",_thresholded_relu}, TODO: PlaidML fix
-  //{"Transpose", _transpose,}, TODO: PlaidML failing transpose tests need to be fixed 
+  //{"Softmax",_softmax}, TODO: //PlaidML fix broken tests (2/8 failures)
+  //{"Split",_split}, //TODO: PlaidML failing split OP WIP
+  //{"Squeeze",_squeeze}, //TODO: PlaidML fix broken tests (5/10 failures)(segfault)
+  //{"ThresholdedRelu",_thresholded_relu}, //TODO: PlaidML fix broken tests (new failure! op not registered )
+  //{"Transpose", _transpose,}, //TODO: PlaidML fix broken tests (8/17 failures)
   {"Unsqueeze",_unsqueeze},
 
 };
