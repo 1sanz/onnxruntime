@@ -112,21 +112,21 @@ TEST(PlaidMLExecutionProviderTest, CeilTest)
   RunTest("testdata/plaidml/ceil.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
 }
 
-TEST(PlaidMLExecutionProviderTest, ClipTest)
-{
-  NameMLValMap feeds;
+// TEST(PlaidMLExecutionProviderTest, ClipTest)
+// {
+//   NameMLValMap feeds;
 
-  add_feeds(feeds, "A", {4}, {-4.0f, -2.0f, 3.0f, 4.0f});
-  add_feeds(feeds, "min_val", {1}, {-1.0f});
-  add_feeds(feeds, "max_val", {1}, {1.0f});
-  std::vector<std::vector<float>> expected_values = {
-      {-1.0f, -1.0f, 1.0f, 1.0f}};
+//   add_feeds(feeds, "A", {4}, {-4.0f, -2.0f, 3.0f, 4.0f});
+//   add_feeds(feeds, "min_val", {1}, {-1.0f});
+//   add_feeds(feeds, "max_val", {1}, {1.0f});
+//   std::vector<std::vector<float>> expected_values = {
+//       {-1.0f, -1.0f, 1.0f, 1.0f}};
 
-  std::vector<std::vector<int64_t>> expected_shapes = {
-      {4}};
+//   std::vector<std::vector<int64_t>> expected_shapes = {
+//       {4}};
 
-  RunTest("testdata/plaidml/clip.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
-}
+//   RunTest("testdata/plaidml/clip.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
+// }
 
 // TODO: fix -> in plaidml  "Invalid enumeration value"
 //onnx nchw plaidml nhwc (default)

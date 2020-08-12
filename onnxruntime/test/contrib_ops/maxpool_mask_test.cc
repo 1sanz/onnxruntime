@@ -77,12 +77,7 @@ TEST(ContribOpTest, MaxPoolWithMask) {
   test.AddInput<float>("X", x_dims, x_vals);
   test.AddInput<int32_t>("M", x_dims, m_vals);
   test.AddOutput<float>("Y", expected_dims, expected_vals);
-  //TODO: Plaidml-TODO need to add some ops to get this to work tanh is missing 
-  std::unordered_set<std::string> excluded_providers;
-  //Plaidml removed from tests for now 
-  excluded_providers.insert(kPlaidMLExecutionProvider);
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-  //test.Run();
+  test.Run();
 }
 
 }  // namespace test

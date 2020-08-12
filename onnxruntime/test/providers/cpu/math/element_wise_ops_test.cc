@@ -73,7 +73,6 @@ TEST(MathOpTest, Add_int64) {
   test.AddInput<int64_t>("A", {3}, {1, 2, 3});
   test.AddInput<int64_t>("B", {3}, {4, 5, 6});
   test.AddOutput<int64_t>("C", {3}, {5, 7, 9});
-  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
   test.Run();
 }
 
@@ -96,7 +95,6 @@ TEST(MathOpTest, Add_float) {
 #if defined(OPENVINO_CONFIG_MYRIAD) || defined(OPENVINO_CONFIG_GPU_FP16) || defined(OPENVINO_CONFIG_VAD_M)
   test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kOpenVINOExecutionProvider});  //OpenVINO: Disabled due to accuracy mismatch for FP16
 #else
-  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
   test.Run();
 #endif
 }
@@ -117,7 +115,6 @@ TEST(MathOpTest, Add_double) {
                           0.0, 5.0, -36.0,
                           -10.8, 18.6, 0.0});
 
-  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kOpenVINOExecutionProvider,kPlaidMLExecutionProvider});
   test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kOpenVINOExecutionProvider});  // Disabling OpenVINO as this type is not supported
 }
 
@@ -137,7 +134,6 @@ TEST(MathOpTest, Add_Broadcast_Axis) {
                         {4.0f, 5.0f, 6.0f,
                          6.0f, 7.0f, 8.0f,
                          8.0f, 9.0f, 10.0f});
-  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
   test.Run(OpTester::ExpectResult::kExpectSuccess, "");
 }
 
@@ -154,7 +150,6 @@ TEST(MathOpTest, Add_Broadcast_MultidirectionalAB) {
                         {4.0f, 5.0f, 6.0f,
                          3.0f, 4.0f, 5.0f,
                          2.0f, 3.0f, 4.0f});
-  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider,kPlaidMLExecutionProvider}); 
   test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider});  //TensorRT: got C with shape [3, 1]
 }
 
@@ -171,7 +166,6 @@ TEST(MathOpTest, Add_Broadcast_MultidirectionalBA) {
                         {4.0f, 5.0f, 6.0f,
                          3.0f, 4.0f, 5.0f,
                          2.0f, 3.0f, 4.0f});
-  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider,kPlaidMLExecutionProvider}); 
   test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider});  //TensorRT: got C with shape [3, 1]
 }
 
@@ -594,7 +588,7 @@ TEST(MathOpTest, Pow_Double) {
   test.AddOutput<double>("Z", dims,
                          {1.0, 256.0,
                           2.0, 1.0});
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});//TODO: PlaidML_TODO LLVM error needs fixing 
+  test.Run(OpTester::ExpectResult::kExpectSuccess);
 }
 
 TEST(MathOpTest, Pow_Broadcast_Scalar0) {
@@ -892,9 +886,7 @@ TEST(MathOpTest, Xor) {
   test.AddInput<bool>("A", dims, {false, true, false, true});
   test.AddInput<bool>("B", dims, {false, false, true, true});
   test.AddOutput<bool>("C", dims, {false, true, true, false});
-  //TODO: PlaidML fix xor issues and enable test 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(MathOpTest, Xor_bcast3v2d) {
@@ -920,9 +912,7 @@ TEST(MathOpTest, Xor_bcast3v2d) {
                         false, true, true, false,
                         false, true, true, false,
                         false, true, true, false});
-   //TODO: PlaidML fix xor issues and enable test 
-   test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(MathOpTest, Less) {
@@ -1206,9 +1196,7 @@ void TrigFloatTest(OpTester& test, std::initializer_list<float> input) {
 
   test.AddInput<float>("X", dims, input);
   test.AddOutput<float>("Y", dims, output);
-  //TODO: PlaidML inverse hyperbolic functions not implemented 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 template <double (&op)(double value)>
@@ -1292,9 +1280,7 @@ TEST(MathOpTest, Expand_8_3x3) {
                         {1.0f, 1.0f, 1.0f,
                          1.0f, 1.0f, 1.0f,
                          1.0f, 1.0f, 1.0f});
-  //TODO: PlaidML expand op not yet implemented 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(MathOpTest, Expand_8_3x1) {
@@ -1305,9 +1291,7 @@ TEST(MathOpTest, Expand_8_3x1) {
                         {1.0f, 2.0f, 3.0f,
                          1.0f, 2.0f, 3.0f,
                          1.0f, 2.0f, 3.0f});
-  //TODO: PlaidML expand op not yet implemented 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});  
-  //test.Run();
+  test.Run();
 }
 
 TEST(MathOpTest, Expand_8_1x3) {
@@ -1318,9 +1302,7 @@ TEST(MathOpTest, Expand_8_1x3) {
                         {1.0f, 1.0f, 1.0f,
                          2.0f, 2.0f, 2.0f,
                          3.0f, 3.0f, 3.0f});
-  //TODO: PlaidML expand op not yet implemented 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(MathOpTest, Expand_8_3x3_int32) {
@@ -1331,9 +1313,7 @@ TEST(MathOpTest, Expand_8_3x3_int32) {
                           {1, 1, 1,
                            1, 1, 1,
                            1, 1, 1});
-  //TODO: PlaidML expand op not yet implemented 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(MathOpTest, Expand_8_3x1_int32) {
@@ -1344,9 +1324,7 @@ TEST(MathOpTest, Expand_8_3x1_int32) {
                           {1, 2, 3,
                            1, 2, 3,
                            1, 2, 3});
-  //TODO: PlaidML expand op not yet implemented 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(MathOpTest, Expand_8_1x3_int32) {
@@ -1357,9 +1335,7 @@ TEST(MathOpTest, Expand_8_1x3_int32) {
                           {1, 1, 1,
                            2, 2, 2,
                            3, 3, 3});
-  //TODO: PlaidML expand op not yet implemented 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(MathOpTest, Expand_8_3x3_int64) {
@@ -1370,9 +1346,7 @@ TEST(MathOpTest, Expand_8_3x3_int64) {
                           {1, 1, 1,
                            1, 1, 1,
                            1, 1, 1});
-  //TODO: PlaidML expand op not yet implemented 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(MathOpTest, Expand_8_3x1_int64) {
@@ -1383,9 +1357,7 @@ TEST(MathOpTest, Expand_8_3x1_int64) {
                           {1, 2, 3,
                            1, 2, 3,
                            1, 2, 3});
-  //TODO: PlaidML expand op not yet implemented 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(MathOpTest, Expand_8_1x3_int64) {
@@ -1396,9 +1368,7 @@ TEST(MathOpTest, Expand_8_1x3_int64) {
                           {1, 1, 1,
                            2, 2, 2,
                            3, 3, 3});
-  //TODO: PlaidML expand op not yet implemented 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(MathOpTest, Expand_8_3x1x3x1_int64) {
@@ -1409,9 +1379,7 @@ TEST(MathOpTest, Expand_8_3x1x3x1_int64) {
                           {1, 2, 3, 1, 2, 3, 1, 2, 3, 4, 5, 6, 4, 5, 6, 4, 5, 6, 7, 8, 9, 7, 8, 9, 7, 8, 9,
                            1, 2, 3, 1, 2, 3, 1, 2, 3, 4, 5, 6, 4, 5, 6, 4, 5, 6, 7, 8, 9, 7, 8, 9, 7, 8, 9,
                            1, 2, 3, 1, 2, 3, 1, 2, 3, 4, 5, 6, 4, 5, 6, 4, 5, 6, 7, 8, 9, 7, 8, 9, 7, 8, 9});
-  //TODO: PlaidML expand op not yet implemented 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider}); 
-  //test.Run();
+  test.Run();
 }
 
 TEST(MathOpTest, Expand_8_3x3_float16) {
@@ -1422,9 +1390,7 @@ TEST(MathOpTest, Expand_8_3x3_float16) {
                             {MLFloat16(math::floatToHalf(1.0f)), MLFloat16(math::floatToHalf(1.0f)), MLFloat16(math::floatToHalf(1.0f)),
                              MLFloat16(math::floatToHalf(1.0f)), MLFloat16(math::floatToHalf(1.0f)), MLFloat16(math::floatToHalf(1.0f)),
                              MLFloat16(math::floatToHalf(1.0f)), MLFloat16(math::floatToHalf(1.0f)), MLFloat16(math::floatToHalf(1.0f))});
-  //TODO: PlaidML expand op not yet implemented 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(MathOpTest, Expand_8_3x1_float16) {
@@ -1435,9 +1401,7 @@ TEST(MathOpTest, Expand_8_3x1_float16) {
                             {MLFloat16(math::floatToHalf(1.0f)), MLFloat16(math::floatToHalf(2.0f)), MLFloat16(math::floatToHalf(3.0f)),
                              MLFloat16(math::floatToHalf(1.0f)), MLFloat16(math::floatToHalf(2.0f)), MLFloat16(math::floatToHalf(3.0f)),
                              MLFloat16(math::floatToHalf(1.0f)), MLFloat16(math::floatToHalf(2.0f)), MLFloat16(math::floatToHalf(3.0f))});
-  //TODO: PlaidML expand op not yet implemented 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});  
-  //test.Run();
+  test.Run();
 }
 
 TEST(MathOpTest, Expand_8_1x3_float16) {
@@ -1448,9 +1412,7 @@ TEST(MathOpTest, Expand_8_1x3_float16) {
                             {MLFloat16(math::floatToHalf(1.0f)), MLFloat16(math::floatToHalf(1.0f)), MLFloat16(math::floatToHalf(1.0f)),
                              MLFloat16(math::floatToHalf(2.0f)), MLFloat16(math::floatToHalf(2.0f)), MLFloat16(math::floatToHalf(2.0f)),
                              MLFloat16(math::floatToHalf(3.0f)), MLFloat16(math::floatToHalf(3.0f)), MLFloat16(math::floatToHalf(3.0f))});
-  //TODO: PlaidML expand op not yet implemented 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});  
-  //test.Run();
+  test.Run();
 }
 
 TEST(MathOpTest, Erf) {

@@ -69,8 +69,7 @@ TEST(SqueezeOpTest, UnsortedAxes) {
                        std::vector<float>{1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f});
   test.AddOutput<float>("squeezed", {4, 2},
                         std::vector<float>{1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f});
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "",  {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(SqueezeOpTest, DuplicateAxes) {
@@ -81,8 +80,7 @@ TEST(SqueezeOpTest, DuplicateAxes) {
                        std::vector<float>{1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f});
   test.AddOutput<float>("squeezed", {4, 2},
                         std::vector<float>{1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f});
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "",  {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(SqueezeOpTest, BadAxes) {
@@ -94,7 +92,7 @@ TEST(SqueezeOpTest, BadAxes) {
   test.AddOutput<float>("squeezed", {3, 4, 5}, std::vector<float>(60, 1.0f));
 
   // Expect failure.
-  test.Run(OpTester::ExpectResult::kExpectFailure, "Dimension of input 0 must be 1 instead of 3", {kTensorrtExecutionProvider,kPlaidMLExecutionProvider});
+  test.Run(OpTester::ExpectResult::kExpectFailure, "Dimension of input 0 must be 1 instead of 3", {kTensorrtExecutionProvider});
 }
 
 TEST(SqueezeOpTest, SqueezeNegAxis_2) {

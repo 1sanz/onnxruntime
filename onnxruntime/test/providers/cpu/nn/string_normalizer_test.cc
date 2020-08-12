@@ -49,8 +49,7 @@ TEST(ContribOpTest, StringNormalizerTest) {
     test.AddInput<std::string>("T", dims, input);
     std::vector<std::string> output(input);  // do the same for now
     test.AddOutput<std::string>("Y", dims, output);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
   // - casesensitive approach
   // - filter out monday
@@ -66,8 +65,7 @@ TEST(ContribOpTest, StringNormalizerTest) {
     std::vector<std::string> output = {std::string("tuesday"),
                                        std::string("wednesday"), std::string("thursday")};
     test.AddOutput<std::string>("Y", {3}, output);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
   // - casesensitive approach
   // - filter out monday
@@ -83,8 +81,7 @@ TEST(ContribOpTest, StringNormalizerTest) {
     std::vector<std::string> output = {std::string("tuesday"),
                                        std::string("wednesday"), std::string("thursday")};
     test.AddOutput<std::string>("Y", {3}, output);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
   // - casesensitive approach
   // - filter out monday
@@ -100,8 +97,7 @@ TEST(ContribOpTest, StringNormalizerTest) {
     std::vector<std::string> output = {std::string("TUESDAY"),
                                        std::string("WEDNESDAY"), std::string("THURSDAY")};
     test.AddOutput<std::string>("Y", {3}, output);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
   // - case-SENSETIVE approach en_US locale
   // - we test the behavior of a mix of english, french, german, russian and chinese
@@ -134,8 +130,7 @@ TEST(ContribOpTest, StringNormalizerTest) {
                                        // Chinese do not have cases
                                        std::string(u8"中文")};
     test.AddOutput<std::string>("Y", {6}, output);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
   // - case-INSENSETIVE approach en_US locale
   // - we test the behavior of a mix of english, french, german, russian and chinese
@@ -168,8 +163,7 @@ TEST(ContribOpTest, StringNormalizerTest) {
                                        // Chinese do not have cases
                                        std::string(u8"中文")};
     test.AddOutput<std::string>("Y", {6}, output);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 
   // Empty output case
@@ -186,8 +180,7 @@ TEST(ContribOpTest, StringNormalizerTest) {
 
     std::vector<std::string> output{""};  // One empty string
     test.AddOutput<std::string>("Y", {1}, output);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
   // Empty output case
   // - casesensitive approach
@@ -203,8 +196,7 @@ TEST(ContribOpTest, StringNormalizerTest) {
 
     std::vector<std::string> output{""};  // One empty string
     test.AddOutput<std::string>("Y", {1, 1}, output);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 

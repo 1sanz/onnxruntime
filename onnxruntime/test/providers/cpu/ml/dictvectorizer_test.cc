@@ -22,8 +22,7 @@ TEST(MLOpTest, DictVectorizerStringInput) {
   std::vector<int64_t> dims{1, 4};
   test.AddOutput<int64_t>("Y", dims,
                           {1, 0, 2, 3});
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(MLOpTest, DictVectorizerInt64Input) {
@@ -40,8 +39,7 @@ TEST(MLOpTest, DictVectorizerInt64Input) {
 
   std::vector<int64_t> dims{1, 4};
   test.AddOutput<std::string>("Y", dims, {"a", "", "c", "d"});
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 }  // namespace test

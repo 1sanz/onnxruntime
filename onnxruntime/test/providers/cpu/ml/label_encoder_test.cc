@@ -20,7 +20,6 @@ static void RunTest(const std::vector<int64_t>& dims, const std::vector<TInput>&
 
   test.AddInput<TInput>("X", dims, input);
   test.AddOutput<TOutput>("Y", dims, output);
-
   test.Run();
 }
 

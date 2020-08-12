@@ -48,12 +48,7 @@ static void RunAttentionTest(
       tester.AddInput<int32_t>("mask_index", mask_index_dims, mask_index_data);
       tester.AddOutput<float>("output", output_dims, output_data);
     }
-  //TODO: Plaidml-TODO need to add some ops to get this to work ops missing 
-  std::unordered_set<std::string> excluded_providers;
-  //TODO: PlaidML_TODO removed from tests for now 
-   excluded_providers.insert(kPlaidMLExecutionProvider);
-   tester.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-   // tester.Run();
+    tester.Run();
   }
 }
 

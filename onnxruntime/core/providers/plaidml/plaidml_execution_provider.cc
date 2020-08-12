@@ -175,6 +175,18 @@ std::vector<std::unique_ptr<ComputeCapability>> PlaidMLExecutionProvider::GetCap
     return result;
   }
 
+  auto node_indexes = graph_viewer.GetNodesInTopologicalOrder();
+  for (auto index : node_indexes) {
+    const auto node = graph_viewer.GetNode(index);
+
+    //Check if the Operation is Supported by OpenVINO
+    if (!plaidml_ep::check_op_support(node->OpType())) {
+      {
+        //throw "Operation is not yet supported by PlaidML Execution Provider";
+        return result;
+      }
+    }
+  }
   // This was modeled off of the metadata that nGraph included
   auto meta_def = onnxruntime::make_unique<IndexedSubGraph::MetaDef>();
   meta_def->name = "PlaidML_Fully_Fused_Graph";

@@ -12,10 +12,7 @@ TEST(ContribOpTest, ExpandDims_0) {
   test.AddInput<float>("X", {2, 3}, std::vector<float>(6, 1.0f));
   test.AddInput<int32_t>("axis", {}, {-1});
   test.AddOutput<float>("Y", {2, 3, 1}, std::vector<float>(6, 1.0f));
-  std::unordered_set<std::string> excluded_providers;
-  //Plaidml removed from tests for now 
-   excluded_providers.insert(kPlaidMLExecutionProvider);
-   test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
+  test.Run(OpTester::ExpectResult::kExpectSuccess);
 }
 
 TEST(ContribOpTest, ExpandDims_1) {
@@ -23,11 +20,7 @@ TEST(ContribOpTest, ExpandDims_1) {
   test.AddInput<float>("X", {2, 3}, std::vector<float>(6, 1.0f));
   test.AddInput<int32_t>("axis", {}, {1});
   test.AddOutput<float>("Y", {2, 1, 3}, std::vector<float>(6, 1.0f));
-  //TODO: Plaidml-TODO need to add some ops to get this to work tanh is missing 
-  std::unordered_set<std::string> excluded_providers;
-  //Plaidml removed from tests for now 
-   excluded_providers.insert(kPlaidMLExecutionProvider);
-   test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
+  test.Run();
 }
 
 }  // namespace test

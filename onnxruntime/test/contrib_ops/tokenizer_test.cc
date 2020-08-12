@@ -64,12 +64,7 @@ TEST(ContribOpTest, TokenizerCharLevel_LatinCharsNoMarkersC) {
         padval};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-  //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer is missing 
-  std::unordered_set<std::string> excluded_providers;
-  //Plaidml removed from tests for now 
-  excluded_providers.insert(kPlaidMLExecutionProvider);
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-  //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -107,13 +102,7 @@ TEST(ContribOpTest, TokenizerCharLevel_LatinCharsWithMarkersC) {
         padval};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-  //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer is missing 
-  std::unordered_set<std::string> excluded_providers;
-  //Plaidml removed from tests for now 
-  excluded_providers.insert(kPlaidMLExecutionProvider);
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-  //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -159,13 +148,7 @@ TEST(ContribOpTest, TokenizerCharLevel_LatinCharsNoMarkersNC) {
         "f"};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-  //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-  std::unordered_set<std::string> excluded_providers;
-  //Plaidml removed from tests for now 
-  excluded_providers.insert(kPlaidMLExecutionProvider);
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-  //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -219,13 +202,7 @@ TEST(ContribOpTest, TokenizerCharLevel_LatinCharsWithMarkersNC) {
         end_mark};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-  //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer is missing 
-  std::unordered_set<std::string> excluded_providers;
-  //Plaidml removed from tests for now 
-  excluded_providers.insert(kPlaidMLExecutionProvider);
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-  //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -257,13 +234,7 @@ TEST(ContribOpTest, TokenizerCharLevel_CyrillicCharsWithMarkersC) {
         padval};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -296,14 +267,7 @@ TEST(ContribOpTest, TokenizerCharLevel_MixedCharsWithMarkersC) {
         padval};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -323,14 +287,7 @@ TEST(ContribOpTest, TokenizerCharLevel_EmptyOutputC) {
     std::vector<std::string> output{};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -350,14 +307,7 @@ TEST(ContribOpTest, TokenizerCharLevel_EmptyOutputNC) {
     std::vector<std::string> output{};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -388,14 +338,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsWithMarkersC) {
         end_mark};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-    
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }  // namespace test
 }
 
@@ -418,13 +361,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsWithMarkersCompleteMatchEmpt
     std::vector<std::string> output;
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -452,13 +389,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsWithMarkersStartMatchC) {
         end_mark};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -486,13 +417,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsWithMarkersEndMatchC) {
         end_mark};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -521,13 +446,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsWithMarkersEndMatchAtLeast4C
         padval};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -548,13 +467,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsWithMarkersEmptyInputEmptyOu
     std::vector<std::string> output;
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }  // namespace test
 
@@ -575,13 +488,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsWithMarkersEmptyInputEmptyOu
     std::vector<std::string> output;
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -608,13 +515,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsNoMarkersSeparatorsOverlapSh
         u8"Аб", u8"中文"};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -643,13 +544,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsNoMarkersSeparatorsOverlapLo
     std::vector<std::string> output{u8"中文"};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -678,13 +573,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsNoMarkersSeparatorsOverlapLo
     std::vector<std::string> output{u8"中文"};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -715,13 +604,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharsNoMarkersSeparatorsOverlapin
     std::vector<std::string> output{u8"Абс", u8"су中文"};
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 
@@ -772,12 +655,7 @@ TEST(ContribOpTest, TokenizerWithSeparators_MixCharCommonPrefixC) {
   };
 
   test.AddOutput<std::string>("Y", output_dims, output);
-  //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-  std::unordered_set<std::string> excluded_providers;
-  //Plaidml removed from tests for now 
-  excluded_providers.insert(kPlaidMLExecutionProvider);
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-  //test.Run(OpTester::ExpectResult::kExpectSuccess);
+  test.Run(OpTester::ExpectResult::kExpectSuccess);
 }  // namespace test
 
 TEST(ContribOpTest, TokenizerExpression_RegEx) {
@@ -807,12 +685,7 @@ TEST(ContribOpTest, TokenizerExpression_RegEx) {
   };
 
   test.AddOutput<std::string>("Y", output_dims, output);
-  //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-  std::unordered_set<std::string> excluded_providers;
-  //Plaidml removed from tests for now 
-  excluded_providers.insert(kPlaidMLExecutionProvider);
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-  //test.Run(OpTester::ExpectResult::kExpectSuccess);
+  test.Run(OpTester::ExpectResult::kExpectSuccess);
 }
 
 TEST(ContribOpTest, TokenizerExpression_RegRep) {
@@ -841,12 +714,7 @@ TEST(ContribOpTest, TokenizerExpression_RegRep) {
       padval};
 
   test.AddOutput<std::string>("Y", output_dims, output);
-  //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-  std::unordered_set<std::string> excluded_providers;
-  //Plaidml removed from tests for now 
-  excluded_providers.insert(kPlaidMLExecutionProvider);
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-  //test.Run(OpTester::ExpectResult::kExpectSuccess);
+  test.Run(OpTester::ExpectResult::kExpectSuccess);
 }
 
 TEST(ContribOpTest, TokenizerExpression_Grouping) {
@@ -879,12 +747,7 @@ TEST(ContribOpTest, TokenizerExpression_Grouping) {
       end_mark};
 
   test.AddOutput<std::string>("Y", output_dims, output);
-  //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-  std::unordered_set<std::string> excluded_providers;
-  //Plaidml removed from tests for now 
-  excluded_providers.insert(kPlaidMLExecutionProvider);
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-  //test.Run(OpTester::ExpectResult::kExpectSuccess);
+  test.Run(OpTester::ExpectResult::kExpectSuccess);
 }
 
 TEST(ContribOpTest, TokenizerExpression_RegDot) {
@@ -908,12 +771,7 @@ TEST(ContribOpTest, TokenizerExpression_RegDot) {
       end_mark};
 
   test.AddOutput<std::string>("Y", output_dims, output);
-  //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-  std::unordered_set<std::string> excluded_providers;
-  //Plaidml removed from tests for now 
-  excluded_providers.insert(kPlaidMLExecutionProvider);
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-  //test.Run(OpTester::ExpectResult::kExpectSuccess);
+  test.Run(OpTester::ExpectResult::kExpectSuccess);
 }
 
 TEST(ContribOpTest, TokenizerExpression_RegChar) {
@@ -934,12 +792,7 @@ TEST(ContribOpTest, TokenizerExpression_RegChar) {
       end_mark};
 
   test.AddOutput<std::string>("Y", output_dims, output);
-     //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
- //test.Run(OpTester::ExpectResult::kExpectSuccess);
+  test.Run(OpTester::ExpectResult::kExpectSuccess);
 }
 
 TEST(ContribOpTest, Tokenizer_EmptyInput) {
@@ -957,13 +810,7 @@ TEST(ContribOpTest, Tokenizer_EmptyInput) {
     std::vector<std::string> output;
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
   // For [N][C] empty input we output [N][0]
   {
@@ -978,13 +825,7 @@ TEST(ContribOpTest, Tokenizer_EmptyInput) {
     std::vector<std::string> output;
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
   {
     OpTester test("Tokenizer", opset_ver, domain);
@@ -998,13 +839,7 @@ TEST(ContribOpTest, Tokenizer_EmptyInput) {
     std::vector<std::string> output;
 
     test.AddOutput<std::string>("Y", output_dims, output);
-
-    //TODO: Plaidml-TODO need to add some ops to get this to work tokenizer op is missing 
-    std::unordered_set<std::string> excluded_providers;
-    //Plaidml removed from tests for now 
-    excluded_providers.insert(kPlaidMLExecutionProvider);
-    test.Run(OpTester::ExpectResult::kExpectSuccess, "", excluded_providers);
-    //test.Run(OpTester::ExpectResult::kExpectSuccess);
+    test.Run(OpTester::ExpectResult::kExpectSuccess);
   }
 }
 }  // namespace test

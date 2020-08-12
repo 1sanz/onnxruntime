@@ -18,7 +18,6 @@ void RunTest(std::initializer_list<T> input,
   test.AddInput<T>("input", input_dims, input);
   test.AddInput<int64_t>("repeats", repeat_dims, repeat);
   test.AddOutput<T>("output", output_dims, output);
-  //test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
   test.Run();
 }
 

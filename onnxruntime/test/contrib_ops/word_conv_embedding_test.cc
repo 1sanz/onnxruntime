@@ -45,8 +45,7 @@ TEST(ContribOpTest, WordConvEmbedding) {
   // Invalid input dimensions
   OpTester test("WordConvEmbedding", 1, onnxruntime::kMSDomain);
   InitializeTestWithoutAttribute(test);
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.run();
+  test.Run();
 }
 
 TEST(ContribOpTest, WordConvEmbedding_valid_attribute) {
@@ -56,8 +55,7 @@ TEST(ContribOpTest, WordConvEmbedding_valid_attribute) {
   test.AddAttribute<int64_t>("embedding_size", 2LL);
   test.AddAttribute<int64_t>("conv_window_size", 2LL);
   test.AddAttribute<int64_t>("char_embedding_size", 3LL);
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(ContribOpTest, WordConvEmbedding_embedding_size_mismatch) {
@@ -67,8 +65,7 @@ TEST(ContribOpTest, WordConvEmbedding_embedding_size_mismatch) {
   test.AddAttribute<int64_t>("embedding_size", 3LL);
   test.AddAttribute<int64_t>("conv_window_size", 2LL);
   test.AddAttribute<int64_t>("char_embedding_size", 3LL);
-  test.Run(OpTester::ExpectResult::kExpectFailure,"",{kPlaidMLExecutionProvider});
-  //test.Run(OpTester::ExpectResult::kExpectFailure);
+  test.Run(OpTester::ExpectResult::kExpectFailure);
 }
 
 TEST(ContribOpTest, WordConvEmbedding_conv_window_size_mismatch) {
@@ -78,8 +75,7 @@ TEST(ContribOpTest, WordConvEmbedding_conv_window_size_mismatch) {
   test.AddAttribute<int64_t>("embedding_size", 2LL);
   test.AddAttribute<int64_t>("conv_window_size", 1LL);
   test.AddAttribute<int64_t>("char_embedding_size", 3LL);
-  test.Run(OpTester::ExpectResult::kExpectFailure,"",{kPlaidMLExecutionProvider});
-  //test.Run(OpTester::ExpectResult::kExpectFailure);
+  test.Run(OpTester::ExpectResult::kExpectFailure);
 }
 
 TEST(ContribOpTest, WordConvEmbedding_char_embedding_size_mismatch) {
@@ -89,8 +85,7 @@ TEST(ContribOpTest, WordConvEmbedding_char_embedding_size_mismatch) {
   test.AddAttribute<int64_t>("embedding_size", 2LL);
   test.AddAttribute<int64_t>("conv_window_size", 2LL);
   test.AddAttribute<int64_t>("char_embedding_size", 4LL);
-  test.Run(OpTester::ExpectResult::kExpectFailure,"",{kPlaidMLExecutionProvider});
-  //test.Run(OpTester::ExpectResult::kExpectFailure);
+  test.Run(OpTester::ExpectResult::kExpectFailure);
 }
 
 TEST(ContribOpTest, WordConvEmbedding_char_embedding_shape_conv_shape_not_match) {
@@ -127,9 +122,7 @@ TEST(ContribOpTest, WordConvEmbedding_char_embedding_shape_conv_shape_not_match)
   test.AddInput<float>("B", B_conv_shape, B_conv);
   test.AddInput<float>("C", W_char_embedding_shape, W_char_embedding);
   test.AddOutput<float>("Y", output_shape, output);
-
-  test.Run(OpTester::ExpectResult::kExpectFailure,"",{kPlaidMLExecutionProvider});
-  //test.Run(OpTester::ExpectResult::kExpectFailure);
+  test.Run(OpTester::ExpectResult::kExpectFailure);
 }
 
 }  // namespace test

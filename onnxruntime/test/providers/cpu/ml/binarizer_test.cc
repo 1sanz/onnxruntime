@@ -22,9 +22,7 @@ TEST(MLOpTest, BinarizerOp) {
   vector<int64_t> dims{2, 3};
   test.AddInput<float>("X", dims, input);
   test.AddOutput<float>("Y", dims, expected_output);
-  //TODO: PlaidML Binarizer not yet handled 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider}); 
-  //test.Run();
+  test.Run();
 }
 
 }  // namespace test

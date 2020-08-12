@@ -82,9 +82,8 @@ void RunShrinkTest(const std::vector<ShrinkTestData<T>>& test_cases) {
 
     test.AddInput<T>("X", test_data.input_dimensions, test_data.input_vals);
     test.AddOutput<T>("Y", test_data.expected_dimensions, test_data.expected_vals);
-   //TODO: PlaidML shrink op not yet implemented 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //  test.Run();
+    
+  test.Run();
   }
 }
 

@@ -29,8 +29,7 @@ static void RunTest(const std::map<int64_t, TFrom>& input,
 
   std::vector<int64_t> dims{1, gsl::narrow_cast<int64_t>(output.size())};
   test.AddOutput("Y", dims, output);
-  test.Run(expect_result, "", {kPlaidMLExecutionProvider});
-  //test.Run(expect_result);
+  test.Run(expect_result);
 }
 
 /*
@@ -122,8 +121,7 @@ void RunBadAttributeTest(const std::string& cast_to,
   std::vector<int64_t> dims{1, gsl::narrow_cast<int64_t>(output.size())};
   test.AddOutput<float>("Y", dims, output);
 
-  test.Run(expect_result, "", {kPlaidMLExecutionProvider});
-  //test.Run(expect_result);
+  test.Run(expect_result);
 }
 
 // test invalid attributes are detected

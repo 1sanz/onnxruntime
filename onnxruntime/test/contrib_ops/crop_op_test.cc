@@ -13,7 +13,7 @@ TEST(CropOpTest, Crop_Border) {
   std::vector<int64_t> border{1, 1, 1, 1};
   test.AddAttribute("border", border);
   test.AddOutput<float>("y", {1, 1, 2, 2}, {6.0, 7.0, 10.0, 11.0});
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider,kPlaidMLExecutionProvider});
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider});
 }
 
 TEST(CropOpTest, Crop_Scale) {
@@ -27,7 +27,7 @@ TEST(CropOpTest, Crop_Scale) {
   test.AddAttribute("scale", scale);
 
   test.AddOutput<float>("y", {1, 1, 2, 2}, {6.0, 7.0, 10.0, 11.0});
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kTensorrtExecutionProvider,kPlaidMLExecutionProvider});
+  test.Run(OpTester::ExpectResult::kExpectSuccess);
 }
 
 }  // namespace test

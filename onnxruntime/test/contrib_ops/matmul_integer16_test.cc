@@ -16,9 +16,7 @@ TEST(MatmulInteger16OpTest, MatMulInteger16_1) {
   test.AddInput<int16_t>("T1", {1, 1}, {15});
   test.AddInput<int16_t>("T2", {1, 1}, {16});
   test.AddOutput<int32_t>("T3", {1, 1}, {240});
-  //TODO: PlaidML MatMulInteger16 op not yet handled 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(MatmulInteger16OpTest, MatMulInteger16_2) {
@@ -26,9 +24,7 @@ TEST(MatmulInteger16OpTest, MatMulInteger16_2) {
   test.AddInput<int16_t>("T1", {1, 2}, {-7, 10});
   test.AddInput<int16_t>("T2", {2, 1}, {-8, -11});
   test.AddOutput<int32_t>("T3", {1, 1}, {-54});
-  //TODO: PlaidML MatMulInteger16 op not yet handled 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 TEST(MatmulInteger16OpTest, MatMulInteger16_3) {
@@ -38,9 +34,7 @@ TEST(MatmulInteger16OpTest, MatMulInteger16_3) {
   test.AddOutput<int32_t>("T3", {3, 4}, {-934, 12417, 3119, -158,
                                          110107, -1373552, -357143, 6818,
                                          35068, -439546, -113990, 2444});
-  //TODO: PlaidML MatMulInteger16 op not yet handled 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run();
+  test.Run();
 }
 
 }  // namespace test

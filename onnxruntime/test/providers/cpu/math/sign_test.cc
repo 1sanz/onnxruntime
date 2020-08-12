@@ -118,9 +118,7 @@ TEST(MathOpTest, Sign_uint64) {
   std::vector<uint64_t> output;
   TestImpl<uint64_t>(input.cbegin(), input.cend(), std::back_inserter(output));
   test.AddOutput<uint64_t>("output", input_dims, output);
-  //TODO: PlaidML fix issue with sign op 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run(OpTester::ExpectResult::kExpectSuccess);
+  test.Run(OpTester::ExpectResult::kExpectSuccess);
 }
 
 TEST(MathOpTest, Sign_int64) {
@@ -136,9 +134,7 @@ TEST(MathOpTest, Sign_int64) {
   std::vector<int64_t> output;
   TestImpl<int64_t>(input.cbegin(), input.cend(), std::back_inserter(output));
   test.AddOutput<int64_t>("output", input_dims, output);
-  //TODO: PlaidML fix issue with sign op 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run(OpTester::ExpectResult::kExpectSuccess);
+  test.Run(OpTester::ExpectResult::kExpectSuccess);
 }
 
 TEST(MathOpTest, Sign_float) {
@@ -170,9 +166,7 @@ TEST(MathOpTest, Sign_double) {
   std::vector<double> output;
   TestImpl<double>(input.cbegin(), input.cend(), std::back_inserter(output));
   test.AddOutput<double>("output", input_dims, output);
-  //TODO: PlaidML fix issue with sign op 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run(OpTester::ExpectResult::kExpectSuccess);
+  test.Run(OpTester::ExpectResult::kExpectSuccess);
 }
 TEST(MathOpTest, Sign_MLFloat16) {
   using namespace test_sign_internal;
@@ -187,9 +181,7 @@ TEST(MathOpTest, Sign_MLFloat16) {
   std::vector<MLFloat16> output;
   TestImpl<MLFloat16>(input.cbegin(), input.cend(), std::back_inserter(output));
   test.AddOutput<MLFloat16>("output", input_dims, output);
-  //TODO: PlaidML fix issue with sign op 
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-  //test.Run(OpTester::ExpectResult::kExpectSuccess);
+  test.Run(OpTester::ExpectResult::kExpectSuccess);
 }
 
 }  // namespace test

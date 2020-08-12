@@ -85,9 +85,7 @@ static void RunTest(
       tester.AddOutput<float>("output", output_dims, output_data);
     }
     tester.AddOutput<int32_t>("mask_index", mask_index_dims, mask_index_data);
-    //TODO: PlaidML EmbedLayerNormalization op not yet handled 
-    tester.Run(OpTester::ExpectResult::kExpectSuccess, "", {kPlaidMLExecutionProvider});
-    //tester.Run();
+    tester.Run();
   }
 }
 

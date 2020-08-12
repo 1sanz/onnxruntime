@@ -218,5 +218,7 @@ std::vector<plaidml::edsl::Tensor> MakePlaidMLOp(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
 
+bool check_op_support(std::string op_name);
+
 }  // namespace plaidml_ep
 }  // namespace onnxruntime
