@@ -1,3 +1,54 @@
+[submodule "cmake/external/protobuf"]
+	path = cmake/external/protobuf
+	url = https://github.com/google/protobuf.git
+[submodule "cmake/external/googletest"]
+	path = cmake/external/googletest
+	url = https://github.com/google/googletest.git
+[submodule "cmake/external/onnx"]
+  path = cmake/external/onnx
+  url = https://github.com/onnx/onnx
+[submodule "cmake/external/tvm"]
+	path = cmake/external/tvm
+	url = https://github.com/microsoft/onnxruntime-tvm.git
+[submodule "cmake/external/date"]
+	path = cmake/external/date
+	url = https://github.com/HowardHinnant/date.git
+[submodule "cmake/external/gemmlowp"]
+	path = cmake/external/gemmlowp
+	url = https://github.com/google/gemmlowp.git
+[submodule "cmake/external/nsync"]
+	path = cmake/external/nsync
+	url = https://github.com/google/nsync
+[submodule "cmake/external/re2"]
+	path = cmake/external/re2
+	url = https://github.com/google/re2.git
+[submodule "cmake/external/eigen"]
+	path = cmake/external/eigen
+	url = https://gitlab.com/libeigen/eigen.git
+[submodule "cmake/external/DNNLibrary"]
+	path = cmake/external/DNNLibrary
+	url = https://github.com/JDAI-CV/DNNLibrary
+[submodule "cmake/external/mimalloc"]
+	path = cmake/external/mimalloc
+	url = https://github.com/microsoft/mimalloc.git
+[submodule "cmake/external/cub"]
+	path = cmake/external/cub
+	url = https://github.com/NVlabs/cub.git
+[submodule "cmake/external/wil"]
+	path = cmake/external/wil
+	url = https://github.com/microsoft/wil
+[submodule "cmake/external/json"]
+	path = cmake/external/json
+	url = https://github.com/nlohmann/json
 [submodule "server/external/spdlog"]
 	path = server/external/spdlog
 	url = https://github.com/gabime/spdlog.git
+[submodule "cmake/external/FeaturizersLibrary"]
+	path = cmake/external/FeaturizersLibrary
+	url = https://github.com/microsoft/FeaturizersLibrary.git
+[submodule "cmake/external/SafeInt/safeint"]
+	path = cmake/external/SafeInt/safeint
+	url = https://github.com/dcleblanc/SafeInt.git
+[submodule "cmake/external/onnx-tensorrt"]
+	path = cmake/external/onnx-tensorrt
+	url = https://github.com/stevenlix/onnx-tensorrt.git
