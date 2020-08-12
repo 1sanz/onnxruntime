@@ -1,11 +1,11 @@
 # PlaidML Execution Provider
 
-PlaidML Execution Provider uses a pre-release PlaidML version (plaidml-v1) to generate MLIR code for onnxruntime programs. This version is being developed on the plaidml-v1 branch of the PlaidML GitHub repository [here](https://github.com/plaidml/plaidml/tree/plaidml-v1). Please refer to [this](https://software.intel.com/en-us/openvino-toolkit/hardware) page for details on the Intel hardware. For details on MLIR see https://mlir.llvm.org
+PlaidML Execution Provider uses a pre-release PlaidML version (plaidml-v1) to generate MLIR code for onnxruntime programs. This version is being developed on the plaidml-v1 branch of the PlaidML GitHub repository [here](https://github.com/plaidml/plaidml/tree/plaidml-v1). Please refer to [this](https://software.intel.com/en-us/openvino-toolkit/hardware) page for details on the Intel hardware. For details on [MLIR](https://mlir.llvm.org)
 
 
 ## Build instructions for ONNXRT with PlaidML (plaidml-v1)
 
-PlaidML version 1 pre-release can be downloaded and build from source see: https://github.com/plaidml/plaidml
+[PlaidML version 1](https://github.com/plaidml/plaidml) pre-release can be downloaded and build from [source](https://github.com/plaidml/plaidml)
 
 Build the PlaidML library to use with onnxruntime
 ```
@@ -28,11 +28,11 @@ export TODO_TEMP_PLAIDML_LIB_DIR=~/path/to/plaidml.dylib
 ```
 
 ## Tile eDSL (C++ / Python)
-PlaidML provides the Tile eDSL (Embedded Domain Specific Language) as a simple way to translate mathematical logic into code. Tile eDSL is designed to make machine learning code easier to read and write. For learning more about Tile eDSL see: https://plaidml.readthedocs.io/en/latest/usage/edsl.html#how-to-write-tile-code
+PlaidML provides the [Tile eDSL](https://plaidml.readthedocs.io/en/latest/usage/edsl.html#how-to-write-tile-code) (Embedded Domain Specific Language) as a simple way to translate mathematical logic into code. Tile eDSL is designed to make machine learning code easier to read and write. For learning more about Tile eDSL see : [Tile eDSL](https://plaidml.readthedocs.io/en/latest/usage/edsl.html#how-to-write-tile-code)
 
 ## ONNX Layers supported using PlaidML
 
-The table below shows the ONNX layers created using Tile eDSL wrapper functions that translate onnx nodes into eDSL and generate MLIR code for the specified device, to provide the most efficient execution possible. Click (TODO: add link to PlaidML exec provider ops in onnxruntime) to see Tile eDSL in action under onnxruntime. PlaidML also provides an op library which has been built on top of Tile eDSL to facilitate developers, this library provides access to eDSL implementations of commonly used ML operations with an easy to use fluent API. The table below lists supported layers and corresponding eDSL op library functions employed. 
+The table below shows the ONNX layers created using Tile eDSL wrapper functions that translate onnx nodes into eDSL and generate MLIR code for the specified device, to provide the most efficient execution possible. PlaidML also provides an op library which has been built on top of Tile eDSL to facilitate developers, this library provides access to eDSL implementations of commonly used ML operations with an easy to use fluent API. The table below lists supported layers and corresponding eDSL op library functions employed. 
 
 TODO: distinguish between edsl, oplib and wrapper edsl functions 
 
