@@ -67,7 +67,7 @@ std::map<std::string, _OpFunction> _kSupportedOps =
   //{"ArgMax", _argmax,}, //TODO: PlaidML fix broken tests (7/7 failures )
   //{"ArgMin", _argmin,},  //TODO: PlaidML fix (4/5 failures)
   //{"AveragePool", _average_pool,}, //TODO: PlaidML fix broken tests (2/4 failures)
-  //{"Cast",_cast}, //TODO: PlaidML fix
+  //{"Cast",_cast}, //TODO: PlaidML OP WIP
   //{"Conv",_conv}, //TODO: PlaidML fix broken tests (6/17 failures)
   //{"ConvInteger",_conv}, //TODO: PlaidML 
   //{"Concat",_concat}, //TODO: PlaidML fix broken tests (3/12 failures)
@@ -140,11 +140,6 @@ std::vector<plaidml::edsl::Tensor> asin(const std::vector<plaidml::edsl::Value>&
   return {plaidml::edsl::asin(A)};
 }
 
-// std::vector<plaidml::edsl::Tensor> asinh(const std::vector<plaidml::edsl::Value>& args) {
-//   const auto A = args[0].as_tensor();
-//   return {plaidml::edsl::asinh(A)};
-// }
-
 std::vector<plaidml::edsl::Tensor> acos(const std::vector<plaidml::edsl::Value>& args) {
   const auto A = args[0].as_tensor();
   return {plaidml::edsl::acos(A)};
@@ -160,6 +155,7 @@ std::vector<plaidml::edsl::Tensor> ceil(const std::vector<plaidml::edsl::Value>&
   return {plaidml::edsl::ceil(A)};
 }
 
+// TODO: PlaidML OP WIP clip
 std::vector<plaidml::edsl::Tensor> clip(const std::vector<plaidml::edsl::Value>& args) {
   const auto& A = args[0].as_tensor();
   const auto& min_val = args[1].as_tensor();
@@ -236,6 +232,7 @@ std::vector<plaidml::edsl::Tensor> max(const std::vector<plaidml::edsl::Value>& 
   return {result};
 }
 
+// TODO: PlaidML OP WIP
 // std::vector<plaidml::edsl::Tensor> matmul(const std::vector<plaidml::edsl::Value>& args) {
 //   auto A = args[0].as_tensor();
 //   auto B = args[1].as_tensor();
@@ -277,6 +274,7 @@ std::vector<plaidml::edsl::Tensor> neg(const std::vector<plaidml::edsl::Value>& 
   return {-A};
 }
 
+//TODO: PlaidML fix broken tests (double)
 std::vector<plaidml::edsl::Tensor> pow(const std::vector<plaidml::edsl::Value>& args) {
   const auto& I = args[0].as_tensor();
   const auto& p = args[1].as_tensor();
@@ -300,6 +298,7 @@ std::vector<plaidml::edsl::Tensor> relu(const std::vector<plaidml::edsl::Value>&
   return {plaidml::op::relu(X)};
 }
 
+// TODO: PlaidML OP WIP reshape
 std::vector<plaidml::edsl::Tensor> reshape(const std::vector<plaidml::edsl::Value>& args) {
   const auto& I = args[0].as_tensor();
   const auto& shape = args[1];//need to convert this into 
@@ -311,11 +310,13 @@ std::vector<plaidml::edsl::Tensor> sample_op(const std::vector<plaidml::edsl::Va
   return {X};
 }
 
+//TODO: PlaidML fix broken tests (11/11 failures)
 std::vector<plaidml::edsl::Tensor> shape(const std::vector<plaidml::edsl::Value>& args) {
   const auto& I= args[0].as_tensor();
   return {plaidml::edsl::shape(I)};
 }
 
+//TODO: PlaidML fix broken tests (4/5 failures)
 std::vector<plaidml::edsl::Tensor> sign(const std::vector<plaidml::edsl::Value>& args) {
   const auto& I = args[0].as_tensor();
   auto Z = plaidml::edsl::Tensor(0.0);
@@ -386,6 +387,7 @@ std::vector<plaidml::edsl::Tensor> where(const std::vector<plaidml::edsl::Value>
   return {O};
 }
 
+//TODO: PlaidML fix broken tests (7/7 failures )
 std::vector<plaidml::edsl::Tensor> _argmax(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -436,6 +438,7 @@ std::vector<plaidml::edsl::Tensor> _argmax(
   return {plaidml::op::argmax(A,plaidml::edsl::make_tuple(axis))};
 }
 
+ //TODO: PlaidML fix (4/5 failures)
 std::vector<plaidml::edsl::Tensor> _argmin(//TODO: PlaidML merge argmax and argmin into one wrapper
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -487,6 +490,92 @@ std::vector<plaidml::edsl::Tensor> _argmin(//TODO: PlaidML merge argmax and argm
   return {plaidml::op::argmax(-A,plaidml::edsl::make_tuple(axis))};
 }
 
+//TODO: PlaidML fix broken tests (2/4 failures) 
+// std::vector<plaidml::edsl::Tensor> _average_pool(
+//     const ONNX_NAMESPACE::NodeProto& node,
+//     const std::vector<plaidml::edsl::Value>& inputs){
+
+//     const auto I = inputs[0].as_tensor();
+//     auto num_attributes = node.attribute_size();
+
+//     auto auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
+//     int ceil_mode = 0;
+//     bool use_ceil = false;
+//     int count_include_pad = 0;
+//     std::vector<int> kernel_shape;
+//     std::vector<int> pads;
+//     bool has_manual_pads = true;
+//     auto input_order = plaidml::op::TensorLayout::NCX;
+//     std::vector<int> strides;
+//     bool has_defined_strides = false;
+
+//     if(num_attributes>0){
+//       auto attributes = node.attribute();
+//       for(auto attribute :attributes){
+//         if(attribute.name() == "auto_pad"){//NOTSET, SAME_UPPER, SAME_LOWER or VALID
+//           const auto auto_pad = attribute.s();
+//           if(auto_pad=="NOTSET")auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;//default
+//           if(auto_pad=="SAME_UPPER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
+//           if(auto_pad=="SAME_LOWER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_LOWER;
+//           if(auto_pad=="VALID")auto_pad_mode = plaidml::op::AutoPadMode::VALID;
+
+//         }
+//         if(attribute.name()=="ceil_mode"){
+//           //Whether to use ceil or floor (default) to compute the output shape.
+//           ceil_mode = attribute.i();
+//           if(ceil_mode==1)use_ceil = true;
+//         }
+//         if(attribute.name()=="count_include_pad"){
+//           //Whether include pad pixels when calculating values for the edges. 
+//           //Default is 0, doesn't count include pad.
+//           count_include_pad = attribute.i();
+//         }
+//         if(attribute.name()=="kernel_shape"){
+//           //The size of the kernel along each axis.
+//           auto kernel_shape_ints = attribute.ints();
+//           for(auto kernel_shape_int: kernel_shape_ints){
+//             kernel_shape.push_back(kernel_shape_int);
+//           }
+//         }
+//         if(attribute.name()=="pads"){
+//           //If not present, the padding defaults to 
+//           //0 along start and end of each spatial axis.
+//           auto pads_ints = attribute.ints();
+//           for(auto pad: pads_ints){
+//             pads.push_back(pad);
+//           }
+//           has_manual_pads = true;
+//           auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
+//         }
+//         if(attribute.name()=="strides"){
+//           //If not present, the stride defaults is 1 along each spatial axis
+//           auto strides_ints = attribute.ints();
+//           for(auto stride: strides_ints){
+//             strides.push_back(stride);
+//           }
+//           has_defined_strides = true;
+//         }
+//       }
+//     }
+//     if(!has_defined_strides){
+//       for(size_t i=0;i<I.rank();i++){
+//             strides.push_back(0);
+//           }
+//     }  
+//     auto result =  plaidml::op::pool(I,
+//                                     plaidml::op::PoolMode::AVG,
+//                                     kernel_shape,
+//                                     strides,
+//                                     auto_pad_mode,
+//                                     pads,
+//                                     input_order, 
+//                                     has_manual_pads, 
+//                                     use_ceil);
+
+//   return {result};
+// }
+
+//TODO: PlaidML OP WIP
 std::vector<plaidml::edsl::Tensor> _cast(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -558,6 +647,7 @@ std::vector<plaidml::edsl::Tensor> _cast(
   return {plaidml::edsl::cast(I,plaidml_type)};
 }
 
+//TODO: PlaidML fix broken tests (3/12 failures)
 std::vector<plaidml::edsl::Tensor> _concat(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -585,6 +675,7 @@ std::vector<plaidml::edsl::Tensor> _concat(
   return {plaidml::op::concatenate(tensors,axis)};
 }
 
+//TODO: PlaidML fix broken tests (6/17 failures)
 std::vector<plaidml::edsl::Tensor> _conv(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -674,6 +765,7 @@ std::vector<plaidml::edsl::Tensor> _conv(
   return {result};
 }
 
+//TODO: PlaidML fix broken tests
 std::vector<plaidml::edsl::Tensor> _cumsum(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -731,6 +823,7 @@ std::vector<plaidml::edsl::Tensor> _elu(
   return {plaidml::edsl::select(I >= 0, I, alpha * (plaidml::edsl::exp(I) - 1))};
 }
 
+//TODO: PlaidML OP WIP
 // std::vector<plaidml::edsl::Tensor> _eye_like(    
 //     const ONNX_NAMESPACE::NodeProto& node,
 //     const std::vector<plaidml::edsl::Value>& inputs){
@@ -787,6 +880,7 @@ std::vector<plaidml::edsl::Tensor> _elu(
 //     return {O};	 
 // }
 
+//TODO: PlaidML fix broken tests (4/6 failures)
 std::vector<plaidml::edsl::Tensor> _flatten(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -850,6 +944,7 @@ std::vector<plaidml::edsl::Tensor> _hard_sigmoid(
   return {result};
 }
 
+//TODO: PlaidML fix broken tests (2/7 failures)
 std::vector<plaidml::edsl::Tensor> _log_softmax(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -941,6 +1036,7 @@ std::vector<plaidml::edsl::Tensor> _leaky_relu(
   return {plaidml::op::relu(I).alpha(plaidml::edsl::Tensor{alpha})};
 }
 
+//TODO: PlaidML fix broken tests (2/2 failures)
 std::vector<plaidml::edsl::Tensor> _lrn(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -971,6 +1067,7 @@ std::vector<plaidml::edsl::Tensor> _lrn(
   return {plaidml::op::lrn(A,{static_cast<int64_t>(size)}).alpha(alpha).beta(beta).epsilon(bias).axes({1})};
 }
 
+//TODO: PlaidML fix broken tests (10/12 failures) (attribute handling)
 // std::vector<plaidml::edsl::Tensor> _maxpool(
 //     const ONNX_NAMESPACE::NodeProto& node,
 //     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1072,92 +1169,7 @@ std::vector<plaidml::edsl::Tensor> _lrn(
 //   return {result};
 // }
 
-// std::vector<plaidml::edsl::Tensor> _average_pool(
-//     const ONNX_NAMESPACE::NodeProto& node,
-//     const std::vector<plaidml::edsl::Value>& inputs){
-
-//     const auto I = inputs[0].as_tensor();
-//     auto num_attributes = node.attribute_size();
-
-//     auto auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
-//     int ceil_mode = 0;
-//     bool use_ceil = false;
-//     int count_include_pad = 0;
-//     std::vector<int> kernel_shape;
-//     std::vector<int> pads;
-//     bool has_manual_pads = true;
-//     auto input_order = plaidml::op::TensorLayout::NCX;
-//     std::vector<int> strides;
-//     bool has_defined_strides = false;
-
-//     if(num_attributes>0){
-//       auto attributes = node.attribute();
-//       for(auto attribute :attributes){
-//         if(attribute.name() == "auto_pad"){//NOTSET, SAME_UPPER, SAME_LOWER or VALID
-//           const auto auto_pad = attribute.s();
-//           if(auto_pad=="NOTSET")auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;//default
-//           if(auto_pad=="SAME_UPPER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
-//           if(auto_pad=="SAME_LOWER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_LOWER;
-//           if(auto_pad=="VALID")auto_pad_mode = plaidml::op::AutoPadMode::VALID;
-
-//         }
-//         if(attribute.name()=="ceil_mode"){
-//           //Whether to use ceil or floor (default) to compute the output shape.
-//           ceil_mode = attribute.i();
-//           if(ceil_mode==1)use_ceil = true;
-//         }
-//         if(attribute.name()=="count_include_pad"){
-//           //Whether include pad pixels when calculating values for the edges. 
-//           //Default is 0, doesn't count include pad.
-//           count_include_pad = attribute.i();
-//         }
-//         if(attribute.name()=="kernel_shape"){
-//           //The size of the kernel along each axis.
-//           auto kernel_shape_ints = attribute.ints();
-//           for(auto kernel_shape_int: kernel_shape_ints){
-//             kernel_shape.push_back(kernel_shape_int);
-//           }
-//         }
-//         if(attribute.name()=="pads"){
-//           //If not present, the padding defaults to 
-//           //0 along start and end of each spatial axis.
-//           auto pads_ints = attribute.ints();
-//           for(auto pad: pads_ints){
-//             pads.push_back(pad);
-//           }
-//           has_manual_pads = true;
-//           auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
-//         }
-//         if(attribute.name()=="strides"){
-//           //If not present, the stride defaults is 1 along each spatial axis
-//           auto strides_ints = attribute.ints();
-//           for(auto stride: strides_ints){
-//             strides.push_back(stride);
-//           }
-//           has_defined_strides = true;
-//         }
-//       }
-//     }
-//     if(!has_defined_strides){
-//       for(size_t i=0;i<I.rank();i++){
-//             strides.push_back(0);
-//           }
-//     }
-
-    
-//     auto result =  plaidml::op::pool(I,
-//                                     plaidml::op::PoolMode::AVG,
-//                                     kernel_shape,
-//                                     strides,
-//                                     auto_pad_mode,
-//                                     pads,
-//                                     input_order, 
-//                                     has_manual_pads, 
-//                                     use_ceil);
-
-//   return {result};
-// }
-
+//TODO: PlaidML fix broken tests (6/15 failures)
 // std::vector<plaidml::edsl::Tensor> _mod(    
 //     const ONNX_NAMESPACE::NodeProto& node,
 //     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1180,6 +1192,7 @@ std::vector<plaidml::edsl::Tensor> _lrn(
 //   return {result};
 // }
 
+//TODO: PlaidML OP WIP
 // std::vector<plaidml::edsl::Tensor> _one_hot(    
 //     const ONNX_NAMESPACE::NodeProto& node,
 //     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1224,6 +1237,7 @@ std::vector<plaidml::edsl::Tensor> _lrn(
 //   return {indices};
 // }
 
+//TODO: PlaidML fix broken tests (2/9 failures)
 std::vector<plaidml::edsl::Tensor> _reduce_max(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1246,6 +1260,7 @@ std::vector<plaidml::edsl::Tensor> _reduce_max(
   return {plaidml::op::max(A,plaidml::edsl::make_tuple(axes),keep_dims)};
 }
 
+//TODO: PlaidML fix broken tests (2/8 failures)
 std::vector<plaidml::edsl::Tensor> _reduce_mean(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1268,6 +1283,7 @@ std::vector<plaidml::edsl::Tensor> _reduce_mean(
   return {plaidml::op::mean(A,plaidml::edsl::make_tuple(axes),keep_dims)};
 }
 
+//TODO: PlaidML fix broken tests (4/9 failures)
 std::vector<plaidml::edsl::Tensor> _reduce_min(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1290,6 +1306,7 @@ std::vector<plaidml::edsl::Tensor> _reduce_min(
   return {plaidml::op::min(A,plaidml::edsl::make_tuple(axes),keep_dims)};
 }
 
+//TODO: PlaidML fix broken tests (2/8 failures)
 std::vector<plaidml::edsl::Tensor> _reduce_prod(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1312,6 +1329,7 @@ std::vector<plaidml::edsl::Tensor> _reduce_prod(
   return {plaidml::op::prod(A,plaidml::edsl::make_tuple(axes),keep_dims)};
 }
 
+//TODO: PlaidML fix broken tests (2/19 failures)
 std::vector<plaidml::edsl::Tensor> _reduce_sum(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1334,6 +1352,7 @@ std::vector<plaidml::edsl::Tensor> _reduce_sum(
   return {plaidml::op::sum(A,plaidml::edsl::make_tuple(axes),keep_dims)};
 }
 
+//TODO: PlaidML OP WIP
 std::vector<plaidml::edsl::Tensor> _reverse_sequence(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1393,6 +1412,7 @@ std::vector<plaidml::edsl::Tensor> _selu(
   return {gamma * plaidml::edsl::select(I > 0, I, alpha * (plaidml::edsl::exp(I) - 1))};
 }
 
+//TODO: PlaidML fix broken tests (2/8 failures)
 std::vector<plaidml::edsl::Tensor> _softmax(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1414,6 +1434,7 @@ std::vector<plaidml::edsl::Tensor> _softmax(
   return {plaidml::op::softmax(A,axis)};
 }
 
+//TODO: PlaidML failing split OP WIP
 std::vector<plaidml::edsl::Tensor> _split(//TODO: need to handle multiple outputs in makeprogram 
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1464,6 +1485,7 @@ std::vector<plaidml::edsl::Tensor> _split(//TODO: need to handle multiple output
   return {I_split};
 }
 
+//TODO: PlaidML fix broken tests (5/10 failures)(segfault)
 std::vector<plaidml::edsl::Tensor> _squeeze(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1482,6 +1504,7 @@ std::vector<plaidml::edsl::Tensor> _squeeze(
   return {plaidml::op::squeeze(A,axes)};
 }
 
+//TODO: PlaidML fix broken tests (new failure! op not registered )
 std::vector<plaidml::edsl::Tensor> _thresholded_relu(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1500,6 +1523,7 @@ std::vector<plaidml::edsl::Tensor> _thresholded_relu(
   return {plaidml::op::relu(I).threshold((double)alpha)};
 }
 
+//TODO: PlaidML fix broken tests (8/17 failures)
 std::vector<plaidml::edsl::Tensor> _transpose(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
