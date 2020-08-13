@@ -179,7 +179,7 @@ std::vector<std::unique_ptr<ComputeCapability>> PlaidMLExecutionProvider::GetCap
   for (auto index : node_indexes) {
     const auto node = graph_viewer.GetNode(index);
 
-    //Check if the Operation is Supported by OpenVINO
+    //TODO: PlaidML do we need to add a kernel registry instead?
     if (!plaidml_ep::check_op_support(node->OpType())) {
       {
         //throw "Operation is not yet supported by PlaidML Execution Provider";

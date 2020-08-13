@@ -166,22 +166,6 @@ std::vector<plaidml::edsl::Tensor> clip(const std::vector<plaidml::edsl::Value>&
   const auto& max_val = args[2].as_tensor();
   return {plaidml::op::clip(A,min_val,max_val)};
 }
-
-// std::vector<plaidml::edsl::Tensor> conv(const std::vector<plaidml::edsl::Value>& args) {
-//   const auto I = args[0].as_tensor();
-//   const auto K = args[1].as_tensor();
-//   // TODO: figure out how to translate node attributes into arguments 
-//   // return {plaidml::op::convolution(I,K)
-//   //           .deriv_mode(plaidml::op::ConvDerivMode::NONE)
-//   //           .group_layout(plaidml::op::GroupLayout::NONE)
-//   //           .autogroup_mode(plaidml::op::AutoGroupMode::UNGROUPED)
-//   //           .autopad_mode(plaidml::op::AutoPadMode::SAME_UPPER)
-//   //           .input_layout(plaidml::op::TensorLayout::NCX)
-//   //           .filter_layout(plaidml::op::TensorLayout::KCX)};
-//     return {plaidml::op::convolution(I,K)
-//             .input_layout(plaidml::op::TensorLayout::NCX)
-//             .filter_layout(plaidml::op::TensorLayout::KCX)};
-// }
   
 std::vector<plaidml::edsl::Tensor> cos(const std::vector<plaidml::edsl::Value>& args) {
   const auto A = args[0].as_tensor();
@@ -214,20 +198,6 @@ std::vector<plaidml::edsl::Tensor> exp(const std::vector<plaidml::edsl::Value>& 
   const auto A = args[0].as_tensor();
   return {plaidml::edsl::exp(A)};
 }
-
-// std::vector<plaidml::edsl::Tensor> flatten(const std::vector<plaidml::edsl::Value>& args) {
-//     const auto X = args[0].as_tensor();
-//     std::vector<plaidml::edsl::TensorDim> X_dims(X.rank());
-//     X.bind_dims(X_dims);
-//     if (X_dims.empty()) {
-//       return {X};
-//     }
-//     plaidml::edsl::TensorDim product(1);
-//     for (size_t i = 1; i < X.rank(); i++) {
-//       product = product * X_dims[i];
-//     }
-//     return {reshape(X, {X_dims[0], product})};
-// }
 
 std::vector<plaidml::edsl::Tensor> floor(const std::vector<plaidml::edsl::Value>& args) {
   const auto A = args[0].as_tensor();
@@ -444,10 +414,29 @@ std::vector<plaidml::edsl::Tensor> _argmax(
         }
       }
     }
+    
+    if(select_last_index){
+      //TODO: PlaidML handle select_last_index attribute here 
+      //temp statement added to bypass compile errors
+      select_last_index = !select_last_index;
+    }
+    else{
+      select_last_index = !select_last_index;
+    }
+    if(keep_dims==1){
+      //keep the reduced dimensions
+      //TODO: PlaidML handle keep_dims attribute here 
+      //temp statement added to bypass compile errors
+      keep_dims = 0;
+    }
+    else{
+      //do not keep the reduced dimensions
+      keep_dims = 0;
+    }
   return {plaidml::op::argmax(A,plaidml::edsl::make_tuple(axis))};
 }
 
-std::vector<plaidml::edsl::Tensor> _argmin(
+std::vector<plaidml::edsl::Tensor> _argmin(//TODO: PlaidML merge argmax and argmin into one wrapper
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
   
@@ -465,16 +454,36 @@ std::vector<plaidml::edsl::Tensor> _argmin(
         }
         if(attribute.name() == "keepdims"){
           keep_dims = attribute.i();
-          //TODO: handle keepdims attribue
+          //TODO: PlaidMLhandle keepdims attribue
         }
         if(attribute.name() == "select_last_index"){
           //Whether to select the last index or the first index if the {name} 
           //appears in multiple indices, default is False (first index).
           select_last_index = attribute.i();
-          //TODO: handle select_last_index attribue
+          //TODO: PlaidML handle select_last_index attribue
         }
       }
     }
+
+    if(select_last_index){
+      //TODO: PlaidML handle select_last_index attribute here 
+      //temp statement added to bypass compile errors
+      select_last_index = !select_last_index;
+    }
+    else{
+      select_last_index = !select_last_index;
+    }
+    if(keep_dims==1){
+      //keep the reduced dimensions
+      //TODO: PlaidML handle keep_dims attribute here 
+      //temp statement added to bypass compile errors
+      keep_dims = 0;
+    }
+    else{
+      //do not keep the reduced dimensions
+      keep_dims = 0;
+    }
+
   return {plaidml::op::argmax(-A,plaidml::edsl::make_tuple(axis))};
 }
 
@@ -686,6 +695,21 @@ std::vector<plaidml::edsl::Tensor> _cumsum(
         }
       }
     }
+  if(reverse==1){
+    //TODO: PlaidML handle reverse 
+    //perform the sum in reverse direction 
+    reverse = 0;
+  }
+  if(exclusive==1){
+    //TODO: PlaidML handle exclusive
+    //If set to 1 will return exclusive sum in which the top element 
+    //is not included. In other terms, if set to 1, the j-th output 
+    //element would be the sum of the first (j-1) elements. Otherwise, 
+    //it would be the sum of the first j elements
+    exclusive=0;
+  }
+
+  
   return {plaidml::op::cumsum(I,int_axis)};//cumsum(Tensor,int)
 }
 
@@ -733,6 +757,10 @@ std::vector<plaidml::edsl::Tensor> _eye_like(
     if(!has_dtype && k==0){
       return{plaidml::edsl::ident(I)};
       }
+    else{
+      //TODO: PlaidML handle dtype 
+      dtype = 0;
+    }
 
     //create identity matrix from input tensor
     plaidml::edsl::TensorDim X, Y;
@@ -1023,6 +1051,14 @@ std::vector<plaidml::edsl::Tensor> _maxpool(
         }
       }
     }
+    if(has_defined_dilations){
+      //TODO: PlaidML handle this 
+      has_defined_dilations = true;
+    }
+    if(has_defined_strides){
+      //TODO: PlaidML handle this 
+      has_defined_strides = true;
+    }
     auto result =  plaidml::op::pool(I,
                                     plaidml::op::PoolMode::MAX,
                                     kernel_shape,
@@ -1107,6 +1143,8 @@ std::vector<plaidml::edsl::Tensor> _average_pool(
             strides.push_back(0);
           }
     }
+
+    
     auto result =  plaidml::op::pool(I,
                                     plaidml::op::PoolMode::AVG,
                                     kernel_shape,
