@@ -1072,91 +1072,91 @@ std::vector<plaidml::edsl::Tensor> _lrn(
 //   return {result};
 // }
 
-std::vector<plaidml::edsl::Tensor> _average_pool(
-    const ONNX_NAMESPACE::NodeProto& node,
-    const std::vector<plaidml::edsl::Value>& inputs){
+// std::vector<plaidml::edsl::Tensor> _average_pool(
+//     const ONNX_NAMESPACE::NodeProto& node,
+//     const std::vector<plaidml::edsl::Value>& inputs){
 
-    const auto I = inputs[0].as_tensor();
-    auto num_attributes = node.attribute_size();
+//     const auto I = inputs[0].as_tensor();
+//     auto num_attributes = node.attribute_size();
 
-    auto auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
-    int ceil_mode = 0;
-    bool use_ceil = false;
-    int count_include_pad = 0;
-    std::vector<int> kernel_shape;
-    std::vector<int> pads;
-    bool has_manual_pads = true;
-    auto input_order = plaidml::op::TensorLayout::NCX;
-    std::vector<int> strides;
-    bool has_defined_strides = false;
+//     auto auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
+//     int ceil_mode = 0;
+//     bool use_ceil = false;
+//     int count_include_pad = 0;
+//     std::vector<int> kernel_shape;
+//     std::vector<int> pads;
+//     bool has_manual_pads = true;
+//     auto input_order = plaidml::op::TensorLayout::NCX;
+//     std::vector<int> strides;
+//     bool has_defined_strides = false;
 
-    if(num_attributes>0){
-      auto attributes = node.attribute();
-      for(auto attribute :attributes){
-        if(attribute.name() == "auto_pad"){//NOTSET, SAME_UPPER, SAME_LOWER or VALID
-          const auto auto_pad = attribute.s();
-          if(auto_pad=="NOTSET")auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;//default
-          if(auto_pad=="SAME_UPPER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
-          if(auto_pad=="SAME_LOWER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_LOWER;
-          if(auto_pad=="VALID")auto_pad_mode = plaidml::op::AutoPadMode::VALID;
+//     if(num_attributes>0){
+//       auto attributes = node.attribute();
+//       for(auto attribute :attributes){
+//         if(attribute.name() == "auto_pad"){//NOTSET, SAME_UPPER, SAME_LOWER or VALID
+//           const auto auto_pad = attribute.s();
+//           if(auto_pad=="NOTSET")auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;//default
+//           if(auto_pad=="SAME_UPPER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
+//           if(auto_pad=="SAME_LOWER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_LOWER;
+//           if(auto_pad=="VALID")auto_pad_mode = plaidml::op::AutoPadMode::VALID;
 
-        }
-        if(attribute.name()=="ceil_mode"){
-          //Whether to use ceil or floor (default) to compute the output shape.
-          ceil_mode = attribute.i();
-          if(ceil_mode==1)use_ceil = true;
-        }
-        if(attribute.name()=="count_include_pad"){
-          //Whether include pad pixels when calculating values for the edges. 
-          //Default is 0, doesn't count include pad.
-          count_include_pad = attribute.i();
-        }
-        if(attribute.name()=="kernel_shape"){
-          //The size of the kernel along each axis.
-          auto kernel_shape_ints = attribute.ints();
-          for(auto kernel_shape_int: kernel_shape_ints){
-            kernel_shape.push_back(kernel_shape_int);
-          }
-        }
-        if(attribute.name()=="pads"){
-          //If not present, the padding defaults to 
-          //0 along start and end of each spatial axis.
-          auto pads_ints = attribute.ints();
-          for(auto pad: pads_ints){
-            pads.push_back(pad);
-          }
-          has_manual_pads = true;
-          auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
-        }
-        if(attribute.name()=="strides"){
-          //If not present, the stride defaults is 1 along each spatial axis
-          auto strides_ints = attribute.ints();
-          for(auto stride: strides_ints){
-            strides.push_back(stride);
-          }
-          has_defined_strides = true;
-        }
-      }
-    }
-    if(!has_defined_strides){
-      for(size_t i=0;i<I.rank();i++){
-            strides.push_back(0);
-          }
-    }
+//         }
+//         if(attribute.name()=="ceil_mode"){
+//           //Whether to use ceil or floor (default) to compute the output shape.
+//           ceil_mode = attribute.i();
+//           if(ceil_mode==1)use_ceil = true;
+//         }
+//         if(attribute.name()=="count_include_pad"){
+//           //Whether include pad pixels when calculating values for the edges. 
+//           //Default is 0, doesn't count include pad.
+//           count_include_pad = attribute.i();
+//         }
+//         if(attribute.name()=="kernel_shape"){
+//           //The size of the kernel along each axis.
+//           auto kernel_shape_ints = attribute.ints();
+//           for(auto kernel_shape_int: kernel_shape_ints){
+//             kernel_shape.push_back(kernel_shape_int);
+//           }
+//         }
+//         if(attribute.name()=="pads"){
+//           //If not present, the padding defaults to 
+//           //0 along start and end of each spatial axis.
+//           auto pads_ints = attribute.ints();
+//           for(auto pad: pads_ints){
+//             pads.push_back(pad);
+//           }
+//           has_manual_pads = true;
+//           auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
+//         }
+//         if(attribute.name()=="strides"){
+//           //If not present, the stride defaults is 1 along each spatial axis
+//           auto strides_ints = attribute.ints();
+//           for(auto stride: strides_ints){
+//             strides.push_back(stride);
+//           }
+//           has_defined_strides = true;
+//         }
+//       }
+//     }
+//     if(!has_defined_strides){
+//       for(size_t i=0;i<I.rank();i++){
+//             strides.push_back(0);
+//           }
+//     }
 
     
-    auto result =  plaidml::op::pool(I,
-                                    plaidml::op::PoolMode::AVG,
-                                    kernel_shape,
-                                    strides,
-                                    auto_pad_mode,
-                                    pads,
-                                    input_order, 
-                                    has_manual_pads, 
-                                    use_ceil);
+//     auto result =  plaidml::op::pool(I,
+//                                     plaidml::op::PoolMode::AVG,
+//                                     kernel_shape,
+//                                     strides,
+//                                     auto_pad_mode,
+//                                     pads,
+//                                     input_order, 
+//                                     has_manual_pads, 
+//                                     use_ceil);
 
-  return {result};
-}
+//   return {result};
+// }
 
 std::vector<plaidml::edsl::Tensor> _mod(    
     const ONNX_NAMESPACE::NodeProto& node,
