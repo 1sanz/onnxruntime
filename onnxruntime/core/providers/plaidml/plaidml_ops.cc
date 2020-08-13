@@ -731,61 +731,61 @@ std::vector<plaidml::edsl::Tensor> _elu(
   return {plaidml::edsl::select(I >= 0, I, alpha * (plaidml::edsl::exp(I) - 1))};
 }
 
-std::vector<plaidml::edsl::Tensor> _eye_like(    
-    const ONNX_NAMESPACE::NodeProto& node,
-    const std::vector<plaidml::edsl::Value>& inputs){
-    const auto I = inputs[0].as_tensor();
-    // must be 2D tensor 
-    if(I.rank()>2)throw std::runtime_error("{PlaidML} ERROR: EyeLike given tensor of rank !=2 \n");
-    int dtype = 0; //optional attribue 
-    bool has_dtype = false;
-    int k = 0; 
-    auto num_attributes = node.attribute_size();
-    if(num_attributes>0){
-      auto attributes = node.attribute();
-      for(auto attribute: attributes){
-        if(attribute.name() == "dtype"){
-         dtype = attribute.i();
-         has_dtype = true;
-        }
-        if(attribute.name() == "k"){
-         k = attribute.i();
-        }
-      }
-    }
+// std::vector<plaidml::edsl::Tensor> _eye_like(    
+//     const ONNX_NAMESPACE::NodeProto& node,
+//     const std::vector<plaidml::edsl::Value>& inputs){
+//     const auto I = inputs[0].as_tensor();
+//     // must be 2D tensor 
+//     if(I.rank()>2)throw std::runtime_error("{PlaidML} ERROR: EyeLike given tensor of rank !=2 \n");
+//     int dtype = 0; //optional attribue 
+//     bool has_dtype = false;
+//     int k = 0; 
+//     auto num_attributes = node.attribute_size();
+//     if(num_attributes>0){
+//       auto attributes = node.attribute();
+//       for(auto attribute: attributes){
+//         if(attribute.name() == "dtype"){
+//          dtype = attribute.i();
+//          has_dtype = true;
+//         }
+//         if(attribute.name() == "k"){
+//          k = attribute.i();
+//         }
+//       }
+//     }
 
-    if(!has_dtype && k==0){
-      return{plaidml::edsl::ident(I)};
-      }
-    else{
-      //TODO: PlaidML handle dtype 
-      dtype = 0;
-    }
+//     if(!has_dtype && k==0){
+//       return{plaidml::edsl::ident(I)};
+//       }
+//     else{
+//       //TODO: PlaidML handle dtype 
+//       dtype = 0;
+//     }
 
-    //create identity matrix from input tensor
-    plaidml::edsl::TensorDim X, Y;
-    plaidml::edsl::TensorIndex i,j;
-    I.bind_dims(X, Y);
-    auto O = plaidml::edsl::TensorOutput(X,Y);
+//     //create identity matrix from input tensor
+//     plaidml::edsl::TensorDim X, Y;
+//     plaidml::edsl::TensorIndex i,j;
+//     I.bind_dims(X, Y);
+//     auto O = plaidml::edsl::TensorOutput(X,Y);
     
-    //auto O = plaidml::edsl::Placeholder(type, shape);
-    auto I_zero = plaidml::edsl::Tensor{0};
-    auto I_one = plaidml::edsl::Tensor{1};
-    O(i,j) = I_zero(i);
-    O(i,i+k) = I_one(i);
-    //O(x,x+k) = I(x,x+k) + I(x,x+k);
-    //O = O - I;
-    // O = plaidml::edsl::select(O>0,plaidml::edsl::Tensor{1},O);
-    //TODO: maybe select should allow indices 
-    // O = plaidml::edsl::select(y==x+k,0,1) should get the required identity ?
+//     //auto O = plaidml::edsl::Placeholder(type, shape);
+//     auto I_zero = plaidml::edsl::Tensor{0};
+//     auto I_one = plaidml::edsl::Tensor{1};
+//     O(i,j) = I_zero(i);
+//     O(i,i+k) = I_one(i);
+//     //O(x,x+k) = I(x,x+k) + I(x,x+k);
+//     //O = O - I;
+//     // O = plaidml::edsl::select(O>0,plaidml::edsl::Tensor{1},O);
+//     //TODO: maybe select should allow indices 
+//     // O = plaidml::edsl::select(y==x+k,0,1) should get the required identity ?
     
 
     
-    //TODO: handle dtye attribute
-    //if(has_dtype){cast the tensor into given dtype  }
+//     //TODO: handle dtye attribute
+//     //if(has_dtype){cast the tensor into given dtype  }
 
-    return {O};	 
-}
+//     return {O};	 
+// }
 
 std::vector<plaidml::edsl::Tensor> _flatten(    
     const ONNX_NAMESPACE::NodeProto& node,
@@ -971,106 +971,106 @@ std::vector<plaidml::edsl::Tensor> _lrn(
   return {plaidml::op::lrn(A,{static_cast<int64_t>(size)}).alpha(alpha).beta(beta).epsilon(bias).axes({1})};
 }
 
-std::vector<plaidml::edsl::Tensor> _maxpool(
-    const ONNX_NAMESPACE::NodeProto& node,
-    const std::vector<plaidml::edsl::Value>& inputs){
+// std::vector<plaidml::edsl::Tensor> _maxpool(
+//     const ONNX_NAMESPACE::NodeProto& node,
+//     const std::vector<plaidml::edsl::Value>& inputs){
 
-    const auto I = inputs[0].as_tensor();
-    auto num_attributes = node.attribute_size();
+//     const auto I = inputs[0].as_tensor();
+//     auto num_attributes = node.attribute_size();
 
 
-    auto auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
-    int ceil_mode = 0;
-    bool use_ceil = false;
-    std::vector<int> dilations;
-    bool has_defined_dilations = false;
-    std::vector<int> kernel_shape;
-    std::vector<int> pads;
-    bool has_manual_pads = true;
-    int storage_order = 0;
-    auto input_order = plaidml::op::TensorLayout::NCX;
-    std::vector<int> strides;
-    bool has_defined_strides = false;
+//     auto auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
+//     int ceil_mode = 0;
+//     bool use_ceil = false;
+//     std::vector<int> dilations;
+//     bool has_defined_dilations = false;
+//     std::vector<int> kernel_shape;
+//     std::vector<int> pads;
+//     bool has_manual_pads = true;
+//     int storage_order = 0;
+//     auto input_order = plaidml::op::TensorLayout::NCX;
+//     std::vector<int> strides;
+//     bool has_defined_strides = false;
 
-    if(num_attributes>0){
-      auto attributes = node.attribute();
-      for(auto attribute :attributes){
-        if(attribute.name() == "auto_pad"){//NOTSET, SAME_UPPER, SAME_LOWER or VALID
-          const auto auto_pad = attribute.s();
-          if(auto_pad=="NOTSET")auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;//default
-          if(auto_pad=="SAME_UPPER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
-          if(auto_pad=="SAME_LOWER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_LOWER;
-          if(auto_pad=="VALID")auto_pad_mode = plaidml::op::AutoPadMode::VALID;
+//     if(num_attributes>0){
+//       auto attributes = node.attribute();
+//       for(auto attribute :attributes){
+//         if(attribute.name() == "auto_pad"){//NOTSET, SAME_UPPER, SAME_LOWER or VALID
+//           const auto auto_pad = attribute.s();
+//           if(auto_pad=="NOTSET")auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;//default
+//           if(auto_pad=="SAME_UPPER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
+//           if(auto_pad=="SAME_LOWER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_LOWER;
+//           if(auto_pad=="VALID")auto_pad_mode = plaidml::op::AutoPadMode::VALID;
 
-        }
-        if(attribute.name()=="ceil_mode"){
-          //Whether to use ceil or floor (default) to compute the output shape.
-          ceil_mode = attribute.i();
-          if(ceil_mode==1)use_ceil = true;
-        }
-        if(attribute.name()=="dilations"){
-          //if not present default is 1 along each spacial axis
-          auto dilations_ints = attribute.ints();//returns repeated field 
-          for(auto dilation: dilations_ints){
-            dilations.push_back(dilation);
-          }
-          has_defined_dilations = true;
-        }
-        if(attribute.name()=="kernel_shape"){
-          //If not present, should be inferred from input W
-          //TODO: figure out if these are needed 
-          auto kernel_shape_ints = attribute.ints();
-          for(auto kernel_shape_int: kernel_shape_ints){
-            kernel_shape.push_back(kernel_shape_int);
-          }
-        }
-        if(attribute.name()=="pads"){
-          //If not present, the padding defaults to 
-          //0 along start and end of each spatial axis.
-          auto pads_ints = attribute.ints();
-          for(auto pad: pads_ints){
-            pads.push_back(pad);
-          }
-          has_manual_pads = true;
-          auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
-        }
-        if(attribute.name()=="storage_order"){
-          //The storage order of the tensor. 0 is row major, and 1 is column major.
-          storage_order = attribute.i();
-          if(storage_order==0)input_order = plaidml::op::TensorLayout::NCX;
-          if(storage_order==1)input_order = plaidml::op::TensorLayout::NXC;
-        }
+//         }
+//         if(attribute.name()=="ceil_mode"){
+//           //Whether to use ceil or floor (default) to compute the output shape.
+//           ceil_mode = attribute.i();
+//           if(ceil_mode==1)use_ceil = true;
+//         }
+//         if(attribute.name()=="dilations"){
+//           //if not present default is 1 along each spacial axis
+//           auto dilations_ints = attribute.ints();//returns repeated field 
+//           for(auto dilation: dilations_ints){
+//             dilations.push_back(dilation);
+//           }
+//           has_defined_dilations = true;
+//         }
+//         if(attribute.name()=="kernel_shape"){
+//           //If not present, should be inferred from input W
+//           //TODO: figure out if these are needed 
+//           auto kernel_shape_ints = attribute.ints();
+//           for(auto kernel_shape_int: kernel_shape_ints){
+//             kernel_shape.push_back(kernel_shape_int);
+//           }
+//         }
+//         if(attribute.name()=="pads"){
+//           //If not present, the padding defaults to 
+//           //0 along start and end of each spatial axis.
+//           auto pads_ints = attribute.ints();
+//           for(auto pad: pads_ints){
+//             pads.push_back(pad);
+//           }
+//           has_manual_pads = true;
+//           auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
+//         }
+//         if(attribute.name()=="storage_order"){
+//           //The storage order of the tensor. 0 is row major, and 1 is column major.
+//           storage_order = attribute.i();
+//           if(storage_order==0)input_order = plaidml::op::TensorLayout::NCX;
+//           if(storage_order==1)input_order = plaidml::op::TensorLayout::NXC;
+//         }
 
-        if(attribute.name()=="strides"){
-          //If not present, the stride defaults is 1 along each spatial axis
-          auto strides_ints = attribute.ints();
-          for(auto stride: strides_ints){
-            strides.push_back(stride);
-          }
-          has_defined_strides = true;
-        }
-      }
-    }
-    if(has_defined_dilations){
-      //TODO: PlaidML handle this 
-      has_defined_dilations = true;
-    }
-    if(has_defined_strides){
-      //TODO: PlaidML handle this 
-      has_defined_strides = true;
-    }
-    auto result =  plaidml::op::pool(I,
-                                    plaidml::op::PoolMode::MAX,
-                                    kernel_shape,
-                                    strides,
-                                    auto_pad_mode,
-                                    pads,
-                                    input_order, 
-                                    has_manual_pads, 
-                                    use_ceil);
+//         if(attribute.name()=="strides"){
+//           //If not present, the stride defaults is 1 along each spatial axis
+//           auto strides_ints = attribute.ints();
+//           for(auto stride: strides_ints){
+//             strides.push_back(stride);
+//           }
+//           has_defined_strides = true;
+//         }
+//       }
+//     }
+//     if(has_defined_dilations){
+//       //TODO: PlaidML handle this 
+//       has_defined_dilations = true;
+//     }
+//     if(has_defined_strides){
+//       //TODO: PlaidML handle this 
+//       has_defined_strides = true;
+//     }
+//     auto result =  plaidml::op::pool(I,
+//                                     plaidml::op::PoolMode::MAX,
+//                                     kernel_shape,
+//                                     strides,
+//                                     auto_pad_mode,
+//                                     pads,
+//                                     input_order, 
+//                                     has_manual_pads, 
+//                                     use_ceil);
 
-  return {result};
-}
+//   return {result};
+// }
 
 std::vector<plaidml::edsl::Tensor> _average_pool(
     const ONNX_NAMESPACE::NodeProto& node,
@@ -1179,49 +1179,49 @@ std::vector<plaidml::edsl::Tensor> _mod(
   return {result};
 }
 
-std::vector<plaidml::edsl::Tensor> _one_hot(    
-    const ONNX_NAMESPACE::NodeProto& node,
-    const std::vector<plaidml::edsl::Value>& inputs){
-  const auto& indices = inputs[0].as_tensor();
-  //const auto& depth = inputs[1].as_tensor();//TODO: need to convert this to int
-  //const auto& values = inputs[2].as_tensor();//on value off value 
-  int axis = -1;
-   auto num_attributes = node.attribute_size();
-     if(num_attributes>0){
-       auto attributes = node.attribute();
-       for(auto attribute: attributes){
-         if(attribute.name() == "axis"){
-          axis = attribute.i();
-         }
-       }
-     }
+// std::vector<plaidml::edsl::Tensor> _one_hot(    
+//     const ONNX_NAMESPACE::NodeProto& node,
+//     const std::vector<plaidml::edsl::Value>& inputs){
+//   const auto& indices = inputs[0].as_tensor();
+//   //const auto& depth = inputs[1].as_tensor();//TODO: need to convert this to int
+//   //const auto& values = inputs[2].as_tensor();//on value off value 
+//   int axis = -1;
+//    auto num_attributes = node.attribute_size();
+//      if(num_attributes>0){
+//        auto attributes = node.attribute();
+//        for(auto attribute: attributes){
+//          if(attribute.name() == "axis"){
+//           axis = attribute.i();
+//          }
+//        }
+//      }
   
 
-  // std::vector<plaidml::edsl::TensorDim> I_dims(indices.rank());
-  // indices.bind_dims(I_dims);
-  // std::vector<plaidml::edsl::TensorDim> O_dims(indices.rank() + 1);
+//   // std::vector<plaidml::edsl::TensorDim> I_dims(indices.rank());
+//   // indices.bind_dims(I_dims);
+//   // std::vector<plaidml::edsl::TensorDim> O_dims(indices.rank() + 1);
 
-  //  if (axis < 0) axis = indices.rank() + axis;
-  //  size_t j = 0;
-  //  for (size_t i = 0; i < O_dims.size(); i++) {
-  //    if (i == axis) {
-  //      O_dims[i] = plaidml::edsl::TensorDim(depth[0]);
-  //    } else {
-  //      O_dims[i] = I_dims[j];
-  //      j++;
-  //    }
-  //  }
+//   //  if (axis < 0) axis = indices.rank() + axis;
+//   //  size_t j = 0;
+//   //  for (size_t i = 0; i < O_dims.size(); i++) {
+//   //    if (i == axis) {
+//   //      O_dims[i] = plaidml::edsl::TensorDim(depth[0]);
+//   //    } else {
+//   //      O_dims[i] = I_dims[j];
+//   //      j++;
+//   //    }
+//   //  }
  
-  // plaidml::edsl::TensorIndex v;
-  // plaidml::edsl::Tensor O = plaidml::edsl::TensorOutput(O_dims);
-  // std::vector<plaidml::edsl::TensorIndex> O_idxs(indices.rank() + 1);
-  // std::vector<plaidml::edsl::TensorIndex> I_idxs(indices.rank());
-  // plaidml::edsl::Tensor count = plaidml::edsl::index(O_dims, axis);
-  // plaidml::edsl::TensorIndex c;
-  // O(O_idxs) = indices(I_idxs) == count(c);
-  // O = select(O, values(v), values(v+1));
-  return {indices};
-}
+//   // plaidml::edsl::TensorIndex v;
+//   // plaidml::edsl::Tensor O = plaidml::edsl::TensorOutput(O_dims);
+//   // std::vector<plaidml::edsl::TensorIndex> O_idxs(indices.rank() + 1);
+//   // std::vector<plaidml::edsl::TensorIndex> I_idxs(indices.rank());
+//   // plaidml::edsl::Tensor count = plaidml::edsl::index(O_dims, axis);
+//   // plaidml::edsl::TensorIndex c;
+//   // O(O_idxs) = indices(I_idxs) == count(c);
+//   // O = select(O, values(v), values(v+1));
+//   return {indices};
+// }
 
 std::vector<plaidml::edsl::Tensor> _reduce_max(    
     const ONNX_NAMESPACE::NodeProto& node,
