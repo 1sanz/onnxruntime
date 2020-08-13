@@ -1,15 +1,15 @@
 # PlaidML Execution Provider
 
-PlaidML Execution Provider uses a pre-release PlaidML version (plaidml-v1) to generate MLIR code for onnxruntime programs. This version is being developed on the plaidml-v1 branch of the PlaidML GitHub repository [here](https://github.com/plaidml/plaidml/tree/plaidml-v1). Please refer to [this](https://software.intel.com/en-us/openvino-toolkit/hardware) page for details on the Intel hardware. For details on [MLIR](https://mlir.llvm.org)
+PlaidML Execution Provider uses a pre-release PlaidML version (plaidml-v1) to generate [MLIR](https://mlir.llvm.org) code for onnxruntime programs. This version is being developed on the plaidml-v1 branch of the PlaidML GitHub repository [here](https://github.com/plaidml/plaidml/tree/plaidml-v1). Please refer to [this](https://software.intel.com/en-us/openvino-toolkit/hardware) page for details on the Intel hardware. Details on [MLIR](https://mlir.llvm.org) are available on their website.
 
 
 ## Build instructions for ONNXRT with PlaidML (plaidml-v1)
 
-[PlaidML version 1](https://github.com/plaidml/plaidml) pre-release can be downloaded and build from [source](https://github.com/plaidml/plaidml)
+PlaidML [version 1](https://github.com/plaidml/plaidml/tree/plaidml-v1) pre-release can be downloaded and build from source [->The PlaidML Github Repository](https://github.com/plaidml/plaidml)
 
 Build the PlaidML library to use with onnxruntime
 ```
-git clone --recursive  --branch --plaidml-v1  https://github.com/plaidml/plaidml.git
+git clone --recursive  --branch plaidml-v1  https://github.com/plaidml/plaidml.git
 cd plaidml
 ./configure
 conda activate .cenv/

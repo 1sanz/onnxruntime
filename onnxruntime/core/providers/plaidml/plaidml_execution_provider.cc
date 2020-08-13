@@ -52,9 +52,6 @@ plaidml::DType ConvertPrecisionONNXToPlaidML(
 
 PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
   PlaidMLProgram ret;
-
-  //std::map<std::string, plaidml::edsl::Tensor> tensors;
-
   std::map<std::string, plaidml::edsl::Value> init_tensors;
   // TODO: We might instead implement this on an ONNX ModelProto instead of an ONNX RT Node.
   //     This might have benefits for reuse in a non-RT ONNX context?
@@ -90,7 +87,7 @@ PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
    
     for (const auto& local_input : node.InputDefs()) {
       try {
-        if(local_input->Name()!=""){
+        if(local_input->Name()!=""){//TODO: PlaidML fix this
           auto input = init_tensors.at(local_input->Name());
           local_input_tensors.push_back(plaidml::edsl::Value(input));
         }
@@ -235,11 +232,10 @@ common::Status PlaidMLExecutionProvider::Compile(
             binder.input(input_placeholder).copy_from(input_data);
           }
           plaidml::init();
-          
-              plaidml::edsl::init();
-              plaidml::op::init();
-              plaidml::exec::init();
-              executable->run();
+          plaidml::edsl::init();
+          plaidml::op::init();
+          plaidml::exec::init();
+          executable->run();
 
           // Write output data
           unsigned output_idx = 0;

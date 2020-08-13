@@ -7,10 +7,10 @@
 # provider support and runs internal node and inference tests 
 
 
-#start the time
+#Start the time
 START=$(date +%s)
 
-# download plaidml-v1 from source and build it 
+# Download plaidml-v1 from source and build it 
 # TODO: PlaidML - this should be done in .gitmodules and the build instructions 
 # added to onnxruntime OR post plaidml-v1 release the user will be instructed to
 # install plaidml-v1 through pip    
@@ -22,7 +22,7 @@ bazelisk build plaidml:shlib
 conda deactivate
 cd ../../
 
-# set environment variables so that onnxruntime can find plaidml 
+# Set environment variables so that onnxruntime can find plaidml 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; 
 then
     export TODO_TEMP_PLAIDML_DIR=$PWD
@@ -33,10 +33,10 @@ then
     export TODO_TEMP_PLAIDML_LIB_DIR=$PWD/bazel-bin/plaidml/libplaidml.dylib
 fi
 
-# build onnxruntime with plaidml execution provider support 
+# Build onnxruntime with plaidml execution provider support 
 ./build.sh --config RelWithDebInfo --build_shared_lib --parallel --use_plaidml
 
-#build complete -> print time
+# Build complete -> print time
 END=$(date +%s)
 DIFF=$(( $END - $START ))
 echo "-----------------------------------"
