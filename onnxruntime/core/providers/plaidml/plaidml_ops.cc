@@ -1165,15 +1165,16 @@ std::vector<plaidml::edsl::Tensor> _mod(
   const auto& B = inputs[1].as_tensor();
   int fmod = 0;
 
-  auto num_attributes = node.attribute_size();
-    if(num_attributes>0){
-      auto attributes = node.attribute();
-      for(auto attribute: attributes){
-        if(attribute.name() == "fmod"){
-         fmod = attribute.i();
-        }
-      }
-    }
+  //TODO: PlaidML handle fmod attribue 
+  // auto num_attributes = node.attribute_size();
+  //   if(num_attributes>0){
+  //     auto attributes = node.attribute();
+  //     for(auto attribute: attributes){
+  //       if(attribute.name() == "fmod"){
+  //        fmod = attribute.i();
+  //       }
+  //     }
+  //   }
   
   auto result = A % B;//TODO: need to handle fmod
   return {result};
