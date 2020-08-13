@@ -1163,7 +1163,7 @@ std::vector<plaidml::edsl::Tensor> _mod(
     const std::vector<plaidml::edsl::Value>& inputs){
   const auto& A = inputs[0].as_tensor();
   const auto& B = inputs[1].as_tensor();
-  int fmod = 0;
+  // int fmod = 0;
 
   //TODO: PlaidML handle fmod attribue 
   // auto num_attributes = node.attribute_size();
