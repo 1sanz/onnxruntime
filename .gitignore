@@ -45,4 +45,5 @@ java/gradlew
 java/gradlew.bat
 java/gradle
 java/.gradle
+.DS_Store
 
