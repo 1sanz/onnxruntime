@@ -23,8 +23,16 @@ conda activate .cenv/
 bazelisk build plaidml:shlib
 conda deactivate
 
-export TODO_TEMP_PLAIDML_DIR=$PWD
-export TODO_TEMP_PLAIDML_LIB_DIR=$PWD/bazel-bin/plaidml/
+if [[ "$OSTYPE" == "linux-gnu"* ]]; 
+then
+    export TODO_TEMP_PLAIDML_DIR=$PWD
+    export TODO_TEMP_PLAIDML_LIB_DIR=$PWD/bazel-bin/plaidml/libplaidml.so
+elif [[ "$OSTYPE" == "darwin"* ]]; 
+then
+    export TODO_TEMP_PLAIDML_DIR=$PWD
+    export TODO_TEMP_PLAIDML_LIB_DIR=$PWD/bazel-bin/plaidml/libplaidml.dylib
+fi
+
 
 cd ../../
 
