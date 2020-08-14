@@ -15,14 +15,14 @@
 #ifdef USE_CUDA
 #include "core/providers/cuda/cuda_execution_provider.h"
 #endif
-#ifdef USE_TENSORRT
-#include "core/providers/tensorrt/tensorrt_execution_provider.h"
-#endif
 #ifdef USE_OPENVINO
 #include "core/providers/openvino/openvino_execution_provider.h"
 #endif
 #ifdef USE_NNAPI
-#include "core/providers/nnapi/nnapi_execution_provider.h"
+#include "core/providers/nnapi/nnapi_builtin/nnapi_execution_provider.h"
+#endif
+#ifdef USE_RKNPU
+#include "core/providers/rknpu/rknpu_execution_provider.h"
 #endif
 #ifdef USE_PLAIDML
 #include "core/providers/plaidml/plaidml_execution_provider.h"
@@ -55,6 +55,8 @@ IExecutionProvider* TestNnapiExecutionProvider();
 
 #ifdef USE_PLAIDML
 IExecutionProvider* TestPlaidMLExecutionProvider();
+#ifdef USE_RKNPU
+IExecutionProvider* TestRknpuExecutionProvider();
 #endif
 
 template <typename T>
@@ -77,8 +79,8 @@ void CreateMLValue(AllocatorPtr alloc, const std::vector<int64_t>& dims, const s
   TensorShape shape(dims);
   auto element_type = DataTypeImpl::GetType<T>();
   std::unique_ptr<Tensor> p_tensor = onnxruntime::make_unique<Tensor>(element_type,
-                                                              shape,
-                                                              alloc);
+                                                                      shape,
+                                                                      alloc);
   if (value.size() > 0) {
     CopyVectorToTensor(value, *p_tensor);
   }
@@ -93,8 +95,8 @@ void AllocateMLValue(AllocatorPtr alloc, const std::vector<int64_t>& dims, OrtVa
   TensorShape shape(dims);
   auto element_type = DataTypeImpl::GetType<T>();
   std::unique_ptr<Tensor> p_tensor = onnxruntime::make_unique<Tensor>(element_type,
-                                                              shape,
-                                                              alloc);
+                                                                      shape,
+                                                                      alloc);
   p_mlvalue->Init(p_tensor.release(),
                   DataTypeImpl::GetType<Tensor>(),
                   DataTypeImpl::GetType<Tensor>()->GetDeleteFunc());
@@ -102,7 +104,7 @@ void AllocateMLValue(AllocatorPtr alloc, const std::vector<int64_t>& dims, OrtVa
 
 // Returns a map with the number of occurrences of each operator in the graph.
 // Helper function to check that the graph transformations have been successfully applied.
-std::map<std::string, int> CountOpsInGraph(const Graph& graph);
+std::map<std::string, int> CountOpsInGraph(const Graph& graph, bool recurse_into_subgraphs = true);
 
 }  // namespace test
 }  // namespace onnxruntime
