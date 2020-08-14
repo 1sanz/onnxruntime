@@ -387,56 +387,56 @@ std::vector<plaidml::edsl::Tensor> where(const std::vector<plaidml::edsl::Value>
   return {O};
 }
 
-//TODO: PlaidML fix broken tests (7/7 failures )
-std::vector<plaidml::edsl::Tensor> _argmax(
-    const ONNX_NAMESPACE::NodeProto& node,
-    const std::vector<plaidml::edsl::Value>& inputs){
+// //TODO: PlaidML fix broken tests (7/7 failures )
+// std::vector<plaidml::edsl::Tensor> _argmax(
+//     const ONNX_NAMESPACE::NodeProto& node,
+//     const std::vector<plaidml::edsl::Value>& inputs){
   
-    const auto& A = inputs[0].as_tensor();
-    int axis = 0;
+//     const auto& A = inputs[0].as_tensor();
+//     int axis = 0;
     
-    int keep_dims = 1;
-    int select_last_index = 0; 
-    auto num_attributes = node.attribute_size();
-    if(num_attributes>0){
-      auto attributes = node.attribute();
-      for(auto attribute: attributes)
-      {
-        if(attribute.name() == "axis")
-        {
-          axis = attribute.i();
-        }
-        if(attribute.name() == "keepdims")//TODO: handle keepdims attribue
-        {
-          keep_dims = attribute.i();
-        }
-        if(attribute.name() == "select_last_index")
-        {
-          select_last_index = attribute.i();
-        }
-      }
-    }
+//     int keep_dims = 1;
+//     int select_last_index = 0; 
+//     auto num_attributes = node.attribute_size();
+//     if(num_attributes>0){
+//       auto attributes = node.attribute();
+//       for(auto attribute: attributes)
+//       {
+//         if(attribute.name() == "axis")
+//         {
+//           axis = attribute.i();
+//         }
+//         if(attribute.name() == "keepdims")//TODO: handle keepdims attribue
+//         {
+//           keep_dims = attribute.i();
+//         }
+//         if(attribute.name() == "select_last_index")
+//         {
+//           select_last_index = attribute.i();
+//         }
+//       }
+//     }
     
-    if(select_last_index){
-      //TODO: PlaidML handle select_last_index attribute here 
-      //temp statement added to bypass compile errors
-      select_last_index = !select_last_index;
-    }
-    else{
-      select_last_index = !select_last_index;
-    }
-    if(keep_dims==1){
-      //keep the reduced dimensions
-      //TODO: PlaidML handle keep_dims attribute here 
-      //temp statement added to bypass compile errors
-      keep_dims = 0;
-    }
-    else{
-      //do not keep the reduced dimensions
-      keep_dims = 0;
-    }
-  return {plaidml::op::argmax(A,plaidml::edsl::make_tuple(axis))};
-}
+//     if(select_last_index){
+//       //TODO: PlaidML handle select_last_index attribute here 
+//       //temp statement added to bypass compile errors
+//       select_last_index = !select_last_index;
+//     }
+//     else{
+//       select_last_index = !select_last_index;
+//     }
+//     if(keep_dims==1){
+//       //keep the reduced dimensions
+//       //TODO: PlaidML handle keep_dims attribute here 
+//       //temp statement added to bypass compile errors
+//       keep_dims = 0;
+//     }
+//     else{
+//       //do not keep the reduced dimensions
+//       keep_dims = 0;
+//     }
+//   return {plaidml::op::argmax(A,plaidml::edsl::make_tuple(axis))};
+// }
 
  //TODO: PlaidML fix (4/5 failures)
 std::vector<plaidml::edsl::Tensor> _argmin(//TODO: PlaidML merge argmax and argmin into one wrapper
