@@ -14,23 +14,13 @@
 #include "Psapi.h"
 
 using namespace winrt;
-using namespace winrt::Windows::AI::MachineLearning;
-using namespace winrt::Windows::Foundation::Collections;
+using namespace winml;
+using namespace wfc;
 
-using winrt::Windows::Foundation::IPropertyValue;
+using wf::IPropertyValue;
 
-static void LearningModelSessionAPITestSetup() {
+static void LearningModelSessionAPITestsClassSetup() {
   init_apartment();
-}
-
-static void LearningModelSessionAPITestGpuSetup() {
-  GPUTEST;
-  init_apartment();
-}
-
-static void LearningModelSessionAPITestsSkipEdgeCoreSetup() {
-  LearningModelSessionAPITestGpuSetup();
-  SKIP_EDGECORE
 }
 
 static void CreateSessionDeviceDefault()
@@ -64,7 +54,7 @@ static void CreateSessionWithModelLoadedFromStream()
     LearningModel learningModel = nullptr;
     LearningModelDevice learningModelDevice = nullptr;
     std::wstring path = FileHelpers::GetModulePath() + L"model.onnx";
-    auto storageFile = winrt::Windows::Storage::StorageFile::GetFileFromPathAsync(path).get();
+    auto storageFile = ws::StorageFile::GetFileFromPathAsync(path).get();
 
     WINML_EXPECT_NO_THROW(learningModel = LearningModel::LoadFromStream(storageFile));
 
@@ -167,7 +157,7 @@ static void EvaluateFeatures()
 
     auto outputTensor = TensorString::Create();
 
-    std::map<hstring, winrt::Windows::Foundation::IInspectable> featuresstandardmap;
+    std::map<hstring, wf::IInspectable> featuresstandardmap;
     featuresstandardmap[L"X"] = tensor;
     featuresstandardmap[L"Y"] = outputTensor;
     auto featureswinrtmap = winrt::single_threaded_map(std::move(featuresstandardmap));
@@ -201,7 +191,7 @@ static void EvaluateFeaturesAsync()
 
     auto outputTensor = TensorString::Create(shape);
 
-    std::map<hstring, winrt::Windows::Foundation::IInspectable> featuresstandardmap;
+    std::map<hstring, wf::IInspectable> featuresstandardmap;
     featuresstandardmap[L"X"] = tensor;
     featuresstandardmap[L"Y"] = outputTensor;
     auto featureswinrtmap = winrt::single_threaded_map(std::move(featuresstandardmap));
@@ -221,7 +211,7 @@ static void EvaluationProperties()
     LearningModelSession learningModelSession = nullptr;
     learningModelSession = LearningModelSession(learningModel);
     // set a property
-    auto value = winrt::Windows::Foundation::PropertyValue::CreateBoolean(true);
+    auto value = wf::PropertyValue::CreateBoolean(true);
     learningModelSession.EvaluationProperties().Insert(L"propName1", value);
     // get the property and make sure it's there with the right value
     auto value2 = learningModelSession.EvaluationProperties().Lookup(L"propName1");
@@ -261,11 +251,8 @@ static void CreateSessionWithCastToFloat16InModel()
     CreateSession(learningModel);
 }
 
-static void DISABLED_CreateSessionWithFloat16InitializersInModel()
+static void CreateSessionWithFloat16InitializersInModel()
 {
-    // Disabled due to https://microsoft.visualstudio.com/DefaultCollection/OS/_workitems/edit/21624720:
-    // Model fails to resolve due to ORT using incorrect IR version within partition
-
     // load a model
     LearningModel learningModel = nullptr;
     WINML_EXPECT_NO_THROW(APITest::LoadModel(L"fp16-initializer.onnx", learningModel));
@@ -322,6 +309,40 @@ static void EvaluateSessionAndCloseModel()
 {
     WINML_EXPECT_NO_THROW(::EvaluateSessionAndCloseModelHelper(LearningModelDeviceKind::Cpu, true));
     WINML_EXPECT_NO_THROW(::EvaluateSessionAndCloseModelHelper(LearningModelDeviceKind::Cpu, false));
+}
+
+static void NamedDimensionOverride() 
+{
+  LearningModel model = nullptr;
+  WINML_EXPECT_NO_THROW(APITest::LoadModel(L"fns-candy.onnx", model));
+
+  LearningModelDevice device(nullptr);
+  WINML_EXPECT_NO_THROW(device = LearningModelDevice(LearningModelDeviceKind::Cpu));
+
+  // the model input shape. the batch size, n, is overriden to 5
+  int64_t n = 5, c = 3, h = 720, w = 720;
+
+  LearningModelSessionOptions options;
+  options.OverrideNamedDimension(L"None", n);
+  
+  // Verifies that if a Dim name doesn't exist the named dimension override does nothing
+  options.OverrideNamedDimension(L"DimNameThatDoesntExist", n);
+
+  LearningModelSession session(nullptr);
+  WINML_EXPECT_NO_THROW(session = LearningModelSession(model, device, options));
+
+  ILearningModelFeatureDescriptor descriptor = model.InputFeatures().GetAt(0);
+  TensorFeatureDescriptor tensorDescriptor = nullptr;
+  descriptor.as(tensorDescriptor);
+  std::vector<int64_t> shape{n,c,h,w};
+  int64_t size = n*c*h*w;
+  std::vector<float> buffer;
+  buffer.resize(static_cast<size_t>(size));
+  auto featureValue = TensorFloat::CreateFromIterable(shape, winrt::single_threaded_vector<float>(std::move(buffer)));
+  LearningModelBinding binding(session);
+  binding.Bind(descriptor.Name(), featureValue);
+
+  WINML_EXPECT_NO_THROW(session.Evaluate(binding, L""));
 }
 
 static void CloseSession()
@@ -398,12 +419,43 @@ static void CloseSession()
     });
  }
 
-const LearningModelSesssionAPITestApi& getapi() {
-  static constexpr LearningModelSesssionAPITestApi api =
+static void SetIntraOpNumThreads() {
+    auto shape = std::vector<int64_t>{1, 1000};
+    auto model = ProtobufHelpers::CreateModel(TensorKind::Float, shape, 1000);
+    auto device = LearningModelDevice(LearningModelDeviceKind::Cpu);
+    auto options = LearningModelSessionOptions();
+    auto nativeOptions = options.as<ILearningModelSessionOptionsNative>();
+
+    // Set the number of intra op threads to half of logical cores.
+    uint32_t desiredThreads = std::thread::hardware_concurrency() / 2;
+    WINML_EXPECT_NO_THROW(nativeOptions->SetIntraOpNumThreadsOverride(desiredThreads));
+    // Create session and grab the number of intra op threads to see if is set properly
+    LearningModelSession session = nullptr;
+    WINML_EXPECT_NO_THROW(session = LearningModelSession(model, device, options));
+    auto nativeSession = session.as<ILearningModelSessionNative>();
+    uint32_t numIntraOpThreads;
+    WINML_EXPECT_NO_THROW(nativeSession->GetIntraOpNumThreads(&numIntraOpThreads));
+    WINML_EXPECT_EQUAL(desiredThreads, numIntraOpThreads);
+
+    // Check to see that bind and evaluate continue to work when setting the intra op thread count
+    std::vector<float> input(1000);
+    std::iota(std::begin(input), std::end(input), 0.0f);
+    auto tensor_input = TensorFloat::CreateFromShapeArrayAndDataArray(shape, input);
+    auto binding = LearningModelBinding(session);
+    binding.Bind(L"input", tensor_input);
+    WINML_EXPECT_NO_THROW(session.Evaluate(binding, L""));
+
+    // Check to verify that the default number of threads in LearningModelSession is equal to the number of logical cores.
+    session = LearningModelSession(model, device);
+    nativeSession = session.as<ILearningModelSessionNative>();
+    WINML_EXPECT_NO_THROW(nativeSession->GetIntraOpNumThreads(&numIntraOpThreads));
+    WINML_EXPECT_EQUAL(std::thread::hardware_concurrency(), numIntraOpThreads);
+ }
+
+const LearningModelSessionAPITestsApi& getapi() {
+  static LearningModelSessionAPITestsApi api =
   {
-    LearningModelSessionAPITestSetup,
-    LearningModelSessionAPITestGpuSetup,
-    LearningModelSessionAPITestsSkipEdgeCoreSetup,
+    LearningModelSessionAPITestsClassSetup,
     CreateSessionDeviceDefault,
     CreateSessionDeviceCpu,
     CreateSessionWithModelLoadedFromStream,
@@ -415,9 +467,31 @@ const LearningModelSesssionAPITestApi& getapi() {
     EvaluateFeaturesAsync,
     EvaluationProperties,
     CreateSessionWithCastToFloat16InModel,
-    DISABLED_CreateSessionWithFloat16InitializersInModel,
+    CreateSessionWithFloat16InitializersInModel,
     EvaluateSessionAndCloseModel,
+    NamedDimensionOverride,
     CloseSession,
+    SetIntraOpNumThreads
   };
+
+  if (SkipGpuTests()) {
+    api.CreateSessionDeviceDirectX = SkipTest;
+    api.CreateSessionDeviceDirectXHighPerformance = SkipTest;
+    api.CreateSessionDeviceDirectXMinimumPower = SkipTest;
+    api.CreateSessionWithCastToFloat16InModel = SkipTest;
+    api.CreateSessionWithFloat16InitializersInModel = SkipTest;
+    api.AdapterIdAndDevice = SkipTest;
+  }
+  if (RuntimeParameterExists(L"EdgeCore")) {
+    api.AdapterIdAndDevice = SkipTest;
+  }
+  if (RuntimeParameterExists(L"noIDXGIFactory6Tests")) {
+    api.CreateSessionDeviceDirectXHighPerformance = SkipTest;
+    api.CreateSessionDeviceDirectXMinimumPower = SkipTest;
+    api.AdapterIdAndDevice = SkipTest;
+  }
+  if (SkipTestsImpactedByOpenMP()) {
+      api.SetIntraOpNumThreads = SkipTest;
+  }
  return api;
 }

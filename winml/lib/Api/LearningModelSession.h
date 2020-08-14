@@ -11,9 +11,9 @@
 #include "core/providers/winml/winml_provider_factory.h"
 #include "iengine.h"
 
-namespace winrt::Windows::AI::MachineLearning::implementation {
+namespace WINMLP {
 
-struct LearningModelSession : LearningModelSessionT<LearningModelSession> {
+struct LearningModelSession : LearningModelSessionT<LearningModelSession, ILearningModelSessionNative> {
   /* LearningModelSession constructors (MachineLearningContract 1). */
   LearningModelSession() = delete;
 
@@ -65,10 +65,13 @@ struct LearningModelSession : LearningModelSessionT<LearningModelSession> {
       wfc::IMap<hstring, wf::IInspectable> const features,
       hstring const correlationId);
 
+  STDMETHOD(GetIntraOpNumThreads)
+  (uint32_t* numThreads);
+
  public:
   /* Non-ABI methods */
 
-  WinML::IEngine*
+  _winml::IEngine*
   GetEngine();
 
   void
@@ -84,10 +87,10 @@ struct LearningModelSession : LearningModelSessionT<LearningModelSession> {
   void
   Initialize();
 
-  WinML::IModel*
+  _winml::IModel*
   GetOptimizedModel();
 
-  WinML::IModel*
+  _winml::IModel*
   GetOptimizedModel(bool should_close_model);
 
   uint64_t
@@ -107,8 +110,8 @@ struct LearningModelSession : LearningModelSessionT<LearningModelSession> {
   ToggleProfiler();
 
  private:
-  com_ptr<WinML::IEngineFactory> engine_factory_;
-  com_ptr<WinML::IEngine> engine_;
+  com_ptr<_winml::IEngineFactory> engine_factory_;
+  com_ptr<_winml::IEngine> engine_;
 
   using MLOperatorRegistry = std::unique_ptr<IMLOperatorRegistry, void (*)(IMLOperatorRegistry*)>;
   MLOperatorRegistry operator_registry_;
@@ -121,19 +124,13 @@ struct LearningModelSession : LearningModelSessionT<LearningModelSession> {
   // Synchronization
   CWinMLLock session_creation_lock_;
   CWinMLLock dml_ep_lock_;
-
-  // is_first_evaluate_ is used as a heuristic to determine
-  // when the dml upload heap can be trimmed.
-  bool is_first_evaluate_ = true;
-
-
 };
 
-}  // namespace winrt::Windows::AI::MachineLearning::implementation
+}  // namespace WINMLP
 
-namespace winrt::Windows::AI::MachineLearning::factory_implementation {
+namespace WINML::factory_implementation {
 
 struct LearningModelSession : LearningModelSessionT<LearningModelSession, implementation::LearningModelSession> {
 };
 
-}  // namespace winrt::Windows::AI::MachineLearning::factory_implementation
+}  // namespace WINML::factory_implementation

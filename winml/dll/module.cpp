@@ -7,8 +7,12 @@
 
 #include "LearningModelDevice.h"
 #include "OnnxruntimeProvider.h"
+#include "Dummy.h"
 
-using namespace winrt::Windows::AI::MachineLearning::implementation;
+#define STRINGIFY(x) #x
+#define XSTRINGIFY(x) STRINGIFY(x)
+
+using namespace winmlp;
 
 void __stdcall OnErrorReported(bool alreadyReported, wil::FailureInfo const& failure) WI_NOEXCEPT {
   if (!alreadyReported) {
@@ -57,7 +61,7 @@ extern "C" BOOL WINAPI DllMain(_In_ HINSTANCE hInstance, DWORD dwReason, _In_ vo
 }
 
 extern "C" HRESULT WINAPI MLCreateOperatorRegistry(_COM_Outptr_ IMLOperatorRegistry** registry) try {
-  winrt::com_ptr<WinML::IEngineFactory> engine_factory;
+  winrt::com_ptr<_winml::IEngineFactory> engine_factory;
   WINML_THROW_IF_FAILED(CreateOnnxruntimeEngineFactory(engine_factory.put()));
   WINML_THROW_IF_FAILED(engine_factory->CreateCustomRegistry(registry));
   return S_OK;
@@ -65,7 +69,7 @@ extern "C" HRESULT WINAPI MLCreateOperatorRegistry(_COM_Outptr_ IMLOperatorRegis
 CATCH_RETURN();
 
 STDAPI DllCanUnloadNow() {
-  // The windows.ai.machinelearning.dll should not be freed by
+  // This dll should not be freed by
   // CoFreeUnusedLibraries since there can be outstanding COM object
   // references to many objects (AbiCustomRegistry, IMLOperatorKernelContext,
   // IMLOperatorTensor, etc) that are not reference counted in this path.
@@ -79,13 +83,40 @@ STDAPI DllCanUnloadNow() {
   // that are shared out as a consequence of the MLCreateOperatorRegistry API
   // will be a complex task to complete in RS5.
   //
-  // As a temporary workaround we simply prevent the windows.ai.machinelearning.dll
-  // from unloading.
+  // As a temporary workaround we simply prevent the dll from unloading.
   //
   // There are no known code paths that rely on opportunistic dll unload.
   return S_FALSE;
 }
 
+STDAPI DllGetExperimentalActivationFactory(void* classId, void** factory) noexcept {
+  try {
+    *factory = nullptr;
+    uint32_t length{};
+    wchar_t const* const buffer = WINRT_WindowsGetStringRawBuffer(classId, &length);
+    std::wstring_view const name{buffer, length};
+
+    auto requal = [](std::wstring_view const& left, std::wstring_view const& right) noexcept {
+      return std::equal(left.rbegin(), left.rend(), right.rbegin(), right.rend());
+    };
+
+    std::wostringstream dummy_class;
+    dummy_class << XSTRINGIFY(WINML_ROOT_NS) << ".AI.MachineLearning.Experimental.Dummy";
+    if (requal(name, dummy_class.str())) {
+      *factory = winrt::detach_abi(winrt::make<WINML_EXPERIMENTAL::factory_implementation::Dummy>());
+      return 0;
+    }
+
+    return winrt::hresult_class_not_available(name).to_abi();
+  } catch (...) {
+    return winrt::to_hresult();
+  }
+}
+
 STDAPI DllGetActivationFactory(HSTRING classId, void** factory) {
-  return WINRT_GetActivationFactory(classId, factory);
+  auto ret = WINRT_GetActivationFactory(classId, factory);
+  if (ret != 0)
+    return DllGetExperimentalActivationFactory(classId, factory);
+
+  return 0;
 }
