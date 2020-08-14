@@ -122,7 +122,7 @@ namespace Microsoft.ML.OnnxRuntime
         /// <summary>
         /// Use only if you have the onnxruntime package specific to this Execution Provider.
         /// </summary>
-        public void AppendExecutionProvider_OpenVINO(string deviceId)
+        public void AppendExecutionProvider_OpenVINO(string deviceId = "")
         {
             NativeApiStatus.VerifySuccess(NativeMethods.OrtSessionOptionsAppendExecutionProvider_OpenVINO(_nativePtr, deviceId));
         }
@@ -133,6 +133,14 @@ namespace Microsoft.ML.OnnxRuntime
         public void AppendExecutionProvider_Tensorrt(int deviceId)
         {
             NativeApiStatus.VerifySuccess(NativeMethods.OrtSessionOptionsAppendExecutionProvider_Tensorrt(_nativePtr, deviceId));
+        }
+
+        /// <summary>
+        /// Use only if you have the onnxruntime package specific to this Execution Provider.
+        /// </summary>
+        public void AppendExecutionProvider_MIGraphX(int deviceId)
+        {
+            NativeApiStatus.VerifySuccess(NativeMethods.OrtSessionOptionsAppendExecutionProvider_MIGraphX(_nativePtr, deviceId));
         }
 
         /// <summary>
@@ -160,7 +168,6 @@ namespace Microsoft.ML.OnnxRuntime
         }
 
         #endregion
-        #region Public Properties
 
         internal IntPtr Handle
         {
@@ -170,6 +177,7 @@ namespace Microsoft.ML.OnnxRuntime
             }
         }
 
+        #region Public Properties
         /// <summary>
         /// Enables the use of the memory allocation patterns in the first Run() call for subsequent runs. Default = true.
         /// </summary>
@@ -298,11 +306,28 @@ namespace Microsoft.ML.OnnxRuntime
         }
         private string _logId = "";
 
+        /// <summary>
+        /// Log Severity Level for the session logs. Default = ORT_LOGGING_LEVEL_WARNING
+        /// </summary>
+        public OrtLoggingLevel LogSeverityLevel
+        {
+            get
+            {
+                return _logSeverityLevel;
+            }
+            set
+            {
+                NativeApiStatus.VerifySuccess(NativeMethods.OrtSetSessionLogSeverityLevel(_nativePtr, value));
+                _logSeverityLevel = value;
+            }
+        }
+        private OrtLoggingLevel _logSeverityLevel = OrtLoggingLevel.ORT_LOGGING_LEVEL_WARNING;
 
         /// <summary>
-        /// Log Verbosity Level for the session logs. Default = LogLevel.Verbose
+        /// Log Verbosity Level for the session logs. Default = 0. Valid values are >=0.
+        /// This takes into effect only when the LogSeverityLevel is set to ORT_LOGGING_LEVEL_VERBOSE.
         /// </summary>
-        public LogLevel LogVerbosityLevel
+        public int LogVerbosityLevel
         {
             get
             {
@@ -314,7 +339,7 @@ namespace Microsoft.ML.OnnxRuntime
                 _logVerbosityLevel = value;
             }
         }
-        private LogLevel _logVerbosityLevel = LogLevel.Verbose;
+        private int _logVerbosityLevel = 0;
 
 
         /// <summary>
@@ -388,6 +413,32 @@ namespace Microsoft.ML.OnnxRuntime
             }
         }
         private ExecutionMode _executionMode = ExecutionMode.ORT_SEQUENTIAL;
+
+        /// <summary>
+        /// Enables the use of pre-packing. Default = true.
+        /// </summary>
+        public bool EnablePrePacking
+        {
+            get
+            {
+                return _enablePrePacking;
+            }
+            set
+            {
+                if (!_enablePrePacking && value)
+                {
+                    NativeApiStatus.VerifySuccess(NativeMethods.OrtEnablePrePacking(_nativePtr));
+                    _enablePrePacking = true;
+                }
+                else if (_enablePrePacking && !value)
+                {
+                    NativeApiStatus.VerifySuccess(NativeMethods.OrtDisablePrePacking(_nativePtr));
+                    _enablePrePacking = false;
+                }
+            }
+        }
+        private bool _enablePrePacking = true;
+
         #endregion
 
         #region Private Methods
@@ -422,12 +473,7 @@ namespace Microsoft.ML.OnnxRuntime
 
 
         #endregion
-        #region destructors disposers
-
-        ~SessionOptions()
-        {
-            Dispose(false);
-        }
+        #region IDisposable
 
         public void Dispose()
         {
@@ -439,9 +485,9 @@ namespace Microsoft.ML.OnnxRuntime
         {
             if (disposing)
             {
-                // cleanup managed resources
+                NativeMethods.OrtReleaseSessionOptions(_nativePtr);
+                _nativePtr = IntPtr.Zero;
             }
-            NativeMethods.OrtReleaseSessionOptions(_nativePtr);
         }
 
         #endregion
