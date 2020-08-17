@@ -17,12 +17,14 @@ WinMLTelemetryHelper::~WinMLTelemetryHelper() {
 }
 
 void WinMLTelemetryHelper::LogWinMLShutDown() {
+  std::string message = BINARY_NAME;
+  message += " is unloaded";
   WinMLTraceLoggingWrite(
       provider_,
       "WinMLShutDown",
       TraceLoggingKeyword(WINML_PROVIDER_KEYWORD_DEFAULT),
       TelemetryPrivacyDataTag(PDT_ProductAndServicePerformance),
-      TraceLoggingString("windows.ai.machinelearning.dll is unloaded", "message"),
+      TraceLoggingString(message.c_str(), "message"),
       TraceLoggingKeyword(MICROSOFT_KEYWORD_MEASURES));
 }
 
@@ -103,5 +105,22 @@ void WinMLTelemetryHelper::RegisterOperatorSetSchema(
       TraceLoggingInt32(attribute_count, "attributeCount"),
       TraceLoggingInt32(default_attribute_count, "defaultAttributeCount"),
       TraceLoggingInt32(runtime_session_id_, "runtime_session_id_"),
+      TraceLoggingKeyword(MICROSOFT_KEYWORD_MEASURES));
+}
+
+void WinMLTelemetryHelper::SetIntraOpNumThreadsOverride(
+    uint32_t num_threads_override) {
+  if (!telemetry_enabled_)
+    return;
+  WinMLTraceLoggingWrite(
+      provider_,
+      "SetIntraOpNumThreadsOverride",
+      TraceLoggingKeyword(WINML_PROVIDER_KEYWORD_DEFAULT),
+      TelemetryPrivacyDataTag(PDT_ProductAndServiceUsage),
+      //Telemetry info
+      TraceLoggingUInt8(WINML_TLM_NATIVE_API_INTRAOP_THREADS_VERSION, "schemaVersion"),
+      // num threads info
+      TraceLoggingInt32(num_threads_override, "numThreadsOverride"),
+      TraceLoggingInt32(std::thread::hardware_concurrency(), "maxThreadsOnMachine"),
       TraceLoggingKeyword(MICROSOFT_KEYWORD_MEASURES));
 }

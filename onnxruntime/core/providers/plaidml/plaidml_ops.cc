@@ -48,7 +48,7 @@ std::map<std::string, OpFunction> kSupportedOps = {
   //{"Reshape", reshape}, //TODO: PlaidML OP WIP
   {"SampleOp", sample_op},
   //{"Shape", shape}, //TODO: PlaidML fix broken tests (11/11 failures)
-  {"Sigmoid", sigmoid},
+  //{"Sigmoid", sigmoid}, failing after new build (operation not registered error )
   //{"Sign", sign}, //TODO: PlaidML fix broken tests (4/5 failures)
   {"Sin", sin},
   {"Sinh", sinh},

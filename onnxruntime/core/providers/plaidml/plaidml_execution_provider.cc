@@ -35,6 +35,10 @@ plaidml::DType ConvertPrecisionONNXToPlaidML(
     return plaidml::DType::INT16;
   } else if (*onnx_type == "int8" || *onnx_type == "tensor(int8)") {
     return plaidml::DType::INT8;
+  }else if (*onnx_type == "uint64" || *onnx_type == "tensor(uint64)") {
+    return plaidml::DType::UINT64;
+  } else if (*onnx_type == "uint32" || *onnx_type == "tensor(uint32)") {
+    return plaidml::DType::UINT32;
   } else if (*onnx_type == "uint16" || *onnx_type == "tensor(uint16)") {
     return plaidml::DType::UINT16;
   } else if (*onnx_type == "uint8" || *onnx_type == "tensor(uint8)") {
@@ -140,9 +144,7 @@ PlaidMLExecutionProvider::PlaidMLExecutionProvider(const PlaidMLExecutionProvide
     {
       OrtMemTypeDefault,
       [](int) {
-        return onnxruntime::make_unique<CPUAllocator>(
-          onnxruntime::make_unique<OrtMemoryInfo>(PLAIDML, OrtDeviceAllocator)
-        );
+        return std::make_unique<CPUAllocator>(OrtMemoryInfo(PLAIDML, OrtDeviceAllocator));
       },
       std::numeric_limits<size_t>::max()
     }
@@ -195,7 +197,7 @@ std::vector<std::unique_ptr<ComputeCapability>> PlaidMLExecutionProvider::GetCap
 
   std::unique_ptr<IndexedSubGraph> sub_graph = onnxruntime::make_unique<IndexedSubGraph>();
   sub_graph->nodes = graph_viewer.GetNodesInTopologicalOrder();
-  sub_graph->SetMetaDef(meta_def);
+  sub_graph->SetMetaDef(std::move(meta_def));
   result.push_back(onnxruntime::make_unique<ComputeCapability>(std::move(sub_graph)));
 
   return result;

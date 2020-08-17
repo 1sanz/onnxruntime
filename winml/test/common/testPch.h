@@ -6,7 +6,15 @@
 #endif
 #include "std.h"
 
+// Windows pollutes with preprocessor that redefine OPTIONAL.
+// Undefine OPTIONAL to get onnx macros to resolve correctly.
+#ifdef OPTIONAL
+#undef OPTIONAL
+#endif
+
 #include <wrl/client.h>
 #include <wrl/implements.h>
 
 #include "fileHelpers.h"
+
+#include <thread>

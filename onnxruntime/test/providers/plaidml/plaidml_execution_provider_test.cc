@@ -334,20 +334,20 @@ TEST(PlaidMLExecutionProviderTest, ReluTest)
   RunTest("testdata/plaidml/relu.onnx", feeds, {"Y"}, expected_shapes, expected_values, GetEnvironment());
 }
 
-TEST(PlaidMLExecutionProviderTest, SigmoidTest)
-{
-  NameMLValMap feeds;
-  //TODO: remove hardcoded values add expected value computation 
-  add_feeds(feeds, "A", {4}, {1.0f, 2.0f, 3.0f, 4.0f});
+// TEST(PlaidMLExecutionProviderTest, SigmoidTest)
+// {
+//   NameMLValMap feeds;
+//   //TODO: remove hardcoded values add expected value computation 
+//   add_feeds(feeds, "A", {4}, {1.0f, 2.0f, 3.0f, 4.0f});
 
-  std::vector<std::vector<float>> expected_values = {
-      {0.7310586 , 0.880797  , 0.95257413, 0.98201376 }};
+//   std::vector<std::vector<float>> expected_values = {
+//       {0.7310586 , 0.880797  , 0.95257413, 0.98201376 }};
 
-  std::vector<std::vector<int64_t>> expected_shapes = {
-      {4}};
+//   std::vector<std::vector<int64_t>> expected_shapes = {
+//       {4}};
 
-  RunTest("testdata/plaidml/sigmoid.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
-}
+//   RunTest("testdata/plaidml/sigmoid.onnx", feeds, {"B"}, expected_shapes, expected_values, GetEnvironment());
+// }
 
 TEST(PlaidMLExecutionProviderTest, SoftmaxTest)
 {

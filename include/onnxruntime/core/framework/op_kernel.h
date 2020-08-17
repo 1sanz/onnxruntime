@@ -43,10 +43,31 @@ class OpKernel {
     return op_kernel_info_.GetKernelDef();
   }
 
-  virtual Status Compute(OpKernelContext* context) const ORT_MUST_USE_RESULT = 0;
+  virtual Status Compute(_Inout_ OpKernelContext* context) const ORT_MUST_USE_RESULT = 0;
 
-  virtual Status ComputeAsync(OpKernelContext*, DoneCallback) const ORT_MUST_USE_RESULT {
+  virtual Status ComputeAsync(_Inout_ OpKernelContext*, DoneCallback) const ORT_MUST_USE_RESULT {
     ORT_NOT_IMPLEMENTED(__FUNCTION__, " is not implemented");
+  }
+
+  // Override this function to PrePack initialized constant tensor to the format as needed.
+  // For example, MatMul kernel can pack the input B if it is constant like code below.
+  //   Status PrePack(const Tensor& tensor, int input_idx, bool& is_packed) override {
+  //     is_packed = false;
+  //     if (input_idx == 1) {
+  //       this.Pack(tensor, this.buffer_);
+  //       is_packed = true;
+  //     }
+  //     return Status::OK();
+  //   }
+  // Please refer to MatMulIntegerToFloatBase for a complete example
+  // @param tesnor: The initialized constant tensor
+  // @param input_idx: The input index of the tensor in this kernel
+  // @param is_packed: Set it to true if the kernel packed the tensor or to false
+  //                   The kernel is responsible keep the packed data and related metadata if is_packed is set to true
+  //                   And the original intialized constant tensor will be released and not accessible anymore in Compute function.
+  virtual Status PrePack(const Tensor& /*tensor*/, int /*input_idx*/, bool& is_packed) {
+    is_packed = false;
+    return Status::OK();
   }
 
   const OrtMemoryInfo& Allocator(int id, OrtMemType mem_type) const {
@@ -64,10 +85,8 @@ class OpKernelContext {
  public:
   using ArgMap = std::unordered_map<std::string, size_t>;
 
-  explicit OpKernelContext(IExecutionFrame* frame,
-                           const OpKernel* kernel,
-                           concurrency::ThreadPool* threadpool,
-                           const logging::Logger& logger);
+  OpKernelContext(_Inout_ IExecutionFrame* frame, _In_ const OpKernel* kernel,
+                  _In_opt_ concurrency::ThreadPool* threadpool, _In_ const logging::Logger& logger);
 
   virtual ~OpKernelContext() = default;
 
@@ -91,6 +110,14 @@ class OpKernelContext {
     }
   }
 
+  // Fetch a required input, enforcing that it is present.
+  template <typename T>
+  const T& RequiredInput(int index) const {
+    const T* input_ptr = Input<T>(index);
+    ORT_ENFORCE(input_ptr, "Required input at index ", index, " is not present.");
+    return *input_ptr;
+  }
+
   // Fetch output (non-tensor) with specified index.
   template <typename T>
   T* Output(int index) {
@@ -105,6 +132,15 @@ class OpKernelContext {
   // The memory allocation will be done on-the-fly with given tensor shape.
   // Return nullptr if the output is an unused optional output.
   Tensor* Output(int index, const TensorShape& shape);
+  Tensor* Output(int index, const std::vector<int64_t>& shape);
+  Tensor* Output(int index, const std::initializer_list<int64_t>& shape);
+
+  // Fetch a required tensor output, enforcing that it is present.
+  Tensor& RequiredOutput(int index, const TensorShape& shape) {
+    Tensor* output_ptr = Output(index, shape);
+    ORT_ENFORCE(output_ptr, "Required output at index ", index, " is not present.");
+    return *output_ptr;
+  }
 
   // Fetch a sparse-tensor output corresponding to the specified index.
   // num_values must specify the number of non-zero values (commonly known as NNZ/nnz),
@@ -112,6 +148,16 @@ class OpKernelContext {
   // Memory allocation for the output may happen when this method is invoked,
   // unless static optimization pre-allocates it.
   SparseTensor* Output(int index, size_t num_values, const TensorShape& shape);
+
+  // Retrieve indexed shape obtained from memory planning before actual
+  // computation. If the indexed shape cannot be inferred, this function returns
+  // false.
+  bool TryGetInferredInputShape(int index, TensorShape& shape) const;
+
+  // Retrieve indexed shape obtained from memory planning before actual
+  // computation. If the indexed shape cannot be inferred, this function returns
+  // false.
+  bool TryGetInferredOutputShape(int index, TensorShape& shape) const;
 
   const logging::Logger& Logger() const {
     return *logger_;
@@ -136,7 +182,7 @@ class OpKernelContext {
    Return an allocator on device 0, with memtype of OrtMemTypeDefault.
    @remarks Use SafeInt when calculating the size of memory to allocate using AllocatorPtr->Alloc.
    */
-  Status GetTempSpaceAllocator(AllocatorPtr* output) const;
+  Status GetTempSpaceAllocator(AllocatorPtr* output) const ORT_MUST_USE_RESULT;
 
   /**
   Return the fence of current node's input.
@@ -163,11 +209,18 @@ class OpKernelContext {
   Fence_t OutputFence(int index) const;
 
   /**
+  Return the device id that current kernel runs on.
+  */
+  int GetDeviceId() const {
+    return kernel_->Info().GetExecutionProvider()->GetDeviceId();
+  }
+
+  /**
   Returns the opset domain of the underlying kernel
   **/
   const std::string& GetOpDomain() const;
 
-  /** 
+  /**
   Returns the intra-op threadpool, if available.
   */
   _Ret_maybenull_ onnxruntime::concurrency::ThreadPool* GetOperatorThreadPool() const { return threadpool_; }
@@ -193,10 +246,10 @@ class OpKernelContext {
   int GetImplicitInputArgIndex(int index) const;
   int GetOutputArgIndex(int index) const;
 
-  IExecutionFrame* execution_frame_{nullptr};
-  const OpKernel* kernel_{nullptr};
-  concurrency::ThreadPool* threadpool_{nullptr};
-  const logging::Logger* logger_{nullptr};
+  IExecutionFrame* const execution_frame_;
+  const OpKernel* const kernel_;
+  concurrency::ThreadPool* const threadpool_;
+  const logging::Logger* const logger_;
 
   // The argument starting index in ExecutionFrame.
   int node_input_start_index_{-1};
@@ -333,6 +386,23 @@ using BuildKernelCreateInfoFn = KernelCreateInfo (*)();
         static_cast<KernelCreatePtrFn>([](const OpKernelInfo& info) -> OpKernel* { return new __VA_ARGS__(info); })); \
   }
 
+#define ONNX_OPERATOR_TWO_TYPED_KERNEL_CLASS_NAME(provider, domain, ver, type1, type2, name) \
+  provider##_##name##_##domain##_ver##ver##_##type1##_##type2
+
+#define ONNX_OPERATOR_TWO_TYPED_KERNEL_EX(name, domain, ver, type1, type2, provider, builder, ...)                    \
+  class ONNX_OPERATOR_TWO_TYPED_KERNEL_CLASS_NAME(provider, domain, ver, type1, type2, name);                         \
+  template <>                                                                                                         \
+  KernelCreateInfo                                                                                                    \
+  BuildKernelCreateInfo<ONNX_OPERATOR_TWO_TYPED_KERNEL_CLASS_NAME(provider, domain, ver, type1, type2, name)>() {     \
+    return KernelCreateInfo(                                                                                          \
+        builder.SetName(#name)                                                                                        \
+            .SetDomain(domain)                                                                                        \
+            .SinceVersion(ver)                                                                                        \
+            .Provider(provider)                                                                                       \
+            .Build(),                                                                                                 \
+        static_cast<KernelCreatePtrFn>([](const OpKernelInfo& info) -> OpKernel* { return new __VA_ARGS__(info); })); \
+  }
+
 #define ONNX_OPERATOR_VERSIONED_TYPED_KERNEL_CLASS_NAME(provider, domain, startver, endver, type, name) \
   provider##_##name##_##domain##_ver##startver##_##endver##_##type
 
@@ -358,5 +428,13 @@ using BuildKernelCreateInfoFn = KernelCreateInfo (*)();
             .Build(),                                                                                                        \
         static_cast<KernelCreatePtrFn>([](const OpKernelInfo& info) -> OpKernel* { return new __VA_ARGS__(info); }));        \
   }
+
+// Use within macro definitions to create a custom vector of constraints.
+// Example: #define REG_KERNEL(OP, VERSION, KERNEL_CLASS, Type, ...)
+//  .TypeConstraint("T", BuildKernelDefConstraints<Type, __VA_ARGS_>())
+template <typename T, typename... Types>
+inline std::vector<MLDataType> BuildKernelDefConstraints() {
+  return {DataTypeImpl::GetTensorType<T>(), DataTypeImpl::GetTensorType<Types>()...};
+}
 
 }  // namespace onnxruntime

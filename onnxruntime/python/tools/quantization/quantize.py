@@ -10,10 +10,12 @@ import struct
 
 import numpy as np
 from onnx import onnx_pb as onnx_proto
+from onnx import shape_inference
 
 __producer__ = "onnx.quantize"
 __version__ = "0.1.0"
 onnx_domain = "ai.onnx"
+ms_domain = "com.microsoft"
 onnx_op_set_version = 11
 
 type_to_name = {
@@ -45,8 +47,7 @@ class QuantizationMode():
 
 
 quantization_modes = [
-    getattr(QuantizationMode, attr)
-    for attr in dir(QuantizationMode)
+    getattr(QuantizationMode, attr) for attr in dir(QuantizationMode)
     if not callable(getattr(QuantizationMode, attr)) and not attr.startswith("__")
 ]
 
@@ -55,7 +56,6 @@ class QuantizedInitializer:
     '''
         Represents a linearly quantized weight input from ONNX operators
     '''
-
     def __init__(self,
                  name,
                  initializer,
@@ -91,7 +91,6 @@ class QuantizedValue:
     '''
     Represents a linearly quantized value (input\output\intializer)
     '''
-
     def __init__(self,
                  name,
                  new_quantized_name,
@@ -265,10 +264,10 @@ def _find_nodes_using_initializer(graph, initializer):
 
 
 class ONNXQuantizer:
-
     def __init__(self, model, per_channel, mode, static, fuse_dynamic_quant, weight_qType, input_qType,
-                 quantization_params, nodes_to_quantize):
-        self.model = model
+                 quantization_params, nodes_to_quantize, nodes_to_exclude):
+        self.model = shape_inference.infer_shapes(model)
+        self.value_infos = {vi.name: vi for vi in self.model.graph.value_info}
         self.per_channel = per_channel  # weight-pack per channel
         self.mode = mode  # QuantizationMode.Value
         self.static = static  # use static quantization for inputs.
@@ -277,6 +276,7 @@ class ONNXQuantizer:
         self.weight_qType = weight_qType  # quantize data type
         self.quantization_params = quantization_params
         self.nodes_to_quantize = nodes_to_quantize  # specific nodes to quantize
+        self.nodes_to_exclude = nodes_to_exclude  # specific nodes to exclude
 
         if not self.mode in quantization_modes:
             raise ValueError('unsupported quantization mode {}'.format(self.mode))
@@ -295,27 +295,73 @@ class ONNXQuantizer:
         # Map of all original value names to quantized value names
         self.quantized_value_map = {}
 
+    def replace_gemm_with_matmul(self):
+        nodes_to_remove = []
+        nodes_to_add = []
+        for node in self.model.graph.node:
+            if node.op_type == 'Gemm':
+                alpha = 1.0
+                beta = 1.0
+                transA = 0
+                transB = 0
+                for attr in node.attribute:
+                    if attr.name == 'alpha':
+                        alpha = onnx.helper.get_attribute_value(attr)
+                    elif attr.name == 'beta':
+                        beta = onnx.helper.get_attribute_value(attr)
+                    elif attr.name == 'transA':
+                        transA = onnx.helper.get_attribute_value(attr)
+                    elif attr.name == 'transB':
+                        transB = onnx.helper.get_attribute_value(attr)
+                if alpha == 1.0 and beta == 1.0 and transA == 0 and transB == 0:
+                    matmul_node = onnx.helper.make_node(
+                        'MatMul',
+                        [node.input[0], node.input[1]],
+                        [node.output[0]+'_MatMul'],
+                        name=node.output[0]+'_MatMul')
+
+                    add_node = onnx.helper.make_node(
+                        'Add',
+                        inputs=[node.output[0]+'_MatMul', node.input[2]],
+                        outputs=node.output,
+                        name=node.output[0]+'_Add')
+
+                    nodes_to_remove.extend([node])
+                    nodes_to_add.extend([matmul_node, add_node])
+
+        self.model.graph.node.extend(nodes_to_add)
+        for node in nodes_to_remove:
+            self.model.graph.node.remove(node)
+
     def quantize_model(self):
+        self.replace_gemm_with_matmul()
         # Create a new topologically sorted list for quantizing a model
         new_list = []
         for node in self.model.graph.node:
             # if a list of ops to be quantized is provided then only quantize those ops
             if self.nodes_to_quantize is not None and node.name not in self.nodes_to_quantize:
                 new_list += self._handle_other_ops(node, new_list)
-            # only onnx domain ops can be quantized today
-            elif node.domain != "ai.onnx" and node.domain != '':
+            elif self.nodes_to_exclude is not None and node.name in self.nodes_to_exclude:
                 new_list += self._handle_other_ops(node, new_list)
             else:
                 if node.op_type == 'Conv':
                     new_list += self._quantize_convolution(node, new_list)
                 elif node.op_type == 'MatMul':
                     new_list += self._quantize_matmul(node, new_list)
-                elif node.op_type == 'Gather':
+                elif node.op_type == 'Gather' and self._is_valid_initializer_value(node.input[0]):
                     new_list += self._quantize_gather_ops(node, new_list)
+                elif node.op_type == 'Add' or node.op_type == 'Mul':
+                    new_list += self._quantize_binary_math_ops(node, new_list)
                 elif node.op_type == 'Relu' or node.op_type == 'Clip':
                     new_list += self._handle_activation_ops(node, new_list)
+                elif node.op_type == 'Attention':
+                    new_list += self._quantize_attention(node, new_list)
+                elif node.op_type == 'EmbedLayerNormalization':
+                    new_list += self._quantize_embed_layernorm(node, new_list)
                 else:
                     new_list += self._handle_other_ops(node, new_list)
+
+        new_list += self._dequantize_outputs(new_list)
 
         # extend is used to append to the list for a protobuf fields
         # https://developers.google.com/protocol-buffers/docs/reference/python-generated?csw=1#fields
@@ -342,10 +388,20 @@ class ONNXQuantizer:
         if initializer.data_type == onnx_proto.TensorProto.FLOAT:
             weights = onnx.numpy_helper.to_array(initializer)
         else:
-            raise ValueError(
-                'Model contains conv operator weights in {}. Only float type quantization is supported.'.format(
-                    type_to_name[initializer.data_type]))
+            raise ValueError('Only float type quantization is supported. Weights {} is {}. '.format(
+                initializer.name, type_to_name[initializer.data_type]))
         return weights
+
+    def _is_valid_quantize_value(self, value_name):
+        if value_name in self.value_infos:
+            value_info = self.value_infos[value_name]
+            return value_info.type.HasField(
+                'tensor_type') and value_info.type.tensor_type.elem_type == onnx_proto.TensorProto.FLOAT
+        return self._is_valid_initializer_value(value_name)
+
+    def _is_valid_initializer_value(self, value_name):
+        weight = _find_by_name(value_name, self.model.graph.initializer)
+        return weight is not None and weight.data_type == onnx_proto.TensorProto.FLOAT
 
     def _remove_quantized_weights(self):
         ''' Remove the weights which are already quantized from graph initializer list.
@@ -363,8 +419,7 @@ class ONNXQuantizer:
                 self.model.graph.input.remove(weight_input)
             except StopIteration:
                 if self.model.ir_version < 4:
-                    raise ValueError('invalid weight name {} found in the graph (not a graph input) '.format(
-                        weight.name))
+                    print("Warning: invalid weight name {} found in the graph (not a graph input)".format(weight.name))
 
     def _update_graph(self, weight):
         '''
@@ -662,7 +717,7 @@ class ONNXQuantizer:
             if data_found == False:
                 raise ValueError(
                     "Quantization parameters are not specified for param {}."
-                    "In static mode quantization params for inputs and outputs of odes to be quantized are required.".
+                    "In static mode quantization params for inputs and outputs of nodes to be quantized are required.".
                     format(input_name))
 
             qlinear_node = onnx.helper.make_node("QuantizeLinear", [input_name, scale_name, zp_name], [output_name],
@@ -732,7 +787,9 @@ class ONNXQuantizer:
             return: List of new nodes created.
         '''
         nodes_using_weight = _find_nodes_using_initializer(self.model.graph, weight.initializer)
-        unsupported_nodes = [node for node in nodes_using_weight if node.op_type not in ["Conv", "MatMul", "Gather"]]
+        unsupported_nodes = [
+            node for node in nodes_using_weight if node.op_type not in ["Conv", "MatMul", "Gather", "Attention"]
+        ]
 
         nodes_list = []
         dequantize_linear_name = weight.name + "_DequantizeLinear"
@@ -821,11 +878,9 @@ class ONNXQuantizer:
             # calcuate scale for bias
 
             bias_scale = input_scale * weight_scale
-            print(bias_scale)
 
             # quantize bias
             quantized_data = (np.asarray(bias_data) / bias_scale).round().astype(np.int32)
-            print(quantized_data)
 
             # update bias initializer
             bias_np_data = np.asarray(quantized_data, dtype=np.int32).reshape(bias_initializer.dims)
@@ -863,7 +918,6 @@ class ONNXQuantizer:
                      List of scale names used for input quantization,
                      List of new QuantizeLinear nodes created)
         '''
-        assert (node.op_type == "Conv" or node.op_type == "MatMul" or node.op_type == "Gather")
 
         quantized_input_names = []
         zero_point_names = []
@@ -921,6 +975,31 @@ class ONNXQuantizer:
 
         return (quantized_input_names, zero_point_names, scale_names, nodes)
 
+    def _dequantize_value(self, value_name, new_nodes_list):
+        '''
+        Given a value (input/output) which is quantized, add a DequantizeLinear node to dequantize
+        it back to float32
+
+            parameter value_name: value to dequantize
+            parameter new_nodes_list: List of new nodes created before processing current node
+            return: None if there is already a DequantizeLinear node that dequantizes it
+                    A DequantizeLinear node otherwise
+        '''
+        if value_name in self.quantized_value_map:
+            quantized_value = self.quantized_value_map[value_name]
+            # Add DequantizeLinear Node for this input
+            dqlinear_name = value_name + "_DequantizeLinear"
+            dqlinear_node = _find_node_by_name(dqlinear_name, self.model.graph, new_nodes_list)
+            if dqlinear_node is None:
+                dqlinear_inputs = [quantized_value.q_name, quantized_value.scale_name, quantized_value.zp_name]
+                dequantize_node = onnx.helper.make_node("DequantizeLinear", dqlinear_inputs, [value_name],
+                                                        dqlinear_name)
+                return dequantize_node
+            else:
+                # DQ op is already present, assert it's output matches the input of current node
+                assert (value_name == dqlinear_node.output[0])
+        return None
+
     def _handle_other_ops(self, node, new_nodes_list):
         '''
         Given a node which does not support quantization(Conv, Matmul, Gather), this method
@@ -933,24 +1012,27 @@ class ONNXQuantizer:
         '''
         nodes = []
         for index, node_input in enumerate(node.input):
-            if node_input in self.quantized_value_map:
-                node_input_altered = True
-                input_name = node.input[index]
-                quantized_value = self.quantized_value_map[input_name]
-                # Add DequantizeLinear Node for this input
-                dqlinear_name = input_name + "_DequantizeLinear"
-                dqlinear_node = _find_node_by_name(dqlinear_name, self.model.graph, new_nodes_list)
-                if dqlinear_node is None:
-                    dqlinear_inputs = [quantized_value.q_name, quantized_value.scale_name, quantized_value.zp_name]
-                    dequantize_node = onnx.helper.make_node("DequantizeLinear", dqlinear_inputs, [input_name],
-                                                            dqlinear_name)
-                    nodes.append(dequantize_node)
-                else:
-                    # DQ op is already present, assert it's output matches the input of current node
-                    assert (input_name == dqlinear_node.output[0])
+            dequantize_node = self._dequantize_value(node_input, new_nodes_list)
+            if dequantize_node is not None:
+                nodes.append(dequantize_node)
 
         # Append the original node
         nodes.append(node)
+        return nodes
+
+    def _dequantize_outputs(self, new_nodes_list):
+        '''
+        Dequantize output if it is quantized
+
+            parameter new_nodes_list: List of new nodes created before processing current node
+            return: List of new nodes created
+        '''
+        nodes = []
+        for output in self.model.graph.output:
+            dequantize_node = self._dequantize_value(output.name, new_nodes_list)
+            if dequantize_node is not None:
+                nodes.append(dequantize_node)
+
         return nodes
 
     def _handle_activation_ops(self, node, new_node_list):
@@ -978,6 +1060,61 @@ class ONNXQuantizer:
 
         return []
 
+    def _quantize_binary_math_ops(self, node, new_nodes_list):
+        '''
+        Used when self.mode is QuantizationMode.QLinearOps.
+        Quantize the given binary math op, like Add, Mul, etc, to QLinearAdd, QLinearMul...
+
+            parameter node: Current binary math node
+            parameter new_nodes_list: List of new nodes created before processing current node
+            return: List of nodes in topological order that represents quantized binary math node
+        '''
+        if self.mode is not QuantizationMode.QLinearOps:
+            return self._handle_other_ops(node, new_nodes_list)
+
+        data_found, output_scale_name, output_zp_name, _, _ = \
+            self._get_quantization_params(node.output[0])
+        if (not data_found):  # only try to quantize when given quantization parameters for it
+            return self._handle_other_ops(node, new_nodes_list)
+
+        (quantized_input_names, zero_point_names, scale_names, nodes) = \
+            self._quantize_inputs(node, [0, 1], new_nodes_list)
+
+        qlinear_binary_math_output = node.output[0] + "_quantized"
+        qlinear_binary_math_name = ""
+        if node.name != "":
+            qlinear_binary_math_name = node.name + "_quant"
+        kwargs = {}
+        for attribute in node.attribute:
+            kwargs.update(_attribute_to_kwarg(attribute))
+        kwargs["domain"] = ms_domain
+
+        qlinear_binary_math_inputs = []
+        # Input 0
+        qlinear_binary_math_inputs.append(quantized_input_names[0])
+        qlinear_binary_math_inputs.append(scale_names[0])
+        qlinear_binary_math_inputs.append(zero_point_names[0])
+        # Input 1
+        qlinear_binary_math_inputs.append(quantized_input_names[1])
+        qlinear_binary_math_inputs.append(scale_names[1])
+        qlinear_binary_math_inputs.append(zero_point_names[1])
+
+        # Output
+        qlinear_binary_math_inputs.append(output_scale_name)
+        qlinear_binary_math_inputs.append(output_zp_name)
+
+        qlinear_binary_math_node = onnx.helper.make_node("QLinear" + node.op_type, qlinear_binary_math_inputs,
+                                                         [qlinear_binary_math_output], qlinear_binary_math_name,
+                                                         **kwargs)
+        nodes.append(qlinear_binary_math_node)
+
+        # Create an entry for this quantized value
+        q_output = QuantizedValue(node.output[0], qlinear_binary_math_output, output_scale_name, output_zp_name,
+                                  QuantizedValueType.Input)
+        self.quantized_value_map[node.output[0]] = q_output
+
+        return nodes
+
     def _quantize_gather_ops(self, node, new_nodes_list):
         assert (node.op_type == "Gather")
         (quantized_input_names, zero_point_names, scale_names, nodes) = \
@@ -993,6 +1130,15 @@ class ONNXQuantizer:
         gather_original_output = node.output[0]
         node.output[0] = gather_new_output
         node.input[0] = quantized_input_names[0]
+        nodes.append(node)
+
+        return nodes
+
+    def _quantize_embed_layernorm(self, node, new_nodes_list):
+        assert (node.op_type == "EmbedLayerNormalization")
+        (quantized_input_names, zero_point_names, scale_names, nodes) = \
+            self._quantize_inputs(node, [2, 3, 4], new_nodes_list)
+
         nodes.append(node)
 
         return nodes
@@ -1249,6 +1395,38 @@ class ONNXQuantizer:
 
         return [node]
 
+    def _quantize_attention(self, node, new_nodes_list):
+        '''
+            parameter node: Attention node.
+            parameter new_nodes_list: List of new nodes created before processing this node.
+            return: a list of nodes in topological order that represents quantized Attention node.
+        '''
+        assert (node.op_type == "Attention")
+
+        (quantized_input_names, zero_point_names, scale_names, nodes) = \
+            self._quantize_inputs(node, [0, 1], new_nodes_list)
+
+        qattention_name = ""
+        if node.name != "":
+            qattention_name = node.name + "_quant"
+
+        inputs = []
+        inputs.extend(quantized_input_names)
+        inputs.extend([node.input[2]])
+        inputs.extend(scale_names)
+        inputs.extend([node.input[3] if len(node.input) > 3 else ""])
+        inputs.extend(zero_point_names)
+        inputs.extend([node.input[4] if len(node.input) > 4 else ""])
+
+        kwargs = {}
+        for attribute in node.attribute:
+            kwargs.update(_attribute_to_kwarg(attribute))
+        kwargs["domain"] = ms_domain
+        qattention_node = onnx.helper.make_node("QAttention", inputs, node.output, qattention_name, **kwargs)
+        nodes.append(qattention_node)
+
+        return nodes
+
 
 def check_opset_version(org_model, force_fusions):
     '''
@@ -1260,7 +1438,11 @@ def check_opset_version(org_model, force_fusions):
         :return: fuse_dynamic_quant boolean value.
     '''
     global onnx_op_set_version
-    opset_version = org_model.opset_import[0].version
+    ai_onnx_domain = [opset for opset in org_model.opset_import if not opset.domain or opset.domain == "ai.onnx"]
+    if 1 != len(ai_onnx_domain):
+        raise ValueError('Failed to find proper ai.onnx domain')
+    opset_version = ai_onnx_domain[0].version
+
     fuse_dynamic_quant = False
 
     if opset_version < 11 and force_fusions == True:
@@ -1291,7 +1473,8 @@ def quantize(model,
              symmetric_activation=False,
              symmetric_weight=False,
              quantization_params=None,
-             nodes_to_quantize=None):
+             nodes_to_quantize=None,
+             nodes_to_exclude=None):
     '''
         Given an onnx model, create a quantized onnx model and save it into a file
 
@@ -1332,7 +1515,7 @@ def quantize(model,
                 'resnet_model/Relu_2:0': [np.uint8(0), np.float32(0.011359662748873234)]
             }
     :return: ModelProto with quantization
-    :param nodes_to quantize:
+    :param nodes_to_quantize:
         List of nodes names to quantize. When this list is not None only the nodes in this list
         are quantized.
         example:
@@ -1340,6 +1523,9 @@ def quantize(model,
             'Conv__224',
             'Conv__252'
         ]
+    :param nodes_to_exclude:
+        List of nodes names to exclude. The nodes in this list will be excluded from quantization
+        when it is not None.
     '''
     if nbits == 8:
         input_qType = onnx_proto.TensorProto.INT8 if symmetric_activation else onnx_proto.TensorProto.UINT8
@@ -1349,7 +1535,7 @@ def quantize(model,
         copy_model.CopyFrom(model)
         fuse_dynamic_quant = check_opset_version(copy_model, force_fusions)
         quantizer = ONNXQuantizer(copy_model, per_channel, mode, static, fuse_dynamic_quant, weight_qType, input_qType,
-                                  quantization_params, nodes_to_quantize)
+                                  quantization_params, nodes_to_quantize, nodes_to_exclude)
         quantizer.quantize_model()
         quantizer.model.producer_name = __producer__
         quantizer.model.producer_version = __version__

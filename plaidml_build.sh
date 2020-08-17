@@ -20,7 +20,7 @@ cd build/plaidml/
 conda activate .cenv/
 bazelisk build plaidml:shlib
 conda deactivate
-cd ../../
+
 
 # Set environment variables so that onnxruntime can find plaidml 
 if [[ "$OSTYPE" == "linux-gnu"* ]]; 
@@ -33,6 +33,7 @@ then
     export TODO_TEMP_PLAIDML_LIB_DIR=$PWD/bazel-bin/plaidml/libplaidml.dylib
 fi
 
+cd ../../
 # Build onnxruntime with plaidml execution provider support 
 ./build.sh --config RelWithDebInfo --build_shared_lib --parallel --use_plaidml
 
