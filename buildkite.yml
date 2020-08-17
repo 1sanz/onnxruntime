@@ -1,5 +1,5 @@
 steps:
-  - command: "./build.sh"
+  - command: "./plaidml_build.sh"
     label: ":pipeline:"
     agents:
       PLATFORM: linux_x86_64
