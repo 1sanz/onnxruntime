@@ -13,45 +13,13 @@
 #include "core/session/onnxruntime_cxx_api.h"
 // #include "core/providers/plaidml/plaidml_ops.h"
 #include "plaidml_ops.h"
+#include "plaidml_utils.h"
 
 #include <stdio.h>
 #include <string.h>
 namespace onnxruntime {
 
-  //TODO: move to plaidml_utils
-plaidml::DType ConvertPrecisionONNXToPlaidML(
-    ONNX_NAMESPACE::DataType onnx_type) {
-  if (*onnx_type == "double" || *onnx_type == "tensor(double)") {
-    return plaidml::DType::FLOAT64;
-  } else if (*onnx_type == "float" || *onnx_type == "tensor(float)") {
-    return plaidml::DType::FLOAT32;
-  } else if (*onnx_type == "float16" || *onnx_type == "tensor(float16)") {
-    return plaidml::DType::FLOAT16;
-  } else if (*onnx_type == "int32" || *onnx_type == "tensor(int32)") {
-    return plaidml::DType::INT32;
-  } else if (*onnx_type == "int64" || *onnx_type == "tensor(int64)") {
-    return plaidml::DType::INT64; 
-  } else if (*onnx_type == "int16" || *onnx_type == "tensor(int16)") {
-    return plaidml::DType::INT16;
-  } else if (*onnx_type == "int8" || *onnx_type == "tensor(int8)") {
-    return plaidml::DType::INT8;
-  }else if (*onnx_type == "uint64" || *onnx_type == "tensor(uint64)") {
-    return plaidml::DType::UINT64;
-  } else if (*onnx_type == "uint32" || *onnx_type == "tensor(uint32)") {
-    return plaidml::DType::UINT32;
-  } else if (*onnx_type == "uint16" || *onnx_type == "tensor(uint16)") {
-    return plaidml::DType::UINT16;
-  } else if (*onnx_type == "uint8" || *onnx_type == "tensor(uint8)") {
-    return plaidml::DType::UINT8;
-  } else if (*onnx_type == "bool" || *onnx_type == "tensor(bool)") {
-    return plaidml::DType::BOOLEAN;
-  } 
-  else{
-    throw std::runtime_error("{PlaidML} ERROR: invalid data type " + *onnx_type);
-    return plaidml::DType::INVALID;
-  }
 
-}
 // TODO: Some of this stuff should probably be separated into new files
 
 PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
@@ -74,7 +42,7 @@ PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
     for (int dim = 0; dim < node_input->Shape()->dim_size(); dim++) {
       shape.push_back(node_input->Shape()->dim(dim).dim_value());
     }
-    auto type = ConvertPrecisionONNXToPlaidML(node_input->Type());
+    auto type = plaidml_ep::get_precision(node_input->Type());
     auto input_placeholder = plaidml::edsl::Placeholder(type, shape);
     if (!init_tensors.insert({node_input->Name(), plaidml::edsl::Value(input_placeholder)}).second) {
       throw std::runtime_error("Unexpected duplicate name in fused node while adding inputs [TODO better error handling]");
@@ -180,12 +148,20 @@ std::vector<std::unique_ptr<ComputeCapability>> PlaidMLExecutionProvider::GetCap
 
     //TODO: PlaidML do we need to add a kernel registry instead?
     if (!plaidml_ep::check_op_support(node->OpType())) {
-      {
         //throw "Operation is not yet supported by PlaidML Execution Provider";
         return result;
-      }
+    }
+    //TODO: PlaidML check for unsupported attributes 
+    ONNX_NAMESPACE::NodeProto node_proto;
+    node->ToProto(node_proto);
+    if(!plaidml_ep::check_attribute_support(node_proto)){
+      return result;
     }
   }
+
+  
+
+
   // This was modeled off of the metadata that nGraph included
   auto meta_def = onnxruntime::make_unique<IndexedSubGraph::MetaDef>();
   meta_def->name = "PlaidML_Fully_Fused_Graph";
