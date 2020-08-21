@@ -66,7 +66,7 @@ std::map<std::string, _OpFunction> _kSupportedOps =
 {
   //{"ArgMax", _argmax,}, //TODO: PlaidML fix broken tests (7/7 failures )
   //{"ArgMin", _argmin,},  //TODO: PlaidML fix (4/5 failures)
-  //{"AveragePool", _average_pool,}, //TODO: PlaidML fix broken tests (2/4 failures)
+  {"AveragePool", _average_pool,}, //TODO: PlaidML fix broken tests (2/4 failures)
   //{"Cast",_cast}, //TODO: PlaidML OP WIP
   //{"Clip", _clip}, //TODO: PlaidML fix broken tests incorrect docs in onnx has min max attributes not inputs 
   {"Conv",_conv}, //TODO: PlaidML fix broken tests (6/17 failures)
@@ -453,7 +453,8 @@ std::vector<plaidml::edsl::Tensor> _argmin(//TODO: PlaidML merge argmax and argm
   return {plaidml::op::argmax(-A,plaidml::edsl::make_tuple(axis))};
 }
 
-//TODO: PlaidML fix broken tests (2/4 failures) 
+//TODO: PlaidML fix broken tests (1/4 failures) 
+// fix ceil_mode and count_include_mode handling 
 std::vector<plaidml::edsl::Tensor> _average_pool(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -467,6 +468,7 @@ std::vector<plaidml::edsl::Tensor> _average_pool(
     if(auto_pad=="SAME_UPPER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
     if(auto_pad=="SAME_LOWER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_LOWER;
     if(auto_pad=="VALID")auto_pad_mode = plaidml::op::AutoPadMode::VALID;
+    if(auto_pad=="")auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;//default
 
     int ceil_mode = pnode.get_attribute("ceil_mode",(int)0);
     bool use_ceil = (ceil_mode == 1);
@@ -481,8 +483,8 @@ std::vector<plaidml::edsl::Tensor> _average_pool(
 
 
     if(!has_defined_strides){
-      for(size_t i=0;i<I.rank();i++){
-            strides.push_back(0);
+      for(size_t i=0;i<kernel_shape.size();i++){
+            strides.push_back(1);
           }
     }  
     auto result =  plaidml::op::pool(I,
@@ -1237,8 +1239,8 @@ bool check_op_support(std::string op_name){
 bool check_attribute_support(const ONNX_NAMESPACE::NodeProto& node){
   auto pnode =  plaidml_ep::PlaidMLNode(node);
 
-  if(node.op_type()=="Conv"){
-    if(pnode.has_attribute("bias")) return false;
+  if(node.op_type()=="AveragePool"){
+    if(pnode.get_attribute("ceil_mode",(int)0) == 1) return false;
   }
   return true;
 }
