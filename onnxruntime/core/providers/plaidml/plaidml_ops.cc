@@ -22,7 +22,6 @@ std::map<std::string, OpFunction> kSupportedOps = {
   {"Acos", acos},
   {"Atan", atan},
   {"Ceil", ceil},
-  //{"Clip", clip}, //TODO: PlaidML fix broken tests (segfault) (4/4 failures)
   {"Cos", cos},
   {"Cosh", cosh},
   {"Div", div},
@@ -69,7 +68,8 @@ std::map<std::string, _OpFunction> _kSupportedOps =
   //{"ArgMin", _argmin,},  //TODO: PlaidML fix (4/5 failures)
   //{"AveragePool", _average_pool,}, //TODO: PlaidML fix broken tests (2/4 failures)
   //{"Cast",_cast}, //TODO: PlaidML OP WIP
-  //{"Conv",_conv}, //TODO: PlaidML fix broken tests (6/17 failures)
+  //{"Clip", _clip}, //TODO: PlaidML fix broken tests incorrect docs in onnx has min max attributes not inputs 
+  {"Conv",_conv}, //TODO: PlaidML fix broken tests (6/17 failures)
   //{"ConvInteger",_conv}, //TODO: PlaidML 
   //{"Concat",_concat}, //TODO: PlaidML fix broken tests (3/12 failures)
   //{"CumSum", _cumsum}, //TODO: PlaidML fix broken tests
@@ -156,13 +156,13 @@ std::vector<plaidml::edsl::Tensor> ceil(const std::vector<plaidml::edsl::Value>&
   return {plaidml::edsl::ceil(A)};
 }
 
-// TODO: PlaidML OP WIP clip
-std::vector<plaidml::edsl::Tensor> clip(const std::vector<plaidml::edsl::Value>& args) {
-  const auto& A = args[0].as_tensor();
-  const auto& min_val = args[1].as_tensor();
-  const auto& max_val = args[2].as_tensor();
-  return {plaidml::op::clip(A,min_val,max_val)};
-}
+// // TODO: PlaidML OP WIP clip
+// std::vector<plaidml::edsl::Tensor> clip(const std::vector<plaidml::edsl::Value>& args) {
+//   const auto& A = args[0].as_tensor();
+//   //const auto& min_val = args[1].as_tensor();
+//   //const auto& max_val = args[2].as_tensor();
+//   return {plaidml::op::clip(A,min_val,max_val)};
+// }
   
 std::vector<plaidml::edsl::Tensor> cos(const std::vector<plaidml::edsl::Value>& args) {
   const auto A = args[0].as_tensor();
@@ -562,6 +562,21 @@ std::vector<plaidml::edsl::Tensor> _cast(
   return {plaidml::edsl::cast(I,plaidml_type)};
 }
 
+// // TODO: PlaidML OP WIP clip
+std::vector<plaidml::edsl::Tensor> _clip(
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs){
+  const auto& A = inputs[0].as_tensor();
+  auto pnode = plaidml_ep::PlaidMLNode(node);
+  //TODO: PlaidML need to know type to set min max defaults does not work for int8 uint8 int64 uint64 
+  auto default_min = std::numeric_limits<float>::lowest();
+  auto default_max = std::numeric_limits<float>::max();
+  auto min_val = pnode.get_attribute("min",(float)default_min);
+  auto max_val = pnode.get_attribute("max",(float)default_max);
+  
+  return {plaidml::op::clip(A,plaidml::edsl::Value(min_val).as_tensor(),plaidml::edsl::Value(max_val).as_tensor())};
+}
+
 //TODO: PlaidML fix broken tests (3/12 failures)
 std::vector<plaidml::edsl::Tensor> _concat(
     const ONNX_NAMESPACE::NodeProto& node,
@@ -581,7 +596,14 @@ std::vector<plaidml::edsl::Tensor> _concat(
   return {plaidml::op::concatenate(tensors,axis)};
 }
 
-//TODO: PlaidML fix broken tests (6/17 failures)
+// TODO: PlaidML fix broken tests (6/17 failures)
+// TODO: PlaidML fix failing tests: 
+// ConvTest.Conv1D_Bias, 
+// ConvTest.Conv2D_1, 
+// ConvTest.Conv2D_Bias_1, 
+// ConvTest.Conv2D_Bias_2,
+// ConvTest.Conv2D_group,
+// ConvTest.ConvDimWithZero
 std::vector<plaidml::edsl::Tensor> _conv(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -594,20 +616,27 @@ std::vector<plaidml::edsl::Tensor> _conv(
     //default auto_pad mode
     auto auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
 
-    const auto auto_pad = pnode.get_attribute("auto_pad","SAME_UPPER");
+    const auto auto_pad = pnode.get_attribute("auto_pad","NOTSET");
     if(auto_pad=="SAME_UPPER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
     if(auto_pad=="SAME_LOWER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_LOWER;
     if(auto_pad=="VALID")auto_pad_mode = plaidml::op::AutoPadMode::VALID;
+    if(auto_pad=="NOTSET")auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
+    if(auto_pad=="")auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
 
     auto auto_group_mode = plaidml::op::AutoGroupMode::UNGROUPED;
     bool has_group_layout = false;
     int group = pnode.get_attribute("group",(int)1);
+    if(group!=1){
+        has_group_layout = true;
+        auto_group_mode = plaidml::op::AutoGroupMode::EXPLICIT;
+    }
     std::vector<int> dilations = pnode.get_attribute("dilations");
     bool has_defined_dilations = !dilations.empty();
     std::vector<int> strides = pnode.get_attribute("strides");
     bool has_defined_strides = !strides.empty();
     std::vector<int> pads = pnode.get_attribute("pads");
     bool has_manual_pads = !pads.empty();
+    if(has_manual_pads) auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
     std::vector<int> kernel_shape = pnode.get_attribute("kernel_shape");
 
     auto result =  plaidml::op::convolution(I,K)
@@ -825,7 +854,8 @@ std::vector<plaidml::edsl::Tensor> _lrn(
   float alpha = pnode.get_attribute("alpha",(float)0.0001);
   float beta = pnode.get_attribute("beta",(float)0.75);
   float bias = pnode.get_attribute("bias",(float)1.0);
-  int size = 1;
+  int size = pnode.get_attribute("size",(int)1.0);
+  //if size is set to 1 instead of 5 (as requested by the test) second test (LRNTest.LRN_2) passes 
 
   return {plaidml::op::lrn(A,{static_cast<int64_t>(size)}).alpha(alpha).beta(beta).epsilon(bias).axes({1})};
 }
@@ -910,7 +940,7 @@ std::vector<plaidml::edsl::Tensor> _one_hot(
     const std::vector<plaidml::edsl::Value>& inputs){
   const auto& indices = inputs[0].as_tensor();
   //const auto& depth = inputs[1].as_tensor();//TODO: need to convert this to int
-  int fake_depth = 2;
+  int fake_depth = 10;
   //const auto& values = inputs[2].as_tensor();//on value off value 
 
   auto pnode = plaidml_ep::PlaidMLNode(node);
@@ -939,7 +969,7 @@ std::vector<plaidml::edsl::Tensor> _one_hot(
   plaidml::edsl::Tensor count = plaidml::edsl::index(O_dims, axis);
   plaidml::edsl::TensorIndex c;
   O(O_idxs) = indices(I_idxs) == count(c);
-  //O = plaidml::edsl::select(O, , 0);
+  //O = plaidml::edsl::select(O, 0,1);
   return {O};
 }
 
@@ -1025,23 +1055,42 @@ std::vector<plaidml::edsl::Tensor> _reverse_sequence(
   const auto& I = inputs[0].as_tensor();
   //const auto& sequence_lens = inputs[1].as_tensor();
   auto pnode = plaidml_ep::PlaidMLNode(node);
-  size_t batch_axis = (size_t)pnode.get_attribute("batch_axis",1);
-  size_t time_axis = (size_t)pnode.get_attribute("time_axis",0);
+  size_t batch_axis = (size_t)pnode.get_attribute("batch_axis",(int)1);
+  size_t time_axis = (size_t)pnode.get_attribute("time_axis",(int)0);
 
-  //check that input tensor has rank>=2 else throw error
   if(I.rank()<2){
     throw std::runtime_error("{PlaidML ERROR} ReverseSequense reqiured an input Tensor of rank >= 2");
   }
-  if(time_axis> I.rank() || batch_axis>I.rank()){
-    throw std::runtime_error("{PlaidML ERROR} ReverseSequense was given invalid axis");
+  if(time_axis!=0 && time_axis!=1){
+    throw std::runtime_error("{PlaidML ERROR} ReverseSequense was given invalid time axis");
+  }
+  if(batch_axis!=0 && batch_axis!=1)
+  {
+    throw std::runtime_error("{PlaidML ERROR} ReverseSequense was given invalid batch axis");
+  }
+  auto O = I;
+ 
+  std::vector<plaidml::edsl::TensorIndex> I_idxs(I.rank());
+  std::vector<plaidml::edsl::TensorDim> I_dims;
+  std::vector<plaidml::edsl::TensorIndex> I_revidxs(I.rank());
+  I.bind_dims(I_dims);
+  std::vector<plaidml::edsl::TensorIndex> seq_lens_index(I.rank());
+  //plaidml::edsl::TensorIndex seq_index;
+  //for each slice on the batch axis 
+  for(size_t i=0; i<I.rank();i++){
+    if(i==batch_axis)I_revidxs[i]=I_idxs[i];
+    else I_revidxs[i] = I_idxs[i] + seq_lens_index[i];
   }
 
- 
+  //I_revidxs[batch_axis] = I_idxs[batch_axis];
 
-   //auto O=I+I;
-
-
-  return {I+I};
+  O(I_idxs) = I(I_revidxs);
+  //O.add_constraint(seq_index<I_dims);
+  for(size_t i=0; i<I.rank();i++){
+    if(i!=batch_axis) O.add_constraint(seq_lens_index[i] < I_dims[i]);
+    
+  }
+  return {O};
 }
 
 std::vector<plaidml::edsl::Tensor> _selu(    

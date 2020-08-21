@@ -130,9 +130,15 @@ std::vector<std::unique_ptr<ComputeCapability>> PlaidMLExecutionProvider::GetCap
   std::vector<std::unique_ptr<ComputeCapability>> result;
   std::vector<std::string> inputs;
   std::vector<std::string> outputs;
+  //std::vector<std::string> initializers;
+
+  const auto& initializers = graph_viewer.GetAllInitializedTensors();
 
   std::for_each(graph_viewer.GetInputs().begin(), graph_viewer.GetInputs().end(),
                 [&inputs](const NodeArg* node_arg) { inputs.push_back(node_arg->Name()); });
+                  
+  //add initializers to inputs 
+  for(auto it: initializers){inputs.push_back(it.first);}
 
   std::for_each(graph_viewer.GetOutputs().begin(), graph_viewer.GetOutputs().end(),
                 [&outputs](const NodeArg* node_arg) { outputs.push_back(node_arg->Name()); });

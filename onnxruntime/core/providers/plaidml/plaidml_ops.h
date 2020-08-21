@@ -140,7 +140,10 @@ std::vector<plaidml::edsl::Tensor> sum(const std::vector<plaidml::edsl::Value>& 
 std::vector<plaidml::edsl::Tensor> _cast(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
-std::vector<plaidml::edsl::Tensor> clip(const std::vector<plaidml::edsl::Value>& args);
+//std::vector<plaidml::edsl::Tensor> clip(const std::vector<plaidml::edsl::Value>& args);
+std::vector<plaidml::edsl::Tensor> _clip(
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs);
 std::vector<plaidml::edsl::Tensor> _concat(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
