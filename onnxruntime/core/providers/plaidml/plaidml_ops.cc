@@ -30,7 +30,7 @@ std::map<std::string, OpFunction> kSupportedOps = {
   {"Exp", exp},
   {"Floor", floor},
   {"Greater", greater},
-  //{"Identity", identity}, //TODO: PlaidML broken test (1/2 failures) (string type needed)
+  //{"Identity", identity}, //TODO: PlaidML broken test (1/2 failures) (string type needed)//need to enable for Loop, scan9 etc tests
   {"Less", less},
   {"Log", log},
   {"Max", max},
@@ -58,7 +58,7 @@ std::map<std::string, OpFunction> kSupportedOps = {
   {"Tan", tan,},
   {"Tanh", tanh,},
   //{"Tile", tile,}, //TODO: PlaidML OP WIP (11/11 failures)
-  //{"Where", where,}, //TODO: PlaidML fix broken tests (3/4 failures)
+  {"Where", where,}, //TODO: PlaidML fix broken tests (3/4 failures)
   //{"Xor", logical_xor,}, //TODO: PlaidML fix broken tests (2/2 failures)
 };
 
@@ -66,12 +66,12 @@ std::map<std::string, _OpFunction> _kSupportedOps =
 {
   //{"ArgMax", _argmax,}, //TODO: PlaidML fix broken tests (7/7 failures )
   //{"ArgMin", _argmin,},  //TODO: PlaidML fix (4/5 failures)
-  {"AveragePool", _average_pool,}, //TODO: PlaidML fix broken tests (2/4 failures)
+  {"AveragePool", _average_pool,}, //TODO: PlaidML fix broken tests (1/4 failures)
   //{"Cast",_cast}, //TODO: PlaidML OP WIP
   //{"Clip", _clip}, //TODO: PlaidML fix broken tests incorrect docs in onnx has min max attributes not inputs 
   {"Conv",_conv}, //TODO: PlaidML fix broken tests (6/17 failures)
-  //{"ConvInteger",_conv}, //TODO: PlaidML 
-  //{"Concat",_concat}, //TODO: PlaidML fix broken tests (3/12 failures)
+  {"ConvInteger",_conv_integer}, //TODO: PlaidML need to handle x_zero_point and w_zero_point inputs
+  //{"Concat",_concat}, //TODO: PlaidML fix broken tests (3/12 failures) string type not handled 
   //{"CumSum", _cumsum}, //TODO: PlaidML fix broken tests
   {"Elu",_elu},
   //{"EyeLike",_eye_like}, //TODO: PlaidML OP WIP
@@ -81,21 +81,21 @@ std::map<std::string, _OpFunction> _kSupportedOps =
   //{"LogSoftmax",_log_softmax}, //TODO: PlaidML fix broken tests (2/7 failures)
   {"LpNormalization",_lp_normalization},
   //{"LRN",_lrn}, //TODO: PlaidML fix broken tests (2/2 failures)
-  //{"MaxPool",_maxpool}, //TODO: PlaidML fix broken tests (10/12 failures) (attribute handling)
+  {"MaxPool",_maxpool}, //TODO: PlaidML fix broken tests (multiple outputs, attribute handling)
   //{"Mod",_mod}, //TODO: PlaidML fix broken tests (6/15 failures)
   //{"OneHot",_one_hot}, //TODO: PlaidML OP WIP
-  //{"ReduceMax",_reduce_max}, //TODO: PlaidML fix broken tests (2/9 failures)
-  //{"ReduceMean",_reduce_mean}, //TODO: PlaidML fix broken tests (2/8 failures)
-  //{"ReduceMin",_reduce_min}, //TODO: PlaidML fix broken tests (4/9 failures)
-  //{"ReduceProd",_reduce_prod}, //TODO: PlaidML fix broken tests (2/8 failures)
-  //{"ReduceSum",_reduce_sum}, //TODO: PlaidML fix broken tests (2/19 failures)
+  //{"ReduceMax",_reduce_max}, //TODO: PlaidML fix broken tests (2/9 failures) keep_dims = false malfunctions
+  //{"ReduceMean",_reduce_mean}, //TODO: PlaidML fix broken tests (2/8 failures) keep_dims = false malfunctions
+  //{"ReduceMin",_reduce_min}, //TODO: PlaidML fix broken tests (4/9 failures) keep_dims = false malfunctions
+  //{"ReduceProd",_reduce_prod}, //TODO: PlaidML fix broken tests (2/8 failures) keep_dims = false malfunctions
+  //{"ReduceSum",_reduce_sum}, //TODO: PlaidML fix broken tests (2/19 failures) keep_dims = false malfunctions
   //{"ReverseSequence",_reverse_sequence}, //TODO: PlaidML OP WIP
   {"Selu",_selu},
-  //{"Softmax",_softmax}, TODO: //PlaidML fix broken tests (2/8 failures)
-  //{"Split",_split}, //TODO: PlaidML failing split OP WIP
-  //{"Squeeze",_squeeze}, //TODO: PlaidML fix broken tests (5/10 failures)(segfault)
+  //{"Softmax",_softmax}, // TODO: PlaidML fix broken tests (2/8 failures)
+  //{"Split",_split}, // TODO: PlaidML failing split OP WIP
+  //{"Squeeze",_squeeze}, // TODO: PlaidML fix broken tests (5/10 failures)(segfault)
   //{"ThresholdedRelu",_thresholded_relu}, //TODO: PlaidML fix broken tests (new failure! op not registered )
-  //{"Transpose", _transpose,}, //TODO: PlaidML fix broken tests (8/17 failures)
+  {"Transpose", _transpose,}, //TODO: PlaidML fix broken tests (8/17 failures)
   {"Unsqueeze",_unsqueeze},
 
 };
@@ -654,6 +654,73 @@ std::vector<plaidml::edsl::Tensor> _conv(
   if(has_group_layout) result = result.group_layout(plaidml::op::GroupLayout::IN_C);
   return {result};
 }
+// TODO: PlaidML handle optional inputs: 
+//        from onnx docs:
+// x_zero_point (optional) : T1
+// Zero point tensor for input 'x'. It's optional and default value is 0. 
+// It's a scalar, which means a per-tensor/layer quantization.
+// w_zero_point (optional) : T2
+// Zero point tensor for input 'w'. It's optional and default value is 0. 
+// It could be a scalar or a 1-D tensor, which means a per-tensor/layer or 
+// per output channel quantization. If it's a 1-D tensor, its number of 
+// elements should be equal to the number of output channels (M)
+std::vector<plaidml::edsl::Tensor> _conv_integer(
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs){
+
+    const auto I = inputs[0].as_tensor();
+    const auto K = inputs[1].as_tensor();
+    // plaidml::edsl::Tensor x_zero_point;
+    // plaidml::edsl::Tensor w_zero_point;
+    // if(inputs.size()>2)
+    // {
+    //     x_zero_point = inputs[2].as_tensor();
+    // }
+    // if(inputs.size()>3){
+    //     w_zero_point = inputs[3].as_tensor();
+    // }
+    //auto num_attributes = node.attribute_size();
+    auto pnode = plaidml_ep::PlaidMLNode(node);
+
+    //default auto_pad mode
+    auto auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
+
+    const auto auto_pad = pnode.get_attribute("auto_pad","NOTSET");
+    if(auto_pad=="SAME_UPPER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
+    if(auto_pad=="SAME_LOWER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_LOWER;
+    if(auto_pad=="VALID")auto_pad_mode = plaidml::op::AutoPadMode::VALID;
+    if(auto_pad=="NOTSET")auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
+    if(auto_pad=="")auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
+
+    auto auto_group_mode = plaidml::op::AutoGroupMode::UNGROUPED;
+    bool has_group_layout = false;
+    int group = pnode.get_attribute("group",(int)1);
+    if(group!=1){
+        has_group_layout = true;
+        auto_group_mode = plaidml::op::AutoGroupMode::EXPLICIT;
+    }
+    std::vector<int> dilations = pnode.get_attribute("dilations");
+    bool has_defined_dilations = !dilations.empty();
+    std::vector<int> strides = pnode.get_attribute("strides");
+    bool has_defined_strides = !strides.empty();
+    std::vector<int> pads = pnode.get_attribute("pads");
+    bool has_manual_pads = !pads.empty();
+    if(has_manual_pads) auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
+    std::vector<int> kernel_shape = pnode.get_attribute("kernel_shape");
+
+    auto result =  plaidml::op::convolution(I,K)
+              .input_layout(plaidml::op::TensorLayout::NCX)
+              .filter_layout(plaidml::op::TensorLayout::KCX)
+              .autopad_mode(auto_pad_mode)
+              .groups(group)
+              .autogroup_mode(auto_group_mode);
+
+  if(has_defined_strides)result = result.strides(strides);
+  if(has_defined_dilations) result = result.dilations(dilations);
+  if(has_manual_pads) result = result.manual_padding(pads);
+  if(has_group_layout) result = result.group_layout(plaidml::op::GroupLayout::IN_C);
+  return {result};
+    }
 
 //TODO: PlaidML fix broken tests
 std::vector<plaidml::edsl::Tensor> _cumsum(    
@@ -862,7 +929,15 @@ std::vector<plaidml::edsl::Tensor> _lrn(
   return {plaidml::op::lrn(A,{static_cast<int64_t>(size)}).alpha(alpha).beta(beta).epsilon(bias).axes({1})};
 }
 
-//TODO: PlaidML fix broken tests (10/12 failures) (attribute handling)
+//TODO: PlaidML fix broken tests 
+//TODO: Indices  (optional) output not handled 
+//from onnx docs: Indices (optional, non-differentiable) : I
+//      Indices tensor from max pooling across the input tensor. 
+//      The dimensions of indices are the same as output tensor. 
+//      The values in indices of are the indices of the selected values during pooling. 
+//      The indices are computed as flatten 1-D tensor, and the indices do not consider padding. 
+//      So the values in indices are in [0, N x C x D1 x ... x Dn). 
+//TODO: attribute "dilations" not handled 
 std::vector<plaidml::edsl::Tensor> _maxpool(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -877,11 +952,12 @@ std::vector<plaidml::edsl::Tensor> _maxpool(
     if(auto_pad=="SAME_UPPER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_UPPER;
     if(auto_pad=="SAME_LOWER")auto_pad_mode = plaidml::op::AutoPadMode::SAME_LOWER;
     if(auto_pad=="VALID")auto_pad_mode = plaidml::op::AutoPadMode::VALID;
+    if(auto_pad=="")auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
 
     //Whether to use ceil or floor (default) to compute the output shape.
     int ceil_mode = pnode.get_attribute("ceil_mode",(int)0);
     bool use_ceil = (ceil_mode==1);
-    std::vector<int> dilations = pnode.get_attribute("dilations");
+    //std::vector<int> dilations = pnode.get_attribute("dilations");
     //if not present default is 1 along each spacial axis
     //bool has_defined_dilations = !dilations.empty();
     std::vector<int> kernel_shape = pnode.get_attribute("kernel_shape");
@@ -898,6 +974,11 @@ std::vector<plaidml::edsl::Tensor> _maxpool(
     
     std::vector<int> strides = pnode.get_attribute("strides");
     //If not present, the stride defaults is 1 along each spatial axis
+    if(strides.empty()){
+      for(size_t i=0;i<kernel_shape.size();i++){
+            strides.push_back(1);
+          }
+    }
     //bool has_defined_strides = !strides.empty();
 
     auto result =  plaidml::op::pool(I,
@@ -1156,10 +1237,19 @@ std::vector<plaidml::edsl::Tensor> _split(//TODO: need to handle multiple output
 std::vector<plaidml::edsl::Tensor> _squeeze(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
-  const auto& A = inputs[0].as_tensor();
+  const auto& I = inputs[0].as_tensor();
   auto pnode = plaidml_ep::PlaidMLNode(node);
   std::vector<int> axes = pnode.get_attribute("axes");
-  return {plaidml::op::squeeze(A,axes)};
+  //If axes is not provided, all the single dimensions will be removed from the shape.
+  if(axes.empty()){
+    for(size_t i = 0 ;i < I.rank() ;i++)
+    {
+      axes.push_back(i);
+    }
+  }
+  // unsorted axis segfaults
+  //std::sort(axes.begin(),axes.end(),[](int a, int b) {return a < b; });
+  return {plaidml::op::squeeze(I,axes)};
 }
 
 //TODO: PlaidML fix broken tests (new failure! op not registered )
@@ -1213,7 +1303,7 @@ std::vector<plaidml::edsl::Tensor> MakePlaidMLOp(
   auto op_it = plaidml_ep::kSupportedOps.find(node.op_type());
   auto _op_it = plaidml_ep::_kSupportedOps.find(node.op_type());
   if (op_it == plaidml_ep::kSupportedOps.end() && _op_it==plaidml_ep::_kSupportedOps.end()) {
-    throw std::runtime_error("Asked to executed unsupported op " + node.op_type());
+    throw std::runtime_error("{PlaidML ERROR} Asked to executed unsupported op " + node.op_type());
   }
   if(op_it != plaidml_ep::kSupportedOps.end()){
     return op_it->second(inputs);
@@ -1241,6 +1331,17 @@ bool check_attribute_support(const ONNX_NAMESPACE::NodeProto& node){
 
   if(node.op_type()=="AveragePool"){
     if(pnode.get_attribute("ceil_mode",(int)0) == 1) return false;
+  }
+  if(node.op_type()=="MaxPool"){
+    //indices output not handled: maxpool only produces one output
+    if(node.output_size()>1) return false;
+    //dilations attribute not handled 
+    if(pnode.has_attribute("dilations")) return false;
+  }
+  if(node.op_type()=="ConvInteger")
+  {
+    // optional inputs (x_zero_point, w_zero_point) not handled
+    if(node.input_size()>2) return false;
   }
   return true;
 }

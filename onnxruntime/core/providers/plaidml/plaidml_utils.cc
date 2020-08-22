@@ -34,7 +34,7 @@ plaidml::DType get_precision(
     return plaidml::DType::BOOLEAN;
   } 
   else{
-    throw std::runtime_error("{PlaidML} ERROR: invalid data type " + *onnx_type);
+    throw std::runtime_error("{PlaidML ERROR} : invalid data type " + *onnx_type);
     return plaidml::DType::INVALID;
   }
 

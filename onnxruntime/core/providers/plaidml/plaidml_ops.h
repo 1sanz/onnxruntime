@@ -150,6 +150,9 @@ std::vector<plaidml::edsl::Tensor> _concat(
 std::vector<plaidml::edsl::Tensor> _conv(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
+std::vector<plaidml::edsl::Tensor> _conv_integer(
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs);
 // std::vector<plaidml::edsl::Tensor> _crop(
 //     const ONNX_NAMESPACE::NodeProto& node,
 //     const std::vector<plaidml::edsl::Value>& inputs);

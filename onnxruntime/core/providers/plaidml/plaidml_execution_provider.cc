@@ -71,11 +71,17 @@ PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
     node.ToProto(node_proto);
     auto local_output_tensors = plaidml_ep::MakePlaidMLOp(node_proto, local_input_tensors);
     // Iterate over output tensors and names in tandem
+    if(local_output_tensors.empty())
+    {
+      throw std::runtime_error("{PlaidML ERROR} op produced empty output");
+    }
+    if(local_output_tensors.size()!=node.OutputDefs().size()){
+      throw std::runtime_error("{PlaidML ERROR} op produced inconsistent number of outputs expected " + 
+                              std::to_string(node.OutputDefs().size())+ ", got " +
+                              std::to_string(local_output_tensors.size()));
+    }
     auto output_tensor_it = local_output_tensors.begin();
     for (const auto& local_output : node.OutputDefs()) {
-      if (output_tensor_it == local_output_tensors.end()) {
-        throw std::runtime_error("Inconsistent number of outputs [TODO better error handling]");
-      }
       if (!init_tensors.insert({
           local_output->Name(),
           plaidml::edsl::Value(*output_tensor_it)
@@ -83,9 +89,6 @@ PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
         throw std::runtime_error("Unexpected duplicate name in fused node while adding outputs (possibly intermediate) [TODO better error handling]");
       }
       output_tensor_it++;
-    }
-    if (output_tensor_it != local_output_tensors.end()) {
-      throw std::runtime_error("Inconsistent number of outputs [TODO better error handling]");
     }
   }
 
@@ -152,6 +155,15 @@ std::vector<std::unique_ptr<ComputeCapability>> PlaidMLExecutionProvider::GetCap
   for (auto index : node_indexes) {
     const auto node = graph_viewer.GetNode(index);
 
+
+  // TODO: PlaidML does not support STRING types yet
+  for (const auto n_input: node->InputDefs()) {
+    if(n_input->Type()!=nullptr){
+        if (!strcmp(n_input->Type()->c_str(),"string") || !strcmp(n_input->Type()->c_str(),"tensor(string)")) {
+          return result;
+        }
+    }
+  }
     //TODO: PlaidML do we need to add a kernel registry instead?
     if (!plaidml_ep::check_op_support(node->OpType())) {
         //throw "Operation is not yet supported by PlaidML Execution Provider";
@@ -164,9 +176,6 @@ std::vector<std::unique_ptr<ComputeCapability>> PlaidMLExecutionProvider::GetCap
       return result;
     }
   }
-
-  
-
 
   // This was modeled off of the metadata that nGraph included
   auto meta_def = onnxruntime::make_unique<IndexedSubGraph::MetaDef>();
@@ -181,7 +190,7 @@ std::vector<std::unique_ptr<ComputeCapability>> PlaidMLExecutionProvider::GetCap
   sub_graph->nodes = graph_viewer.GetNodesInTopologicalOrder();
   sub_graph->SetMetaDef(std::move(meta_def));
   result.push_back(onnxruntime::make_unique<ComputeCapability>(std::move(sub_graph)));
-
+  
   return result;
 }
 
@@ -229,7 +238,6 @@ common::Status PlaidMLExecutionProvider::Compile(
             void* output_data = ort.GetTensorMutableData<void>(output_value);
             binder.output(output_arg.tensor).copy_into(output_data);
           }
-
           return Status::OK();
         };
 
