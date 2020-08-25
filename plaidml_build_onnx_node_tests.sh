@@ -10,8 +10,6 @@
 #Start the time
 START=$(date +%s)
 
-
-
 # Download plaidml-v1 from source and build it 
 # TODO: PlaidML - this should be done in .gitmodules and the build instructions 
 # added to onnxruntime OR post plaidml-v1 release the user will be instructed to

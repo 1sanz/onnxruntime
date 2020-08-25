@@ -78,7 +78,7 @@ std::map<std::string, _OpFunction> _kSupportedOps =
   //{"Flatten", _flatten}, //TODO: PlaidML fix broken tests (4/6 failures)
   {"HardSigmoid",_hard_sigmoid},
   {"LeakyRelu",_leaky_relu},
-  //{"LogSoftmax",_log_softmax}, //TODO: PlaidML fix broken tests (2/7 failures)
+  {"LogSoftmax",_log_softmax}, //TODO: PlaidML fix broken tests (2/7 failures)
   {"LpNormalization",_lp_normalization},
   //{"LRN",_lrn}, //TODO: PlaidML fix broken tests (2/2 failures)
   {"MaxPool",_maxpool}, //TODO: PlaidML fix broken tests (multiple outputs, attribute handling)
