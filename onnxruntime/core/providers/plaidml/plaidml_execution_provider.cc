@@ -44,8 +44,9 @@ PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
     }
     auto type = plaidml_ep::get_precision(node_input->Type());
     auto input_placeholder = plaidml::edsl::Placeholder(type, shape);
-    if (!init_tensors.insert({node_input->Name(), plaidml::edsl::Value(input_placeholder)}).second) {
-      throw std::runtime_error("Unexpected duplicate name in fused node while adding inputs [TODO better error handling]");
+    auto check = init_tensors.insert({node_input->Name(), plaidml::edsl::Value(input_placeholder)});
+    if (check.second == false) {
+      throw std::runtime_error("{PlaidML ERROR} Unexpected duplicate name in fused node while adding inputs");
     }
     ret.inputs.push_back(input_placeholder);
   }

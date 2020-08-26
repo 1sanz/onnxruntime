@@ -302,7 +302,8 @@ std::vector<plaidml::edsl::Tensor> relu(const std::vector<plaidml::edsl::Value>&
 // TODO: PlaidML OP WIP reshape
 std::vector<plaidml::edsl::Tensor> reshape(const std::vector<plaidml::edsl::Value>& args) {
   const auto& I = args[0].as_tensor();
-  const auto& shape = args[1];//need to convert this into 
+  //const auto& shape = args[1];//need to convert this into 
+  auto shape = plaidml::edsl::shape(I);
   return {plaidml::op::reshape(I,plaidml::edsl::make_tuple(shape))};
 }
 
@@ -808,6 +809,8 @@ std::vector<plaidml::edsl::Tensor> _eye_like(
 }
 
 //TODO: PlaidML fix broken tests (4/6 failures)
+//Flatten_axis0 test sets axis attribute to 0 and here receives 4 !!
+
 std::vector<plaidml::edsl::Tensor> _flatten(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -827,10 +830,20 @@ std::vector<plaidml::edsl::Tensor> _flatten(
       return {X};
     }
     plaidml::edsl::TensorDim product(1);
-    for (size_t i = 1; i < X.rank(); i++) {
+    plaidml::edsl::TensorDim first_dim(1);
+    size_t i = 0;
+    if(axis == 0){
+        i = 0;
+    }
+    else{
+      i = 1;
+      first_dim = X_dims[0];
+    }
+    for (; i < X.rank(); i++) {
       product = product * X_dims[i];
     }
-    return {reshape(X, {X_dims[0], product})};
+
+    return {plaidml::edsl::reshape(X, {first_dim, product})};
 }
 
 std::vector<plaidml::edsl::Tensor> _hard_sigmoid(

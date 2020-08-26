@@ -9,6 +9,7 @@ class PlaidMLNode {
 
     //attribute getters
     bool has_attribute(const std::string& name);
+    //TODO: PlaidML change in to int64_t for consistency with nodeproto
     int get_attribute(const std::string& name,int default_value);
     float get_attribute(const std::string& name,float default_value);
     std::string get_attribute(const std::string& name,std::string default_value);
