@@ -1,4 +1,5 @@
 #include "plaidml_utils.h"
+#include "plaidml/edsl/edsl.h"
 
 namespace onnxruntime {
 namespace plaidml_ep {

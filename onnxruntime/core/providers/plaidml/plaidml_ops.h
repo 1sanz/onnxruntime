@@ -1,15 +1,25 @@
 // Copyright(C) 2020 Intel Corporation
 // Licensed under the MIT License
 
-#pragma once
+//#pragma once
 
 #include <functional>
 #include <map>
 #include <string>
 
-#include "plaidml/edsl/edsl.h"
+
+//#include "plaidml/edsl/edsl.h"
 
 #include "core/graph/onnx_protobuf.h"
+
+namespace plaidml {
+namespace edsl {
+class Program;
+class Tensor;
+class Value;
+}  // namespace edsl
+enum class DType;
+}  // namespace plaidml
 
 namespace onnxruntime {
 namespace plaidml_ep {

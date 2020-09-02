@@ -48,10 +48,23 @@ python3 -m onnx.backend.test.cmd_tools generate-data -o ./build/pipeline_test_da
 #run the node tests using plaidml execution provider
 ./build/Linux/RelWithDebInfo/onnx_test_runner -e plaidml ./build/pipeline_test_data
 
+# download and run resnet50
+# TODO: PalidMl this should use https://github.com/onnx/models#gitlfs- to download specific models
+# cd build/
+# mkdir pipeline_model_data
+# cd pipeline_model_data
+# wget https://github.com/onnx/models/blob/master/vision/classification/resnet/model/resnet50-v1-7.tar.gz 
+
+# cd build/pipeline_model_data/
+# tar -xvf resnet50-v1-7.tar.gz
+
+# cd ../../
+# ./build/Linux/RelWithDebInfo/onnx_test_runner -e plaidml ./build/pipeline_model_data/resnet50v2
 # Build complete -> print time
 END=$(date +%s)
 DIFF=$(( $END - $START ))
 echo "-----------------------------------"
 echo "This build took $DIFF seconds"
 echo "-----------------------------------"
+
 

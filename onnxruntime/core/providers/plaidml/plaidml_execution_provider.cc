@@ -7,102 +7,26 @@
 #include "plaidml/exec/exec.h"
 #include "plaidml/op/op.h"
 
-#include "core/framework/allocatormgr.h"
-#include "core/framework/compute_capability.h"
-#include "core/graph/model.h"
-#include "core/session/onnxruntime_cxx_api.h"
-// #include "core/providers/plaidml/plaidml_ops.h"
-#include "plaidml_ops.h"
-#include "plaidml_utils.h"
-
-#include <stdio.h>
-#include <string.h>
 namespace onnxruntime {
 
 
 // TODO: Some of this stuff should probably be separated into new files
 
-PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
-  PlaidMLProgram ret;
-  std::map<std::string, plaidml::edsl::Value> init_tensors;
+plaidml_ep::PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
+  plaidml_ep::PlaidMLProgram ret = plaidml_ep::PlaidMLProgram(fused_node);
+
   // TODO: We might instead implement this on an ONNX ModelProto instead of an ONNX RT Node.
   //     This might have benefits for reuse in a non-RT ONNX context?
-
   // TODO: In general, inputs are a mix of initializers and input data; this currently assumes they're all the latter
-
   // TODO: work out if deprecated op is being used and handle it
+  //   // TODO: A node_input's Shape can be nullptr (i.e. if the input isn't a tensor) and we need to handle that case
+  //   // TODO: This doesn't address symbolic shapes
 
-  // For each input, look up shape (or at least rank) and construct a (placeholder) tensor accordingly;
-  // add this to the `tensors` dict
-  
-  for (const auto& node_input : fused_node->InputDefs()) {
-    // TODO: A node_input's Shape can be nullptr (i.e. if the input isn't a tensor) and we need to handle that case
-    // TODO: This doesn't address symbolic shapes
-    std::vector<int64_t> shape;
-    for (int dim = 0; dim < node_input->Shape()->dim_size(); dim++) {
-      shape.push_back(node_input->Shape()->dim(dim).dim_value());
-    }
-    auto type = plaidml_ep::get_precision(node_input->Type());
-    auto input_placeholder = plaidml::edsl::Placeholder(type, shape);
-    auto check = init_tensors.insert({node_input->Name(), plaidml::edsl::Value(input_placeholder)});
-    if (check.second == false) {
-      throw std::runtime_error("{PlaidML ERROR} Unexpected duplicate name in fused node while adding inputs");
-    }
-    ret.inputs.push_back(input_placeholder);
-  }
+  //auto plaidml_fused_node = plaidml_ep::PlaidMLProgram(fused_node);
 
-  // For each node in topological order:
-  //   * Get its inputs out of the `tensors` dict
-  //   * Call `MakePlaidMLOp` and write results into `tensors` dict
-  
-  for (const auto& node : fused_node->GetFunctionBody()->Body().Nodes()) {
-    std::vector<plaidml::edsl::Value> local_input_tensors;
-   
-    for (const auto& local_input : node.InputDefs()) {
-      try {
-        if(local_input->Name()!=""){//TODO: PlaidML fix this
-          auto input = init_tensors.at(local_input->Name());
-          local_input_tensors.push_back(plaidml::edsl::Value(input));
-        }
-      } catch (const std::out_of_range& e) {
-        throw std::runtime_error("Could not find expected tensor " + local_input->Name() + " [TODO better error handling]");
-      }
-    }
-    ONNX_NAMESPACE::NodeProto node_proto;
-    node.ToProto(node_proto);
-    auto local_output_tensors = plaidml_ep::MakePlaidMLOp(node_proto, local_input_tensors);
-    // Iterate over output tensors and names in tandem
-    if(local_output_tensors.empty())
-    {
-      throw std::runtime_error("{PlaidML ERROR} op produced empty output");
-    }
-    if(local_output_tensors.size()!=node.OutputDefs().size()){
-      throw std::runtime_error("{PlaidML ERROR} op produced inconsistent number of outputs expected " + 
-                              std::to_string(node.OutputDefs().size())+ ", got " +
-                              std::to_string(local_output_tensors.size()));
-    }
-    auto output_tensor_it = local_output_tensors.begin();
-    for (const auto& local_output : node.OutputDefs()) {
-      if (!init_tensors.insert({
-          local_output->Name(),
-          plaidml::edsl::Value(*output_tensor_it)
-      }).second) {
-        throw std::runtime_error("Unexpected duplicate name in fused node while adding outputs (possibly intermediate) [TODO better error handling]");
-      }
-      output_tensor_it++;
-    }
-  }
-
-  // Lookup outputs from `tensors` dict, use those to call edsl::ProgramBuilder
-  std::vector<plaidml::edsl::Tensor> output_tensors;
-  for (const auto& node_output : fused_node->OutputDefs()) {
-    auto local_output_tensor_it = init_tensors.find(node_output->Name());
-    if (local_output_tensor_it == init_tensors.end()) {
-      throw std::runtime_error("Expected output tensor " + node_output->Name() + " not found [TODO better error handling]");
-    }
-    output_tensors.push_back(local_output_tensor_it->second.as_tensor());
-  }
-  ret.program = std::make_shared<plaidml::edsl::Program>(plaidml::edsl::ProgramBuilder(fused_node->Name(), output_tensors).compile());
+  //ret.inputs = plaidml_fused_node.get_program_inputs();
+  //ret.outputs = plaidml_fused_node.get_program_outputs();
+ //ret.program = std::make_shared<plaidml::edsl::Program>(plaidml::edsl::ProgramBuilder(fused_node->Name(), ret.outputs).compile());
   return ret;
 }
 
@@ -202,7 +126,7 @@ common::Status PlaidMLExecutionProvider::Compile(
     NodeComputeInfo compute_info;
 
     compute_info.create_state_func =
-        [pml_program = std::make_shared<PlaidMLProgram>(MakePlaidMLProgram(fused_node))](ComputeContext* /*context*/, FunctionState* state) {
+        [pml_program = std::make_shared<plaidml_ep::PlaidMLProgram>(MakePlaidMLProgram(fused_node))](ComputeContext* /*context*/, FunctionState* state) {
           auto* pml_state = new PlaidMLFunctionState();
           pml_state->program = pml_program;
           *state = pml_state;
@@ -213,14 +137,16 @@ common::Status PlaidMLExecutionProvider::Compile(
           // TODO: nGraph code has mutexs all over this stuff, is that something we should be concerned with?
 
           Ort::CustomOpApi ort{*api};
+          // TODO: PlaidML why is this using custom op api? is it necessary ? is there a neater way?
           auto pml_state = static_cast<PlaidMLFunctionState*>(state);
           auto binder = plaidml::exec::Binder(*pml_state->program->program);
 
           // Load input data
           auto executable = binder.compile();
           unsigned input_idx = 0;
-          for (auto input_placeholder : pml_state->program->inputs) {
+          for (auto input_placeholder : pml_state->program->get_program_inputs()) {
             // program->inputs and ORT inputs are in the same order, so these match
+            // TODO: PlaidML this needs to change!
             const OrtValue* input_value = ort.KernelContext_GetInput(context, input_idx++);
             void* input_data = const_cast<void*>(ort.GetTensorData<void>(input_value));
             binder.input(input_placeholder).copy_from(input_data);
