@@ -25,6 +25,12 @@ class PlaidMLNode {
 
 class PlaidMLProgram{
 public:
+  //TODO: PlaidML We might instead implement this on an ONNX ModelProto instead of an ONNX RT Node.
+  //      This might have benefits for reuse in a non-RT ONNX context?
+  // TODO: In general, inputs are a mix of initializers and input data; this currently assumes they're all the latter
+  // TODO: work out if deprecated op is being used and handle it
+  // TODO: A node_input's Shape can be nullptr (i.e. if the input isn't a tensor) and we need to handle that case
+  // TODO: This doesn't address symbolic shapes
   explicit PlaidMLProgram(const onnxruntime::Node* fused_node);
   std::vector<plaidml::edsl::Tensor> get_program_inputs();
   std::vector<plaidml::edsl::Tensor> get_program_outputs();
@@ -40,7 +46,6 @@ private:
   /* fused node input dictionary contains the input tensor name and plaidml placeholder*/
    std::map<std::string, plaidml::edsl::Value> _value_dictionary;
    std::map<std::string, plaidml::edsl::Tensor> _output_dictionary;
-   //PlaidMLProgram _plaidml_program;
 
     std::vector<int64_t> get_input_shape(const onnxruntime::NodeArg* node);
     bool add_fused_node_inputs_to_tensor_dictionary();

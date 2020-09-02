@@ -49,7 +49,7 @@ std::map<std::string, OpFunction> kSupportedOps = {
   {"SampleOp", sample_op},
   //{"Shape", shape}, //TODO: PlaidML fix broken tests (11/11 failures)
   //{"Sigmoid", sigmoid}, failing after new build (operation not registered error )
-  //{"Sign", sign}, //TODO: PlaidML fix broken tests (4/5 failures)
+  //{"Sign", sign}, //TODO: PlaidML fix broken tests (4/5 failures) double uint64 int64 float16 are broken, float works 
   {"Sin", sin},
   {"Sinh", sinh},
   {"Sqrt", sqrt,},

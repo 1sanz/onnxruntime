@@ -3,9 +3,7 @@
 namespace onnxruntime {
 namespace plaidml_ep {
 
-PlaidMLNode::PlaidMLNode(const ONNX_NAMESPACE::NodeProto& node):_node(node){
-
-}
+PlaidMLNode::PlaidMLNode(const ONNX_NAMESPACE::NodeProto& node):_node(node){}
 
 bool PlaidMLNode::has_attribute(const std::string& name){
     auto num_attributes = _node.attribute_size();
@@ -136,8 +134,8 @@ std::vector<plaidml::edsl::Value> PlaidMLProgram::get_local_input_values(const o
 }
 
 
-/*   // For each input, look up shape (or at least rank) and construct a (placeholder) tensor accordingly;
-  // add this to the `tensors` dict */
+/* For each input, look up shape (or at least rank) and construct a (placeholder) tensor accordingly;
+   add this to the `tensors` dict */
 bool PlaidMLProgram::add_fused_node_inputs_to_tensor_dictionary(){
     for (const auto& node_input : _fused_node->InputDefs()) {
         // TODO: A node_input's Shape can be nullptr (i.e. if the input isn't a tensor) and we need to handle that case

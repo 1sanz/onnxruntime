@@ -9,27 +9,6 @@
 
 namespace onnxruntime {
 
-
-// TODO: Some of this stuff should probably be separated into new files
-
-plaidml_ep::PlaidMLProgram MakePlaidMLProgram(const onnxruntime::Node* fused_node) {
-  plaidml_ep::PlaidMLProgram ret = plaidml_ep::PlaidMLProgram(fused_node);
-
-  // TODO: We might instead implement this on an ONNX ModelProto instead of an ONNX RT Node.
-  //     This might have benefits for reuse in a non-RT ONNX context?
-  // TODO: In general, inputs are a mix of initializers and input data; this currently assumes they're all the latter
-  // TODO: work out if deprecated op is being used and handle it
-  //   // TODO: A node_input's Shape can be nullptr (i.e. if the input isn't a tensor) and we need to handle that case
-  //   // TODO: This doesn't address symbolic shapes
-
-  //auto plaidml_fused_node = plaidml_ep::PlaidMLProgram(fused_node);
-
-  //ret.inputs = plaidml_fused_node.get_program_inputs();
-  //ret.outputs = plaidml_fused_node.get_program_outputs();
- //ret.program = std::make_shared<plaidml::edsl::Program>(plaidml::edsl::ProgramBuilder(fused_node->Name(), ret.outputs).compile());
-  return ret;
-}
-
 PlaidMLExecutionProvider::PlaidMLExecutionProvider(const PlaidMLExecutionProviderInfo& info)
     : IExecutionProvider{onnxruntime::kPlaidMLExecutionProvider} {
   ORT_UNUSED_PARAMETER(info);
@@ -126,7 +105,7 @@ common::Status PlaidMLExecutionProvider::Compile(
     NodeComputeInfo compute_info;
 
     compute_info.create_state_func =
-        [pml_program = std::make_shared<plaidml_ep::PlaidMLProgram>(MakePlaidMLProgram(fused_node))](ComputeContext* /*context*/, FunctionState* state) {
+        [pml_program = std::make_shared<plaidml_ep::PlaidMLProgram>(plaidml_ep::PlaidMLProgram(fused_node))](ComputeContext* /*context*/, FunctionState* state) {
           auto* pml_state = new PlaidMLFunctionState();
           pml_state->program = pml_program;
           *state = pml_state;
