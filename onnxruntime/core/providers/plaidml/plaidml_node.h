@@ -16,7 +16,7 @@ class PlaidMLNode {
     int get_attribute(const std::string& name,int default_value);
     float get_attribute(const std::string& name,float default_value);
     std::string get_attribute(const std::string& name,std::string default_value);
-    std::vector<int> get_attribute(const std::string& name);
+    std::vector<int> get_attribute(const std::string& name, std::vector<int> default_value);
   
   private:
    const ONNX_NAMESPACE::NodeProto& _node;

@@ -37,7 +37,6 @@ std::vector<std::unique_ptr<ComputeCapability>> PlaidMLExecutionProvider::GetCap
   std::vector<std::unique_ptr<ComputeCapability>> result;
   std::vector<std::string> inputs;
   std::vector<std::string> outputs;
-  //std::vector<std::string> initializers;
 
   const auto& initializers = graph_viewer.GetAllInitializedTensors();
 
@@ -125,7 +124,8 @@ common::Status PlaidMLExecutionProvider::Compile(
           unsigned input_idx = 0;
           for (auto input_placeholder : pml_state->program->get_program_inputs()) {
             // program->inputs and ORT inputs are in the same order, so these match
-            // TODO: PlaidML this needs to change!
+            // TODO: PlaidML check if a lookup method is required here or it is sufficient to reply
+            // on the matching input order
             const OrtValue* input_value = ort.KernelContext_GetInput(context, input_idx++);
             void* input_data = const_cast<void*>(ort.GetTensorData<void>(input_value));
             binder.input(input_placeholder).copy_from(input_data);

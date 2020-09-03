@@ -57,7 +57,7 @@ std::string PlaidMLNode::get_attribute(const std::string& name,std::string defau
     return default_value;
 }
 
-std::vector<int> PlaidMLNode::get_attribute(const std::string& name){
+std::vector<int> PlaidMLNode::get_attribute(const std::string& name, std::vector<int> default_value){
      auto num_attributes = _node.attribute_size();
      std::vector<int> ret_val;
       if(num_attributes>0){
@@ -70,6 +70,7 @@ std::vector<int> PlaidMLNode::get_attribute(const std::string& name){
             }
         }
       }
+      if(ret_val.empty())return default_value;
     return ret_val;
 }
 
