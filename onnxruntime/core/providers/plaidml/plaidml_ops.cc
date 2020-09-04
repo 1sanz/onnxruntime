@@ -52,42 +52,21 @@ std::map<std::string, OpFunction> kSupportedOps = {
     //{"Sign", sign}, // TODO (PlaidML):: fix broken tests (4/5 failures) double uint64 int64 float16 are broken, float works
     {"Sin", sin},
     {"Sinh", sinh},
-    {
-        "Sqrt",
-        sqrt,
-    },
-    {
-        "Sub",
-        sub,
-    },
-    {
-        "Sum",
-        sum,
-    },
-    {
-        "Tan",
-        tan,
-    },
-    {
-        "Tanh",
-        tanh,
-    },
+    {"Sqrt", sqrt},
+    {"Sub", sub},
+    {"Sum", sum},
+    {"Tan", tan},
+    {"Tanh", tanh},
     //{"Tile", tile,}, // TODO (PlaidML):: OP WIP (11/11 failures)
-    {
-        "Where",
-        where,
-    },  // TODO (PlaidML):: fix broken tests (3/4 failures)
-    //{"Xor", logical_xor,}, // TODO (PlaidML):: fix broken tests (2/2 failures)
+    {"Where", where},  // TODO (PlaidML):: fix broken tests (3/4 failures)
+                       //{"Xor", logical_xor,}, // TODO (PlaidML):: fix broken tests (2/2 failures)
 };
 
 std::map<std::string, _OpFunction> _kSupportedOps =
     {
         //{"ArgMax", _argmax,}, // TODO (PlaidML):: fix broken tests (7/7 failures )
         //{"ArgMin", _argmin,},  // TODO (PlaidML):: fix (4/5 failures)
-        {
-            "AveragePool",
-            _average_pool,
-        },  // TODO (PlaidML):: fix broken tests (1/4 failures)
+        {"AveragePool", _average_pool},  // TODO (PlaidML):: fix broken tests (1/4 failures)
         //{"Cast",_cast}, // TODO (PlaidML):: OP WIP
         //{"Clip", _clip}, // TODO (PlaidML):: fix broken tests incorrect docs in onnx has min max attributes not inputs
         {"Conv", _conv},                 // TODO (PlaidML):: fix broken tests (6/17 failures)
@@ -116,10 +95,7 @@ std::map<std::string, _OpFunction> _kSupportedOps =
         //{"Split",_split}, // TODO (PlaidML): failing split OP WIP
         //{"Squeeze",_squeeze}, // TODO (PlaidML): fix broken tests (5/10 failures)(segfault)
         //{"ThresholdedRelu",_thresholded_relu}, // TODO (PlaidML):: fix broken tests (new failure! op not registered )
-        {
-            "Transpose",
-            _transpose,
-        },  // TODO (PlaidML):: fix broken tests (8/17 failures)
+        {"Transpose", _transpose},  // TODO (PlaidML):: fix broken tests (8/17 failures)
         {"Unsqueeze", _unsqueeze},
 
 };
