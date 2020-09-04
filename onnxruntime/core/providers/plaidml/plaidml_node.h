@@ -12,11 +12,12 @@ class PlaidMLNode {
 
   //attribute getters
   bool has_attribute(const std::string& name);
-  // TODO (PlaidML): change in to int64_t for consistency with nodeproto
-  int get_attribute(const std::string& name, int default_value);
-  float get_attribute(const std::string& name, float default_value);
-  std::string get_attribute(const std::string& name, std::string default_value);
-  std::vector<int> get_attribute(const std::string& name, std::vector<int> default_value);
+  // TODO (PlaidML): change this to template/overloaded funcs with trailing return type to avoid casting problems
+  // this is a temp fix
+  int64_t get_int_attribute(const std::string& name, int64_t default_value);
+  float get_float_attribute(const std::string& name, float default_value);
+  std::string get_string_attribute(const std::string& name, std::string default_value);
+  std::vector<int> get_vector_attribute(const std::string& name, std::vector<int> default_value);
 
  private:
   const ONNX_NAMESPACE::NodeProto& _node;
