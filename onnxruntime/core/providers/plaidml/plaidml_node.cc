@@ -77,7 +77,7 @@ std::vector<int> PlaidMLNode::get_attribute(const std::string& name, std::vector
 PlaidMLProgram::PlaidMLProgram(const onnxruntime::Node * fused_node):_fused_node(fused_node){
 
     /* Add the inputs to tensor dictionary and to plaidml input tensor list */
-    // TODO: PlaidML add error checks 
+    // TODO (PlaidML): add error checks 
     add_fused_node_inputs_to_tensor_dictionary();
 
       
@@ -122,7 +122,7 @@ std::vector<plaidml::edsl::Value> PlaidMLProgram::get_local_input_values(const o
     std::vector<plaidml::edsl::Value> local_input_tensors;
     for (const auto& local_input : node->InputDefs()) {
       try {
-        if(local_input->Name()!=""){//TODO: PlaidML fix this
+        if(local_input->Name()!=""){//TODO (PlaidML): fix this
           auto input = get_value_from_dictionary(local_input->Name());
 
           local_input_tensors.push_back(plaidml::edsl::Value(input));
@@ -139,8 +139,8 @@ std::vector<plaidml::edsl::Value> PlaidMLProgram::get_local_input_values(const o
    add this to the `tensors` dict */
 bool PlaidMLProgram::add_fused_node_inputs_to_tensor_dictionary(){
     for (const auto& node_input : _fused_node->InputDefs()) {
-        // TODO: A node_input's Shape can be nullptr (i.e. if the input isn't a tensor) and we need to handle that case
-        // TODO: This doesn't address symbolic shapes
+        // TODO (PlaidML): A node_input's Shape can be nullptr (i.e. if the input isn't a tensor) and we need to handle that case
+        // TODO (PlaidML): This doesn't address symbolic shapes
         std::vector<int64_t> shape = get_input_shape(node_input);
         auto type = plaidml_ep::get_precision(node_input->Type());
         auto input_placeholder = plaidml::edsl::Placeholder(type, shape);

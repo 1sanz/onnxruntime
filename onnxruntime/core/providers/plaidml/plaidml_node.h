@@ -5,14 +5,14 @@
 namespace onnxruntime {
 namespace plaidml_ep {
 
-//TODO: PlaidML PlaidMLNode should inherit nodeproto ?
+// TODO (PlaidML): PlaidMLNode should inherit nodeproto ?
 class PlaidMLNode {
   public:
    explicit PlaidMLNode(const ONNX_NAMESPACE::NodeProto& node);
 
     //attribute getters
     bool has_attribute(const std::string& name);
-    //TODO: PlaidML change in to int64_t for consistency with nodeproto
+    // TODO (PlaidML): change in to int64_t for consistency with nodeproto
     int get_attribute(const std::string& name,int default_value);
     float get_attribute(const std::string& name,float default_value);
     std::string get_attribute(const std::string& name,std::string default_value);
@@ -25,12 +25,12 @@ class PlaidMLNode {
 
 class PlaidMLProgram{
 public:
-  //TODO: PlaidML We might instead implement this on an ONNX ModelProto instead of an ONNX RT Node.
+  // TODO (PlaidML): We might instead implement this on an ONNX ModelProto instead of an ONNX RT Node.
   //      This might have benefits for reuse in a non-RT ONNX context?
-  // TODO: In general, inputs are a mix of initializers and input data; this currently assumes they're all the latter
-  // TODO: work out if deprecated op is being used and handle it
-  // TODO: A node_input's Shape can be nullptr (i.e. if the input isn't a tensor) and we need to handle that case
-  // TODO: This doesn't address symbolic shapes
+  // TODO (PlaidML):In general, inputs are a mix of initializers and input data; this currently assumes they're all the latter
+  // TODO (PlaidML):work out if deprecated op is being used and handle it
+  // TODO (PlaidML):A node_input's Shape can be nullptr (i.e. if the input isn't a tensor) and we need to handle that case
+  // TODO (PlaidML):This doesn't address symbolic shapes
   explicit PlaidMLProgram(const onnxruntime::Node* fused_node);
   std::vector<plaidml::edsl::Tensor> get_program_inputs();
   std::vector<plaidml::edsl::Tensor> get_program_outputs();

@@ -7,7 +7,7 @@
 #include "plaidml/op/op.h"
 #include "plaidml_node.h"
 
-//TODO: using value of pi to compute sin from cos (find a better way )
+// TODO (PlaidML):: using value of pi to compute sin from cos (find a better way )
 #define _USE_MATH_DEFINES
 #include <cmath>
 
@@ -30,26 +30,26 @@ std::map<std::string, OpFunction> kSupportedOps = {
   {"Exp", exp},
   {"Floor", floor},
   {"Greater", greater},
-  //{"Identity", identity}, //TODO: PlaidML broken test (1/2 failures) (string type needed)//need to enable for Loop, scan9 etc tests
+  //{"Identity", identity}, // TODO (PlaidML):: broken test (1/2 failures) (string type needed)//need to enable for Loop, scan9 etc tests
   {"Less", less},
   {"Log", log},
   {"Max", max},
   {"Mean", mean},
-  //{"MatMul", matmul}, //TODO: PlaidML OP WIP 
+  //{"MatMul", matmul}, // TODO (PlaidML):: OP WIP 
   {"Min", min},
   {"Mul", mul},
   {"Neg", neg},
   {"Not", logical_not},
   {"Or", logical_or},
-  //{"Pow", pow}, //TODO: PlaidML fix broken tests (double)
+  //{"Pow", pow}, // TODO (PlaidML):: fix broken tests (double)
   {"PRelu", prelu},
   {"Reciprocal", reciprocal},
   {"Relu", relu},
-  //{"Reshape", reshape}, //TODO: PlaidML OP WIP
+  //{"Reshape", reshape}, // TODO (PlaidML):: OP WIP
   {"SampleOp", sample_op},
-  //{"Shape", shape}, //TODO: PlaidML fix broken tests (11/11 failures)
+  //{"Shape", shape}, // TODO (PlaidML):: fix broken tests (11/11 failures)
   //{"Sigmoid", sigmoid}, failing after new build (operation not registered error )
-  //{"Sign", sign}, //TODO: PlaidML fix broken tests (4/5 failures) double uint64 int64 float16 are broken, float works 
+  //{"Sign", sign}, // TODO (PlaidML):: fix broken tests (4/5 failures) double uint64 int64 float16 are broken, float works 
   {"Sin", sin},
   {"Sinh", sinh},
   {"Sqrt", sqrt,},
@@ -57,45 +57,45 @@ std::map<std::string, OpFunction> kSupportedOps = {
   {"Sum", sum,},
   {"Tan", tan,},
   {"Tanh", tanh,},
-  //{"Tile", tile,}, //TODO: PlaidML OP WIP (11/11 failures)
-  {"Where", where,}, //TODO: PlaidML fix broken tests (3/4 failures)
-  //{"Xor", logical_xor,}, //TODO: PlaidML fix broken tests (2/2 failures)
+  //{"Tile", tile,}, // TODO (PlaidML):: OP WIP (11/11 failures)
+  {"Where", where,}, // TODO (PlaidML):: fix broken tests (3/4 failures)
+  //{"Xor", logical_xor,}, // TODO (PlaidML):: fix broken tests (2/2 failures)
 };
 
 std::map<std::string, _OpFunction> _kSupportedOps = 
 {
-  //{"ArgMax", _argmax,}, //TODO: PlaidML fix broken tests (7/7 failures )
-  //{"ArgMin", _argmin,},  //TODO: PlaidML fix (4/5 failures)
-  {"AveragePool", _average_pool,}, //TODO: PlaidML fix broken tests (1/4 failures)
-  //{"Cast",_cast}, //TODO: PlaidML OP WIP
-  //{"Clip", _clip}, //TODO: PlaidML fix broken tests incorrect docs in onnx has min max attributes not inputs 
-  {"Conv",_conv}, //TODO: PlaidML fix broken tests (6/17 failures)
-  {"ConvInteger",_conv_integer}, //TODO: PlaidML need to handle x_zero_point and w_zero_point inputs
-  //{"Concat",_concat}, //TODO: PlaidML fix broken tests (3/12 failures) string type not handled 
-  //{"CumSum", _cumsum}, //TODO: PlaidML fix broken tests
+  //{"ArgMax", _argmax,}, // TODO (PlaidML):: fix broken tests (7/7 failures )
+  //{"ArgMin", _argmin,},  // TODO (PlaidML):: fix (4/5 failures)
+  {"AveragePool", _average_pool,}, // TODO (PlaidML):: fix broken tests (1/4 failures)
+  //{"Cast",_cast}, // TODO (PlaidML):: OP WIP
+  //{"Clip", _clip}, // TODO (PlaidML):: fix broken tests incorrect docs in onnx has min max attributes not inputs 
+  {"Conv",_conv}, // TODO (PlaidML):: fix broken tests (6/17 failures)
+  {"ConvInteger",_conv_integer}, // TODO (PlaidML):: need to handle x_zero_point and w_zero_point inputs
+  //{"Concat",_concat}, // TODO (PlaidML):: fix broken tests (3/12 failures) string type not handled 
+  //{"CumSum", _cumsum}, // TODO (PlaidML):: fix broken tests
   {"Elu",_elu},
-  //{"EyeLike",_eye_like}, //TODO: PlaidML OP WIP
-  //{"Flatten", _flatten}, //TODO: PlaidML fix broken tests (4/6 failures)
+  //{"EyeLike",_eye_like}, // TODO (PlaidML):: OP WIP
+  //{"Flatten", _flatten}, // TODO (PlaidML):: fix broken tests (4/6 failures)
   {"HardSigmoid",_hard_sigmoid},
   {"LeakyRelu",_leaky_relu},
-  {"LogSoftmax",_log_softmax}, //TODO: PlaidML fix broken tests (2/7 failures)
+  {"LogSoftmax",_log_softmax}, // TODO (PlaidML):: fix broken tests (2/7 failures)
   {"LpNormalization",_lp_normalization},
-  //{"LRN",_lrn}, //TODO: PlaidML fix broken tests (2/2 failures)
-  {"MaxPool",_maxpool}, //TODO: PlaidML fix broken tests (multiple outputs, attribute handling)
-  //{"Mod",_mod}, //TODO: PlaidML fix broken tests (6/15 failures)
-  //{"OneHot",_one_hot}, //TODO: PlaidML OP WIP
-  //{"ReduceMax",_reduce_max}, //TODO: PlaidML fix broken tests (2/9 failures) keep_dims = false malfunctions
-  //{"ReduceMean",_reduce_mean}, //TODO: PlaidML fix broken tests (2/8 failures) keep_dims = false malfunctions
-  //{"ReduceMin",_reduce_min}, //TODO: PlaidML fix broken tests (4/9 failures) keep_dims = false malfunctions
-  //{"ReduceProd",_reduce_prod}, //TODO: PlaidML fix broken tests (2/8 failures) keep_dims = false malfunctions
-  //{"ReduceSum",_reduce_sum}, //TODO: PlaidML fix broken tests (2/19 failures) keep_dims = false malfunctions
-  //{"ReverseSequence",_reverse_sequence}, //TODO: PlaidML OP WIP
+  //{"LRN",_lrn}, // TODO (PlaidML):: fix broken tests (2/2 failures)
+  {"MaxPool",_maxpool}, // TODO (PlaidML):: fix broken tests (multiple outputs, attribute handling)
+  //{"Mod",_mod}, // TODO (PlaidML):: fix broken tests (6/15 failures)
+  //{"OneHot",_one_hot}, // TODO (PlaidML):: OP WIP
+  //{"ReduceMax",_reduce_max}, // TODO (PlaidML):: fix broken tests (2/9 failures) keep_dims = false malfunctions
+  //{"ReduceMean",_reduce_mean}, // TODO (PlaidML):: fix broken tests (2/8 failures) keep_dims = false malfunctions
+  //{"ReduceMin",_reduce_min}, // TODO (PlaidML):: fix broken tests (4/9 failures) keep_dims = false malfunctions
+  //{"ReduceProd",_reduce_prod}, // TODO (PlaidML):: fix broken tests (2/8 failures) keep_dims = false malfunctions
+  //{"ReduceSum",_reduce_sum}, // TODO (PlaidML):: fix broken tests (2/19 failures) keep_dims = false malfunctions
+  //{"ReverseSequence",_reverse_sequence}, // TODO (PlaidML):: OP WIP
   {"Selu",_selu},
-  //{"Softmax",_softmax}, // TODO: PlaidML fix broken tests (2/8 failures)
-  //{"Split",_split}, // TODO: PlaidML failing split OP WIP
-  //{"Squeeze",_squeeze}, // TODO: PlaidML fix broken tests (5/10 failures)(segfault)
-  //{"ThresholdedRelu",_thresholded_relu}, //TODO: PlaidML fix broken tests (new failure! op not registered )
-  {"Transpose", _transpose,}, //TODO: PlaidML fix broken tests (8/17 failures)
+  //{"Softmax",_softmax}, // TODO (PlaidML): fix broken tests (2/8 failures)
+  //{"Split",_split}, // TODO (PlaidML): failing split OP WIP
+  //{"Squeeze",_squeeze}, // TODO (PlaidML): fix broken tests (5/10 failures)(segfault)
+  //{"ThresholdedRelu",_thresholded_relu}, // TODO (PlaidML):: fix broken tests (new failure! op not registered )
+  {"Transpose", _transpose,}, // TODO (PlaidML):: fix broken tests (8/17 failures)
   {"Unsqueeze",_unsqueeze},
 
 };
@@ -225,7 +225,7 @@ std::vector<plaidml::edsl::Tensor> max(const std::vector<plaidml::edsl::Value>& 
   return {result};
 }
 
-// TODO: PlaidML OP WIP
+// TODO (PlaidML): OP WIP
 // std::vector<plaidml::edsl::Tensor> matmul(const std::vector<plaidml::edsl::Value>& args) {
 //   auto A = args[0].as_tensor();
 //   auto B = args[1].as_tensor();
@@ -267,7 +267,7 @@ std::vector<plaidml::edsl::Tensor> neg(const std::vector<plaidml::edsl::Value>& 
   return {-A};
 }
 
-//TODO: PlaidML fix broken tests (double)
+// TODO (PlaidML):: fix broken tests (double)
 std::vector<plaidml::edsl::Tensor> pow(const std::vector<plaidml::edsl::Value>& args) {
   const auto& I = args[0].as_tensor();
   const auto& p = args[1].as_tensor();
@@ -291,7 +291,7 @@ std::vector<plaidml::edsl::Tensor> relu(const std::vector<plaidml::edsl::Value>&
   return {plaidml::op::relu(X)};
 }
 
-// TODO: PlaidML OP WIP reshape
+// TODO (PlaidML): OP WIP reshape
 std::vector<plaidml::edsl::Tensor> reshape(const std::vector<plaidml::edsl::Value>& args) {
   const auto& I = args[0].as_tensor();
   //const auto& shape = args[1];//need to convert this into 
@@ -304,13 +304,13 @@ std::vector<plaidml::edsl::Tensor> sample_op(const std::vector<plaidml::edsl::Va
   return {X};
 }
 
-//TODO: PlaidML fix broken tests (11/11 failures)
+// TODO (PlaidML):: fix broken tests (11/11 failures)
 std::vector<plaidml::edsl::Tensor> shape(const std::vector<plaidml::edsl::Value>& args) {
   const auto& I= args[0].as_tensor();
   return {plaidml::edsl::shape(I)};
 }
 
-//TODO: PlaidML fix broken tests (4/5 failures)
+// TODO (PlaidML):: fix broken tests (4/5 failures)
 std::vector<plaidml::edsl::Tensor> sign(const std::vector<plaidml::edsl::Value>& args) {
   const auto& I = args[0].as_tensor();
   auto Z = plaidml::edsl::Tensor(0.0);
@@ -381,7 +381,7 @@ std::vector<plaidml::edsl::Tensor> where(const std::vector<plaidml::edsl::Value>
   return {O};
 }
 
-//TODO: PlaidML fix broken tests (7/7 failures )
+// TODO (PlaidML):: fix broken tests (7/7 failures )
 std::vector<plaidml::edsl::Tensor> _argmax(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -393,7 +393,7 @@ std::vector<plaidml::edsl::Tensor> _argmax(
     auto select_last_index = pnode.get_attribute("select_last_index", (int)0);; 
     
     if(select_last_index){
-      //TODO: PlaidML handle select_last_index attribute here 
+      // TODO (PlaidML):: handle select_last_index attribute here 
       //temp statement added to bypass compile errors
       select_last_index = !select_last_index;
     }
@@ -402,7 +402,7 @@ std::vector<plaidml::edsl::Tensor> _argmax(
     }
     if(keep_dims==1){
       //keep the reduced dimensions
-      //TODO: PlaidML handle keep_dims attribute here 
+      // TODO (PlaidML):: handle keep_dims attribute here 
       //temp statement added to bypass compile errors
       keep_dims = 0;
     }
@@ -413,8 +413,8 @@ std::vector<plaidml::edsl::Tensor> _argmax(
   return {plaidml::op::argmax(A,plaidml::edsl::make_tuple(axis))};
 }
 
- //TODO: PlaidML fix (4/5 failures)
-std::vector<plaidml::edsl::Tensor> _argmin(//TODO: PlaidML merge argmax and argmin into one wrapper
+ // TODO (PlaidML):: fix (4/5 failures)
+std::vector<plaidml::edsl::Tensor> _argmin(// TODO (PlaidML):: merge argmax and argmin into one wrapper
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
   
@@ -425,7 +425,7 @@ std::vector<plaidml::edsl::Tensor> _argmin(//TODO: PlaidML merge argmax and argm
     auto select_last_index = pnode.get_attribute("select_last_index", (int)0);; 
 
     if(select_last_index){
-      //TODO: PlaidML handle select_last_index attribute here 
+      // TODO (PlaidML):: handle select_last_index attribute here 
       //temp statement added to bypass compile errors
       select_last_index = !select_last_index;
     }
@@ -434,7 +434,7 @@ std::vector<plaidml::edsl::Tensor> _argmin(//TODO: PlaidML merge argmax and argm
     }
     if(keep_dims==1){
       //keep the reduced dimensions
-      //TODO: PlaidML handle keep_dims attribute here 
+      // TODO (PlaidML):: handle keep_dims attribute here 
       //temp statement added to bypass compile errors
       keep_dims = 0;
     }
@@ -446,7 +446,7 @@ std::vector<plaidml::edsl::Tensor> _argmin(//TODO: PlaidML merge argmax and argm
   return {plaidml::op::argmax(-A,plaidml::edsl::make_tuple(axis))};
 }
 
-//TODO: PlaidML fix broken tests (1/4 failures) 
+// TODO (PlaidML):: fix broken tests (1/4 failures) 
 // fix ceil_mode and count_include_mode handling 
 std::vector<plaidml::edsl::Tensor> _average_pool(
     const ONNX_NAMESPACE::NodeProto& node,
@@ -465,7 +465,7 @@ std::vector<plaidml::edsl::Tensor> _average_pool(
 
     int ceil_mode = pnode.get_attribute("ceil_mode",(int)0);
     bool use_ceil = (ceil_mode == 1);
-    //TODO: PlaidML handle count_include_pad attribue
+    // TODO (PlaidML):: handle count_include_pad attribue
     //int count_include_pad = pnode.get_attribute("count_include_pad",(int)0);
     std::vector<int> kernel_shape;
     kernel_shape = pnode.get_attribute("kernel_shape", kernel_shape);
@@ -492,7 +492,7 @@ std::vector<plaidml::edsl::Tensor> _average_pool(
   return {result};
 }
 
-//TODO: PlaidML OP WIP
+// TODO (PlaidML):: OP WIP
 std::vector<plaidml::edsl::Tensor> _cast(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -556,13 +556,13 @@ std::vector<plaidml::edsl::Tensor> _cast(
   return {plaidml::edsl::cast(I,plaidml_type)};
 }
 
-// // TODO: PlaidML OP WIP clip
+// // TODO (PlaidML): OP WIP clip
 std::vector<plaidml::edsl::Tensor> _clip(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
   const auto& A = inputs[0].as_tensor();
   auto pnode = plaidml_ep::PlaidMLNode(node);
-  //TODO: PlaidML need to know type to set min max defaults does not work for int8 uint8 int64 uint64 
+  // TODO (PlaidML):: need to know type to set min max defaults does not work for int8 uint8 int64 uint64 
   auto default_min = std::numeric_limits<float>::lowest();
   auto default_max = std::numeric_limits<float>::max();
   auto min_val = pnode.get_attribute("min",(float)default_min);
@@ -571,7 +571,7 @@ std::vector<plaidml::edsl::Tensor> _clip(
   return {plaidml::op::clip(A,plaidml::edsl::Value(min_val).as_tensor(),plaidml::edsl::Value(max_val).as_tensor())};
 }
 
-//TODO: PlaidML fix broken tests (3/12 failures)
+// TODO (PlaidML):: fix broken tests (3/12 failures)
 std::vector<plaidml::edsl::Tensor> _concat(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -590,8 +590,8 @@ std::vector<plaidml::edsl::Tensor> _concat(
   return {plaidml::op::concatenate(tensors,axis)};
 }
 
-// TODO: PlaidML fix broken tests (6/17 failures)
-// TODO: PlaidML fix failing tests: 
+// TODO (PlaidML): fix broken tests (6/17 failures)
+// TODO (PlaidML): fix failing tests: 
 // ConvTest.Conv1D_Bias, 
 // ConvTest.Conv2D_1, 
 // ConvTest.Conv2D_Bias_1, 
@@ -635,7 +635,7 @@ std::vector<plaidml::edsl::Tensor> _conv(
     bool has_manual_pads = !pads.empty();
     if(has_manual_pads) auto_pad_mode = plaidml::op::AutoPadMode::EXPLICIT;
     std::vector<int> kernel_shape;
-    kernel_shape = pnode.get_attribute("kernel_shape", kernel_shape);
+    kernel_shape = pnode.get_attribute("kernel_shape",kernel_shape);
 
     auto result =  plaidml::op::convolution(I,K)
               .input_layout(plaidml::op::TensorLayout::NCX)
@@ -650,7 +650,7 @@ std::vector<plaidml::edsl::Tensor> _conv(
   if(has_group_layout) result = result.group_layout(plaidml::op::GroupLayout::IN_C);
   return {result};
 }
-// TODO: PlaidML handle optional inputs: 
+// TODO (PlaidML): handle optional inputs: 
 //        from onnx docs:
 // x_zero_point (optional) : T1
 // Zero point tensor for input 'x'. It's optional and default value is 0. 
@@ -722,7 +722,7 @@ std::vector<plaidml::edsl::Tensor> _conv_integer(
   return {result};
     }
 
-//TODO: PlaidML fix broken tests
+// TODO (PlaidML):: fix broken tests
 std::vector<plaidml::edsl::Tensor> _cumsum(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -730,18 +730,18 @@ std::vector<plaidml::edsl::Tensor> _cumsum(
   auto pnode = plaidml_ep::PlaidMLNode(node);
 
   //const auto& axis = inputs[0].as_tensor();
-  //TODO: need to turn tensor into integer
+  // TODO (PlaidML): need to turn tensor into integer
   int exclusive = pnode.get_attribute("exclusive",(int)0);
   int reverse = pnode.get_attribute("reverse",(int)0);
   int int_axis = 0; ///axis tensor can be int32 or int64
 
   if(reverse==1){
-    //TODO: PlaidML handle reverse 
+    // TODO (PlaidML):: handle reverse 
     //perform the sum in reverse direction 
     reverse = 0;
   }
   if(exclusive==1){
-    //TODO: PlaidML handle exclusive
+    // TODO (PlaidML):: handle exclusive
     //If set to 1 will return exclusive sum in which the top element 
     //is not included. In other terms, if set to 1, the j-th output 
     //element would be the sum of the first (j-1) elements. Otherwise, 
@@ -763,7 +763,7 @@ std::vector<plaidml::edsl::Tensor> _elu(
   return {plaidml::edsl::select(I >= 0, I, alpha * (plaidml::edsl::exp(I) - 1))};
 }
 
-//TODO: PlaidML OP WIP
+// TODO (PlaidML):: OP WIP
 std::vector<plaidml::edsl::Tensor> _eye_like(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -771,7 +771,7 @@ std::vector<plaidml::edsl::Tensor> _eye_like(
     // must be 2D tensor 
     if(I.rank()>2)throw std::runtime_error("{PlaidML} ERROR: EyeLike given tensor of rank !=2 \n");
     auto pnode = plaidml_ep::PlaidMLNode(node);
-    //TODO: PlaidML handle dtype 
+    // TODO (PlaidML):: handle dtype 
     //int dtype = pnode.get_attribute("dtype",(int)0); //optional attribue 
     bool has_dtype = pnode.has_attribute("dtype");
     int k = pnode.get_attribute("k",(int)0);; 
@@ -796,18 +796,18 @@ std::vector<plaidml::edsl::Tensor> _eye_like(
     //O(x,x+k) = I(x,x+k) + I(x,x+k);
     //O = O - I;
     // O = plaidml::edsl::select(O>0,plaidml::edsl::Tensor{1},O);
-    //TODO: maybe select should allow indices 
+    // TODO (PlaidML): maybe select should allow indices 
     // O = plaidml::edsl::select(y==x+k,0,1) should get the required identity ?
     
 
     
-    //TODO: handle dtye attribute
+    // TODO (PlaidML): handle dtye attribute
     //if(has_dtype){cast the tensor into given dtype  }
 
     return {O};	 
 }
 
-//TODO: PlaidML fix broken tests (4/6 failures)
+// TODO (PlaidML):: fix broken tests (4/6 failures)
 //Flatten_axis0 test sets axis attribute to 0 and here receives 4 !!
 
 std::vector<plaidml::edsl::Tensor> _flatten(    
@@ -864,7 +864,7 @@ std::vector<plaidml::edsl::Tensor> _hard_sigmoid(
   return {result};
 }
 
-//TODO: PlaidML fix broken tests (2/7 failures)
+// TODO (PlaidML):: fix broken tests (2/7 failures)
 std::vector<plaidml::edsl::Tensor> _log_softmax(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -925,7 +925,7 @@ std::vector<plaidml::edsl::Tensor> _leaky_relu(
   return {plaidml::op::relu(I).alpha(plaidml::edsl::Tensor{alpha})};
 }
 
-//TODO: PlaidML fix broken tests (2/2 failures)
+// TODO (PlaidML):: fix broken tests (2/2 failures)
 std::vector<plaidml::edsl::Tensor> _lrn(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -941,15 +941,15 @@ std::vector<plaidml::edsl::Tensor> _lrn(
   return {plaidml::op::lrn(A,{static_cast<int64_t>(size)}).alpha(alpha).beta(beta).epsilon(bias).axes({1})};
 }
 
-//TODO: PlaidML fix broken tests 
-//TODO: Indices  (optional) output not handled 
+// TODO (PlaidML):: fix broken tests 
+// TODO (PlaidML): Indices  (optional) output not handled 
 //from onnx docs: Indices (optional, non-differentiable) : I
 //      Indices tensor from max pooling across the input tensor. 
 //      The dimensions of indices are the same as output tensor. 
 //      The values in indices of are the indices of the selected values during pooling. 
 //      The indices are computed as flatten 1-D tensor, and the indices do not consider padding. 
 //      So the values in indices are in [0, N x C x D1 x ... x Dn). 
-//TODO: attribute "dilations" not handled 
+// TODO (PlaidML): attribute "dilations" not handled 
 std::vector<plaidml::edsl::Tensor> _maxpool(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1009,18 +1009,18 @@ std::vector<plaidml::edsl::Tensor> _maxpool(
   return {result};
 }
 
-//TODO: PlaidML fix broken tests (6/15 failures)
+// TODO (PlaidML):: fix broken tests (6/15 failures)
 std::vector<plaidml::edsl::Tensor> _mod(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
   const auto& A = inputs[0].as_tensor();
   const auto& B = inputs[1].as_tensor();
 
-  //TODO: Plaidml if input is float fmod must be 1
+  // TODO (PlaidML):: if input is float fmod must be 1
   auto pnode = plaidml_ep::PlaidMLNode(node);
   int fmod = pnode.get_attribute("fmod",(int)0);
 
-  auto result = A % B;//TODO: need to handle fmod
+  auto result = A % B;// TODO (PlaidML): need to handle fmod
 
   if(fmod == 1) {
     //find floating point remainder
@@ -1032,12 +1032,12 @@ std::vector<plaidml::edsl::Tensor> _mod(
   
 }
 
-//TODO: PlaidML OP WIP
+// TODO (PlaidML):: OP WIP
 std::vector<plaidml::edsl::Tensor> _one_hot(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
   const auto& indices = inputs[0].as_tensor();
-  //const auto& depth = inputs[1].as_tensor();//TODO: need to convert this to int
+  //const auto& depth = inputs[1].as_tensor();// TODO (PlaidML): need to convert this to int
   int fake_depth = 10;
   //const auto& values = inputs[2].as_tensor();//on value off value 
 
@@ -1071,7 +1071,7 @@ std::vector<plaidml::edsl::Tensor> _one_hot(
   return {O};
 }
 
-//TODO: PlaidML fix broken tests (2/9 failures)
+// TODO (PlaidML):: fix broken tests (2/9 failures)
 std::vector<plaidml::edsl::Tensor> _reduce_max(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1087,7 +1087,7 @@ std::vector<plaidml::edsl::Tensor> _reduce_max(
   return {plaidml::op::max(A,plaidml::edsl::make_tuple(axes),keep_dims)};
 }
 
-//TODO: PlaidML fix broken tests (2/8 failures)
+// TODO (PlaidML):: fix broken tests (2/8 failures)
 std::vector<plaidml::edsl::Tensor> _reduce_mean(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1103,7 +1103,7 @@ std::vector<plaidml::edsl::Tensor> _reduce_mean(
   return {plaidml::op::mean(A,plaidml::edsl::make_tuple(axes),keep_dims)};
 }
 
-//TODO: PlaidML fix broken tests (4/9 failures)
+// TODO (PlaidML):: fix broken tests (4/9 failures)
 std::vector<plaidml::edsl::Tensor> _reduce_min(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1119,7 +1119,7 @@ std::vector<plaidml::edsl::Tensor> _reduce_min(
   return {plaidml::op::min(A,plaidml::edsl::make_tuple(axes),keep_dims)};
 }
 
-//TODO: PlaidML fix broken tests (2/8 failures)
+// TODO (PlaidML):: fix broken tests (2/8 failures)
 std::vector<plaidml::edsl::Tensor> _reduce_prod(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1135,7 +1135,7 @@ std::vector<plaidml::edsl::Tensor> _reduce_prod(
   return {plaidml::op::prod(A,plaidml::edsl::make_tuple(axes),keep_dims)};
 }
 
-//TODO: PlaidML fix broken tests (2/19 failures)
+// TODO (PlaidML):: fix broken tests (2/19 failures)
 std::vector<plaidml::edsl::Tensor> _reduce_sum(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1151,7 +1151,7 @@ std::vector<plaidml::edsl::Tensor> _reduce_sum(
   return {plaidml::op::sum(A,plaidml::edsl::make_tuple(axes),keep_dims)};
 }
 
-//TODO: PlaidML OP WIP
+// TODO (PlaidML):: OP WIP
 std::vector<plaidml::edsl::Tensor> _reverse_sequence(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1206,7 +1206,7 @@ std::vector<plaidml::edsl::Tensor> _selu(
   return {gamma * plaidml::edsl::select(I > 0, I, alpha * (plaidml::edsl::exp(I) - 1))};
 }
 
-//TODO: PlaidML fix broken tests (2/8 failures)
+// TODO (PlaidML):: fix broken tests (2/8 failures)
 std::vector<plaidml::edsl::Tensor> _softmax(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1216,8 +1216,8 @@ std::vector<plaidml::edsl::Tensor> _softmax(
   return {plaidml::op::softmax(A,axis)};
 }
 
-//TODO: PlaidML failing split OP WIP
-std::vector<plaidml::edsl::Tensor> _split(//TODO: need to handle multiple outputs in makeprogram 
+// TODO (PlaidML):: failing split OP WIP
+std::vector<plaidml::edsl::Tensor> _split(// TODO (PlaidML): need to handle multiple outputs in makeprogram 
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
   
@@ -1254,7 +1254,7 @@ std::vector<plaidml::edsl::Tensor> _split(//TODO: need to handle multiple output
   return {I_split};
 }
 
-//TODO: PlaidML fix broken tests (5/10 failures)(segfault)
+// TODO (PlaidML):: fix broken tests (5/10 failures)(segfault)
 std::vector<plaidml::edsl::Tensor> _squeeze(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1274,7 +1274,7 @@ std::vector<plaidml::edsl::Tensor> _squeeze(
   return {plaidml::op::squeeze(I,axes)};
 }
 
-//TODO: PlaidML fix broken tests (new failure! op not registered )
+// TODO (PlaidML):: fix broken tests (new failure! op not registered )
 std::vector<plaidml::edsl::Tensor> _thresholded_relu(    
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1284,7 +1284,7 @@ std::vector<plaidml::edsl::Tensor> _thresholded_relu(
   return {plaidml::op::relu(I).threshold((double)alpha)};
 }
 
-//TODO: PlaidML fix broken tests (8/17 failures)
+// TODO (PlaidML):: fix broken tests (8/17 failures)
 std::vector<plaidml::edsl::Tensor> _transpose(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs){
@@ -1337,7 +1337,7 @@ std::vector<plaidml::edsl::Tensor> MakePlaidMLOp(
   }
 }
 
-//TODO: PlaidML adding this temp solution to bypass test failures 
+// TODO (PlaidML):: adding this temp solution to bypass test failures 
 // will be scraped once kernel registry is implemented
 bool check_op_support(std::string op_name){
   auto op_it = plaidml_ep::kSupportedOps.find(op_name);

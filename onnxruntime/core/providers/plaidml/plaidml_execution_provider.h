@@ -18,7 +18,7 @@
 
 namespace onnxruntime {
 
-constexpr const char* PLAIDML = "PlaidML";  // TODO: Borrowed from OpenVINO. Reasonable?
+constexpr const char* PLAIDML = "PlaidML";  // TODO (PlaidML): Borrowed from OpenVINO. Reasonable?
 
 struct PlaidMLFunctionState {
   std::shared_ptr<plaidml_ep::PlaidMLProgram> program = nullptr;
@@ -26,7 +26,7 @@ struct PlaidMLFunctionState {
 
 // Information needed to construct PlaidML execution providers.
 struct PlaidMLExecutionProviderInfo {
-    // TODO: Empty for now. Forever? -- if so we can scrap this struct altogether
+    // TODO (PlaidML): Empty for now. Forever? -- if so we can scrap this struct altogether
 };
 
 class PlaidMLExecutionProvider : public IExecutionProvider {
@@ -42,7 +42,7 @@ class PlaidMLExecutionProvider : public IExecutionProvider {
                  std::vector<NodeComputeInfo>& node_compute_funcs) override;
 
  private:
-  // TODO: PlaidML-specific state goes here; if info_ is truly empty, don't need it here
+  // TODO (PlaidML): -specific state goes here; if info_ is truly empty, don't need it here
   // PlaidMLExecutionProviderInfo info_;
 };
 
