@@ -15,14 +15,11 @@ enum class DType;
 namespace onnxruntime {
 namespace plaidml_ep {
 
-// TODO (PlaidML): add error type enumeration 
+// TODO (PlaidML): add error type enumeration
 
 //-----------------------------------------------helper functions-----------------------------
-plaidml::DType get_precision(ONNX_NAMESPACE::DataType onnx_type); 
+plaidml::DType get_precision(ONNX_NAMESPACE::DataType onnx_type);
 //-----------------------------------------------------------------------------------------------
 
 }  // namespace plaidml_ep
 }  // namespace onnxruntime
-
-
-

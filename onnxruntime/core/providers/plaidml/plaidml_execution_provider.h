@@ -26,7 +26,7 @@ struct PlaidMLFunctionState {
 
 // Information needed to construct PlaidML execution providers.
 struct PlaidMLExecutionProviderInfo {
-    // TODO (PlaidML): Empty for now. Forever? -- if so we can scrap this struct altogether
+  // TODO (PlaidML): Empty for now. Forever? -- if so we can scrap this struct altogether
 };
 
 class PlaidMLExecutionProvider : public IExecutionProvider {

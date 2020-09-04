@@ -7,7 +7,6 @@
 #include <map>
 #include <string>
 
-
 //#include "plaidml/edsl/edsl.h"
 
 #include "core/graph/onnx_protobuf.h"
@@ -50,20 +49,17 @@ std::vector<plaidml::edsl::Tensor> sign(const std::vector<plaidml::edsl::Value>&
 std::vector<plaidml::edsl::Tensor> tile(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> where(const std::vector<plaidml::edsl::Value>& args);
 
-
 //-------------------------------------------binary ops
 std::vector<plaidml::edsl::Tensor> add(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> div(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> mul(const std::vector<plaidml::edsl::Value>& args);
-std::vector<plaidml::edsl::Tensor> prelu(const std::vector<plaidml::edsl::Value>& args);//not tested
+std::vector<plaidml::edsl::Tensor> prelu(const std::vector<plaidml::edsl::Value>& args);  //not tested
 std::vector<plaidml::edsl::Tensor> sub(const std::vector<plaidml::edsl::Value>& args);
-
 
 //-----------------------------------------binary compare ops
 std::vector<plaidml::edsl::Tensor> equal(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> greater(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> less(const std::vector<plaidml::edsl::Value>& args);
-
 
 //--------------------------------------------pool ops
 std::vector<plaidml::edsl::Tensor> _maxpool(
@@ -79,7 +75,7 @@ std::vector<plaidml::edsl::Tensor> _average_pool(
 std::vector<plaidml::edsl::Tensor> _argmax(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
- std::vector<plaidml::edsl::Tensor> _argmin(
+std::vector<plaidml::edsl::Tensor> _argmin(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
 
@@ -87,25 +83,24 @@ std::vector<plaidml::edsl::Tensor> _argmax(
 // std::vector<plaidml::edsl::Tensor> reduce_l2(const std::vector<plaidml::edsl::Value>& args);
 // std::vector<plaidml::edsl::Tensor> reduce_log_sum(const std::vector<plaidml::edsl::Value>& args);
 // std::vector<plaidml::edsl::Tensor> reduce_log_sum_exp(const std::vector<plaidml::edsl::Value>& args);
- std::vector<plaidml::edsl::Tensor> _reduce_max(
+std::vector<plaidml::edsl::Tensor> _reduce_max(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
 std::vector<plaidml::edsl::Tensor> _reduce_mean(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
- std::vector<plaidml::edsl::Tensor> _reduce_min(
+std::vector<plaidml::edsl::Tensor> _reduce_min(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
- std::vector<plaidml::edsl::Tensor> _reduce_prod(
+std::vector<plaidml::edsl::Tensor> _reduce_prod(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
- std::vector<plaidml::edsl::Tensor> _reduce_sum(
+std::vector<plaidml::edsl::Tensor> _reduce_sum(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
 //  std::vector<plaidml::edsl::Tensor> _reduce_sum_square(
 //     const ONNX_NAMESPACE::NodeProto& node,
 //     const std::vector<plaidml::edsl::Value>& inputs);
-
 
 //---------------------------------------------unary ops
 std::vector<plaidml::edsl::Tensor> abs(const std::vector<plaidml::edsl::Value>& args);
@@ -144,7 +139,6 @@ std::vector<plaidml::edsl::Tensor> _thresholded_relu(
 std::vector<plaidml::edsl::Tensor> max(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> min(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> sum(const std::vector<plaidml::edsl::Value>& args);
-
 
 //---------------------------------------other ops
 std::vector<plaidml::edsl::Tensor> _cast(
@@ -201,9 +195,6 @@ std::vector<plaidml::edsl::Tensor> _transpose(
 std::vector<plaidml::edsl::Tensor> _unsqueeze(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
-
-
-
 
 std::vector<plaidml::edsl::Tensor> asin(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> acos(const std::vector<plaidml::edsl::Value>& args);

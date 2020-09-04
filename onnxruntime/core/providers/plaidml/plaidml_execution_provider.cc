@@ -16,14 +16,11 @@ PlaidMLExecutionProvider::PlaidMLExecutionProvider(const PlaidMLExecutionProvide
   // This Allocator setup is ported fairly directly from the OpenVINO version.
   // TODO (PlaidML): Verify that this is the approach we want to take.
   DeviceAllocatorRegistrationInfo device_info(
-    {
-      OrtMemTypeDefault,
-      [](int) {
-        return std::make_unique<CPUAllocator>(OrtMemoryInfo(PLAIDML, OrtDeviceAllocator));
-      },
-      std::numeric_limits<size_t>::max()
-    }
-  );
+      {OrtMemTypeDefault,
+       [](int) {
+         return std::make_unique<CPUAllocator>(OrtMemoryInfo(PLAIDML, OrtDeviceAllocator));
+       },
+       std::numeric_limits<size_t>::max()});
   InsertAllocator(CreateAllocator(device_info));
 }
 
@@ -42,9 +39,11 @@ std::vector<std::unique_ptr<ComputeCapability>> PlaidMLExecutionProvider::GetCap
 
   std::for_each(graph_viewer.GetInputs().begin(), graph_viewer.GetInputs().end(),
                 [&inputs](const NodeArg* node_arg) { inputs.push_back(node_arg->Name()); });
-                  
-  //add initializers to inputs 
-  for(auto it: initializers){inputs.push_back(it.first);}
+
+  //add initializers to inputs
+  for (auto it : initializers) {
+    inputs.push_back(it.first);
+  }
 
   std::for_each(graph_viewer.GetOutputs().begin(), graph_viewer.GetOutputs().end(),
                 [&outputs](const NodeArg* node_arg) { outputs.push_back(node_arg->Name()); });
@@ -58,24 +57,23 @@ std::vector<std::unique_ptr<ComputeCapability>> PlaidMLExecutionProvider::GetCap
   for (auto index : node_indexes) {
     const auto node = graph_viewer.GetNode(index);
 
-
-  // TODO (PlaidML): does not support STRING types yet
-  for (const auto n_input: node->InputDefs()) {
-    if(n_input->Type()!=nullptr){
-        if (!strcmp(n_input->Type()->c_str(),"string") || !strcmp(n_input->Type()->c_str(),"tensor(string)")) {
+    // TODO (PlaidML): does not support STRING types yet
+    for (const auto n_input : node->InputDefs()) {
+      if (n_input->Type() != nullptr) {
+        if (!strcmp(n_input->Type()->c_str(), "string") || !strcmp(n_input->Type()->c_str(), "tensor(string)")) {
           return result;
         }
+      }
     }
-  }
     // TODO (PlaidML): do we need to add a kernel registry instead?
     if (!plaidml_ep::check_op_support(node->OpType())) {
-        //throw "Operation is not yet supported by PlaidML Execution Provider";
-        return result;
+      //throw "Operation is not yet supported by PlaidML Execution Provider";
+      return result;
     }
-    // TODO (PlaidML): check for unsupported attributes 
+    // TODO (PlaidML): check for unsupported attributes
     ONNX_NAMESPACE::NodeProto node_proto;
     node->ToProto(node_proto);
-    if(!plaidml_ep::check_attribute_support(node_proto)){
+    if (!plaidml_ep::check_attribute_support(node_proto)) {
       return result;
     }
   }
@@ -93,7 +91,7 @@ std::vector<std::unique_ptr<ComputeCapability>> PlaidMLExecutionProvider::GetCap
   sub_graph->nodes = graph_viewer.GetNodesInTopologicalOrder();
   sub_graph->SetMetaDef(std::move(meta_def));
   result.push_back(onnxruntime::make_unique<ComputeCapability>(std::move(sub_graph)));
-  
+
   return result;
 }
 
@@ -104,8 +102,7 @@ common::Status PlaidMLExecutionProvider::Compile(
     NodeComputeInfo compute_info;
 
     compute_info.create_state_func =
-        [pml_program = std::make_shared<plaidml_ep::PlaidMLProgram>(plaidml_ep::PlaidMLProgram(fused_node))]
-        (ComputeContext* /*context*/, FunctionState* state) {
+        [pml_program = std::make_shared<plaidml_ep::PlaidMLProgram>(plaidml_ep::PlaidMLProgram(fused_node))](ComputeContext* /*context*/, FunctionState* state) {
           auto* pml_state = new PlaidMLFunctionState();
           pml_state->program = pml_program;
           *state = pml_state;
