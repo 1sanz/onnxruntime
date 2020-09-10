@@ -84,11 +84,11 @@ std::map<std::string, _OpFunction> _kSupportedOps =
         {"MaxPool", _maxpool},  // TODO (PlaidML): fix broken tests (multiple outputs, attribute handling)
         //{"Mod",_mod}, // TODO (PlaidML): fix broken tests (6/15 failures)
         //{"OneHot",_one_hot}, // TODO (PlaidML): OP WIP
-        //{"ReduceMax",_reduce_max}, // TODO (PlaidML): fix broken tests (2/9 failures) keep_dims = false malfunctions
-        //{"ReduceMean",_reduce_mean}, // TODO (PlaidML): fix broken tests (2/8 failures) keep_dims = false malfunctions
-        //{"ReduceMin",_reduce_min}, // TODO (PlaidML): fix broken tests (4/9 failures) keep_dims = false malfunctions
-        //{"ReduceProd",_reduce_prod}, // TODO (PlaidML): fix broken tests (2/8 failures) keep_dims = false malfunctions
-        //{"ReduceSum",_reduce_sum}, // TODO (PlaidML): fix broken tests (2/19 failures) keep_dims = false malfunctions
+        {"ReduceMax", _reduce_max},
+        {"ReduceMean", _reduce_mean},
+        {"ReduceMin", _reduce_min},
+        {"ReduceProd", _reduce_prod},
+        {"ReduceSum", _reduce_sum},
         //{"ReverseSequence",_reverse_sequence}, // TODO (PlaidML): OP WIP
         {"Selu", _selu},
         //{"Softmax",_softmax}, // TODO (PlaidML): fix broken tests (2/8 failures)
@@ -1050,80 +1050,105 @@ std::vector<plaidml::edsl::Tensor> _one_hot(
 std::vector<plaidml::edsl::Tensor> _reduce_max(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs) {
-  const auto& A = inputs[0].as_tensor();
+  const auto& I = inputs[0].as_tensor();
   auto pnode = plaidml_ep::PlaidMLNode(node);
   std::vector<int> att_axes;
   att_axes = pnode.get_vector_attribute("axes", att_axes);
   std::vector<int64_t> axes;
   axes.assign(att_axes.begin(), att_axes.end());
-  auto att_keep_dims = pnode.get_int_attribute("keep_dims", 1);
+  if (axes.empty()) {
+    for (size_t i = 0; i < I.rank(); i++) {
+      axes.push_back(i);
+    }
+  }
+  auto att_keep_dims = pnode.get_int_attribute("keepdims", 1);
   bool keep_dims = true;
   if (att_keep_dims == 0) keep_dims = false;
-  return {plaidml::op::max(A, plaidml::edsl::make_tuple(axes), keep_dims)};
+  return {plaidml::op::max(I, plaidml::edsl::make_tuple(axes), keep_dims)};
 }
 
 // TODO (PlaidML): fix broken tests (2/8 failures)
 std::vector<plaidml::edsl::Tensor> _reduce_mean(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs) {
-  const auto& A = inputs[0].as_tensor();
+  const auto& I = inputs[0].as_tensor();
   auto pnode = plaidml_ep::PlaidMLNode(node);
   std::vector<int> att_axes;
   att_axes = pnode.get_vector_attribute("axes", att_axes);
   std::vector<int64_t> axes;
   axes.assign(att_axes.begin(), att_axes.end());
-  auto att_keep_dims = pnode.get_int_attribute("keep_dims", 1);
+  if (axes.empty()) {
+    for (size_t i = 0; i < I.rank(); i++) {
+      axes.push_back(i);
+    }
+  }
+  auto att_keep_dims = pnode.get_int_attribute("keepdims", 1);
   bool keep_dims = true;
   if (att_keep_dims == 0) keep_dims = false;
-  return {plaidml::op::mean(A, plaidml::edsl::make_tuple(axes), keep_dims)};
+  return {plaidml::op::mean(I, plaidml::edsl::make_tuple(axes), keep_dims)};
 }
 
 // TODO (PlaidML): fix broken tests (4/9 failures)
 std::vector<plaidml::edsl::Tensor> _reduce_min(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs) {
-  const auto& A = inputs[0].as_tensor();
+  const auto& I = inputs[0].as_tensor();
   auto pnode = plaidml_ep::PlaidMLNode(node);
   std::vector<int> att_axes;
   att_axes = pnode.get_vector_attribute("axes", att_axes);
   std::vector<int64_t> axes;
   axes.assign(att_axes.begin(), att_axes.end());
-  auto att_keep_dims = pnode.get_int_attribute("keep_dims", 1);
+  if (axes.empty()) {
+    for (size_t i = 0; i < I.rank(); i++) {
+      axes.push_back(i);
+    }
+  }
+  auto att_keep_dims = pnode.get_int_attribute("keepdims", 1);
   bool keep_dims = true;
   if (att_keep_dims == 0) keep_dims = false;
-  return {plaidml::op::min(A, plaidml::edsl::make_tuple(axes), keep_dims)};
+  return {plaidml::op::min(I, plaidml::edsl::make_tuple(axes), keep_dims)};
 }
 
 // TODO (PlaidML): fix broken tests (2/8 failures)
 std::vector<plaidml::edsl::Tensor> _reduce_prod(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs) {
-  const auto& A = inputs[0].as_tensor();
+  const auto& I = inputs[0].as_tensor();
   auto pnode = plaidml_ep::PlaidMLNode(node);
   std::vector<int> att_axes;
   att_axes = pnode.get_vector_attribute("axes", att_axes);
   std::vector<int64_t> axes;
   axes.assign(att_axes.begin(), att_axes.end());
-  auto att_keep_dims = pnode.get_int_attribute("keep_dims", 1);
+  if (axes.empty()) {
+    for (size_t i = 0; i < I.rank(); i++) {
+      axes.push_back(i);
+    }
+  }
+  auto att_keep_dims = pnode.get_int_attribute("keepdims", 1);
   bool keep_dims = true;
   if (att_keep_dims == 0) keep_dims = false;
-  return {plaidml::op::prod(A, plaidml::edsl::make_tuple(axes), keep_dims)};
+  return {plaidml::op::prod(I, plaidml::edsl::make_tuple(axes), keep_dims)};
 }
 
 // TODO (PlaidML): fix broken tests (2/19 failures)
 std::vector<plaidml::edsl::Tensor> _reduce_sum(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs) {
-  const auto& A = inputs[0].as_tensor();
+  const auto& I = inputs[0].as_tensor();
   auto pnode = plaidml_ep::PlaidMLNode(node);
   std::vector<int> att_axes;
   att_axes = pnode.get_vector_attribute("axes", att_axes);
   std::vector<int64_t> axes;
   axes.assign(att_axes.begin(), att_axes.end());
-  auto att_keep_dims = pnode.get_int_attribute("keep_dims", 1);
+  if (axes.empty()) {
+    for (size_t i = 0; i < I.rank(); i++) {
+      axes.push_back(i);
+    }
+  }
+  auto att_keep_dims = pnode.get_int_attribute("keepdims", 1);
   bool keep_dims = true;
   if (att_keep_dims == 0) keep_dims = false;
-  return {plaidml::op::sum(A, plaidml::edsl::make_tuple(axes), keep_dims)};
+  return {plaidml::op::sum(I, plaidml::edsl::make_tuple(axes), keep_dims)};
 }
 
 // TODO (PlaidML): OP WIP
