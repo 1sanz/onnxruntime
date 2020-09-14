@@ -68,10 +68,10 @@ std::map<std::string, _OpFunction> _kSupportedOps =
         //{"ArgMin", _argmin,},  // TODO (PlaidML): fix (4/5 failures)
         {"AveragePool", _average_pool},  // TODO (PlaidML): fix broken tests (1/4 failures)
         //{"Cast",_cast}, // TODO (PlaidML): OP WIP
-        //{"Clip", _clip}, // TODO (PlaidML): fix broken tests incorrect docs in onnx has min max attributes not inputs
+        //{"Clip", _clip}, // TODO (PlaidML): fix broken tests (int8) incorrect docs in onnx has min max attributes not inputs
         {"Conv", _conv},                 // TODO (PlaidML): fix broken tests (6/17 failures)
         {"ConvInteger", _conv_integer},  // TODO (PlaidML): need to handle x_zero_point and w_zero_point inputs
-        //{"Concat",_concat}, // TODO (PlaidML): fix broken tests (3/12 failures) string type not handled
+        {"Concat", _concat},             // TODO (PlaidML): fix broken tests (3/12 failures) string type not handled
         //{"CumSum", _cumsum}, // TODO (PlaidML): fix broken tests
         {"Elu", _elu},
         //{"EyeLike",_eye_like}, // TODO (PlaidML): OP WIP
@@ -91,6 +91,7 @@ std::map<std::string, _OpFunction> _kSupportedOps =
         {"ReduceSum", _reduce_sum},
         //{"ReverseSequence",_reverse_sequence}, // TODO (PlaidML): OP WIP
         {"Selu", _selu},
+        //{"Slice",_slice},
         //{"Softmax",_softmax}, // TODO (PlaidML): fix broken tests (2/8 failures)
         //{"Split",_split}, // TODO (PlaidML): failing split OP WIP
         //{"Squeeze",_squeeze}, // TODO (PlaidML): fix broken tests (5/10 failures)(segfault)
@@ -1054,7 +1055,7 @@ std::vector<plaidml::edsl::Tensor> _reduce_max(
   auto pnode = plaidml_ep::PlaidMLNode(node);
   std::vector<int> att_axes;
   att_axes = pnode.get_vector_attribute("axes", att_axes);
-  std::vector<int64_t> axes;
+  std::vector<int> axes;
   axes.assign(att_axes.begin(), att_axes.end());
   if (axes.empty()) {
     for (size_t i = 0; i < I.rank(); i++) {
@@ -1075,7 +1076,7 @@ std::vector<plaidml::edsl::Tensor> _reduce_mean(
   auto pnode = plaidml_ep::PlaidMLNode(node);
   std::vector<int> att_axes;
   att_axes = pnode.get_vector_attribute("axes", att_axes);
-  std::vector<int64_t> axes;
+  std::vector<int> axes;
   axes.assign(att_axes.begin(), att_axes.end());
   if (axes.empty()) {
     for (size_t i = 0; i < I.rank(); i++) {
@@ -1096,7 +1097,7 @@ std::vector<plaidml::edsl::Tensor> _reduce_min(
   auto pnode = plaidml_ep::PlaidMLNode(node);
   std::vector<int> att_axes;
   att_axes = pnode.get_vector_attribute("axes", att_axes);
-  std::vector<int64_t> axes;
+  std::vector<int> axes;
   axes.assign(att_axes.begin(), att_axes.end());
   if (axes.empty()) {
     for (size_t i = 0; i < I.rank(); i++) {
@@ -1117,7 +1118,7 @@ std::vector<plaidml::edsl::Tensor> _reduce_prod(
   auto pnode = plaidml_ep::PlaidMLNode(node);
   std::vector<int> att_axes;
   att_axes = pnode.get_vector_attribute("axes", att_axes);
-  std::vector<int64_t> axes;
+  std::vector<int> axes;
   axes.assign(att_axes.begin(), att_axes.end());
   if (axes.empty()) {
     for (size_t i = 0; i < I.rank(); i++) {
@@ -1138,7 +1139,7 @@ std::vector<plaidml::edsl::Tensor> _reduce_sum(
   auto pnode = plaidml_ep::PlaidMLNode(node);
   std::vector<int> att_axes;
   att_axes = pnode.get_vector_attribute("axes", att_axes);
-  std::vector<int64_t> axes;
+  std::vector<int> axes;
   axes.assign(att_axes.begin(), att_axes.end());
   if (axes.empty()) {
     for (size_t i = 0; i < I.rank(); i++) {
@@ -1204,6 +1205,27 @@ std::vector<plaidml::edsl::Tensor> _selu(
   auto alpha = pnode.get_float_attribute("alpha", 1.67326);
   auto gamma = pnode.get_float_attribute("gamma", 1.0507);
   return {gamma * plaidml::edsl::select(I > 0, I, alpha * (plaidml::edsl::exp(I) - 1))};
+}
+
+std::vector<plaidml::edsl::Tensor> _slice(
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs) {
+  const auto I = inputs[0].as_tensor();
+  auto pnode = plaidml_ep::PlaidMLNode(node);
+  std::vector<int> starts;
+  std::vector<int> ends;
+  std::vector<int> axes;
+
+  starts = pnode.get_vector_attribute("starts", starts);
+  ends = pnode.get_vector_attribute("ends", ends);
+  axes = pnode.get_vector_attribute("axes", axes);
+  //const auto starts = args[1].as_tensor();
+  //const auto ends = args[2].as_tensor();
+
+  //const axes = args[3].as_tensor();//optional input
+  //const steps = args[4].as_tensor();//optional input
+
+  return {plaidml::op::slice(I).add_dims(starts).add_dims(ends)};
 }
 
 // TODO (PlaidML): fix broken tests (2/8 failures)
@@ -1289,7 +1311,7 @@ std::vector<plaidml::edsl::Tensor> _transpose(
   auto pnode = plaidml_ep::PlaidMLNode(node);
   std::vector<int> att_axes;
   att_axes = pnode.get_vector_attribute("perm", att_axes);
-  std::vector<int64_t> axes;
+  std::vector<int> axes;
   axes.assign(att_axes.begin(), att_axes.end());
   bool no_perm = axes.empty();
 

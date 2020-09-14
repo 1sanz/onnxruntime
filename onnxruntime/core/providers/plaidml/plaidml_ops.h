@@ -178,7 +178,9 @@ std::vector<plaidml::edsl::Tensor> _log_softmax(
 //std::vector<plaidml::edsl::Tensor> pad(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> reshape(const std::vector<plaidml::edsl::Value>& args);
 std::vector<plaidml::edsl::Tensor> shape(const std::vector<plaidml::edsl::Value>& args);
-//std::vector<plaidml::edsl::Tensor> slice(const std::vector<plaidml::edsl::Value>& args);
+std::vector<plaidml::edsl::Tensor> _slice(
+    const ONNX_NAMESPACE::NodeProto& node,
+    const std::vector<plaidml::edsl::Value>& inputs);
 std::vector<plaidml::edsl::Tensor> _softmax(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs);
