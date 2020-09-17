@@ -71,11 +71,11 @@ std::map<std::string, _OpFunction> _kSupportedOps =
         //{"Clip", _clip}, // TODO (PlaidML): fix broken tests (int8) incorrect docs in onnx has min max attributes not inputs
         {"Conv", _conv},                 // TODO (PlaidML): fix broken tests (6/17 failures)
         {"ConvInteger", _conv_integer},  // TODO (PlaidML): need to handle x_zero_point and w_zero_point inputs
-        {"Concat", _concat},             // TODO (PlaidML): fix broken tests (3/12 failures) string type not handled
+        {"Concat", _concat},             // TODO (PlaidML): fix broken tests (3/12 failures) string type, dynamic shapes not handled
         //{"CumSum", _cumsum}, // TODO (PlaidML): fix broken tests
         {"Elu", _elu},
         //{"EyeLike",_eye_like}, // TODO (PlaidML): OP WIP
-        //{"Flatten", _flatten}, // TODO (PlaidML): fix broken tests (4/6 failures)
+        {"Flatten", _flatten},
         {"HardSigmoid", _hard_sigmoid},
         {"LeakyRelu", _leaky_relu},
         {"LogSoftmax", _log_softmax},  // TODO (PlaidML): fix broken tests (2/7 failures)
@@ -494,7 +494,6 @@ std::vector<plaidml::edsl::Tensor> _cast(
     const std::vector<plaidml::edsl::Value>& inputs) {
   const auto& I = inputs[0].as_tensor();
   auto pnode = plaidml_ep::PlaidMLNode(node);
-
   int to = onnx::TensorProto::UNDEFINED;
   to = pnode.get_int_attribute("to", to);
   auto plaidml_type = plaidml::DType::INVALID;
@@ -504,7 +503,7 @@ std::vector<plaidml::edsl::Tensor> _cast(
       plaidml_type = plaidml::DType::INT8;
       break;
     case onnx::TensorProto::INT16:
-      plaidml_type = plaidml::DType::INT8;
+      plaidml_type = plaidml::DType::INT16;
       break;
     case onnx::TensorProto::INT32:
       plaidml_type = plaidml::DType::INT32;
@@ -548,6 +547,8 @@ std::vector<plaidml::edsl::Tensor> _cast(
     default:
       throw std::runtime_error("{PlaidML} ERROR: Asked to cast to Unrecognized data_type");
   }
+
+  printf("Cast %s to %s\n\n\n", to_string(I.dtype()), to_string(plaidml_type));
   return {plaidml::edsl::cast(I, plaidml_type)};
 }
 
@@ -725,7 +726,8 @@ std::vector<plaidml::edsl::Tensor> _cumsum(
   // TODO (PlaidML): need to turn tensor into integer
   auto exclusive = pnode.get_int_attribute("exclusive", 0);
   auto reverse = pnode.get_int_attribute("reverse", 0);
-  auto int_axis = 0;  ///axis tensor can be int32 or int64
+  auto axis = inputs[0].as_int();
+  //auto int_axis = 0;  ///axis tensor can be int32 or int64
 
   if (reverse == 1) {
     // TODO (PlaidML): handle reverse
@@ -741,7 +743,7 @@ std::vector<plaidml::edsl::Tensor> _cumsum(
     exclusive = 0;
   }
 
-  return {plaidml::op::cumsum(I, int_axis)};  //cumsum(Tensor,int)
+  return {plaidml::op::cumsum(I, axis)};  //cumsum(Tensor,int)
 }
 
 std::vector<plaidml::edsl::Tensor> _elu(
@@ -796,17 +798,12 @@ std::vector<plaidml::edsl::Tensor> _eye_like(
 }
 
 // TODO (PlaidML): fix broken tests (4/6 failures)
-//Flatten_axis0 test sets axis attribute to 0 and here receives 4 !!
-
 std::vector<plaidml::edsl::Tensor> _flatten(
     const ONNX_NAMESPACE::NodeProto& node,
     const std::vector<plaidml::edsl::Value>& inputs) {
   const auto X = inputs[0].as_tensor();
   auto pnode = plaidml_ep::PlaidMLNode(node);
-
-  auto axis = pnode.get_int_attribute("axis", 0);
-
-  if (axis == 0) axis = (int)X.rank();
+  auto axis = pnode.get_int_attribute("axis", 1);
   if (axis < 0) axis = (int)X.rank() + axis;
   if (axis > (int)X.rank() || axis < 0) {
     throw std::runtime_error("{PlaidML ERROR} invalid axis attribute in flatten \n");
@@ -818,17 +815,18 @@ std::vector<plaidml::edsl::Tensor> _flatten(
   }
   plaidml::edsl::TensorDim product(1);
   plaidml::edsl::TensorDim first_dim(1);
-  size_t i = 0;
   if (axis == 0) {
-    i = 0;
-  } else {
-    i = 1;
-    first_dim = X_dims[0];
+    for (size_t i = 0; i < X.rank(); i++) {
+      product = product * X_dims[i];
+    }
+    return {plaidml::edsl::reshape(X, {first_dim, product})};
   }
-  for (; i < X.rank(); i++) {
+  for (size_t i = 0; i < static_cast<size_t>(axis); i++) {
+    first_dim = first_dim * X_dims[i];
+  }
+  for (size_t i = axis; i < X.rank(); i++) {
     product = product * X_dims[i];
   }
-
   return {plaidml::edsl::reshape(X, {first_dim, product})};
 }
 

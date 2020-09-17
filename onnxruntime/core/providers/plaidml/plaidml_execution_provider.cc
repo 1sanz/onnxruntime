@@ -65,6 +65,13 @@ std::vector<std::unique_ptr<ComputeCapability>> PlaidMLExecutionProvider::GetCap
         }
       }
     }
+    for (const auto n_input : node->OutputDefs()) {
+      if (n_input->Type() != nullptr) {
+        if (!strcmp(n_input->Type()->c_str(), "string") || !strcmp(n_input->Type()->c_str(), "tensor(string)")) {
+          return result;
+        }
+      }
+    }
     // TODO (PlaidML): do we need to add a kernel registry instead?
     if (!plaidml_ep::check_op_support(node->OpType())) {
       //throw "Operation is not yet supported by PlaidML Execution Provider";
