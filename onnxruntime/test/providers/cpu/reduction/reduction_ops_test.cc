@@ -1928,8 +1928,8 @@ TEST(ReductionOpTest, ReduceDimWithZero) {
     auto expect = error_msg.empty() ? OpTester::ExpectResult::kExpectSuccess
                                     : OpTester::ExpectResult::kExpectFailure;
 
-    // exclude OpenVINO, NGraph and TensorRT as this isn't handled by those EPs
-    tester.Run(expect, error_msg, {kTensorrtExecutionProvider, kNGraphExecutionProvider, kOpenVINOExecutionProvider, kNupharExecutionProvider});
+    // exclude OpenVINO, NGraph, TensorRT and PlaidML as this isn't handled by those EPs
+    tester.Run(expect, error_msg, {kTensorrtExecutionProvider, kNGraphExecutionProvider, kOpenVINOExecutionProvider, kNupharExecutionProvider, kPlaidMLExecutionProvider});
   };
 
   // reduce on all axes keeping dims. should allow the 0 to be the reduced value
