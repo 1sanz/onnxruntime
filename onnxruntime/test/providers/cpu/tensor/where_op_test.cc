@@ -120,7 +120,7 @@ TEST(WhereOpTest, BroadcastDimWithZero) {
   test.AddOutput<int64_t>("output", {0, 3}, {});
 
   // exclude NGraph as this isn't handled by that EP
-  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kNGraphExecutionProvider});
+  test.Run(OpTester::ExpectResult::kExpectSuccess, "", {kNGraphExecutionProvider,kPlaidMLExecutionProvider});
 }
 
 TEST(WhereOpTest, BroadcastWithScalar) {
